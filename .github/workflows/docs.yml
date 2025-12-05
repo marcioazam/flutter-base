@@ -1,0 +1,140 @@
+name: Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'lib/**/*.dart'
+      - 'docs/**'
+      - '.github/workflows/docs.yml'
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+env:
+  FLUTTER_VERSION: '3.27.0'
+
+jobs:
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Generate Dart Documentation
+        run: |
+          dart doc . --output=doc/api
+          
+      - name: Check dartdoc warnings
+        run: |
+          dart doc . --dry-run 2>&1 | tee dartdoc-output.txt
+          if grep -q "warning" dartdoc-output.txt; then
+            echo "::warning::Dartdoc generated warnings. Consider adding documentation to public APIs."
+          fi
+
+      - name: Copy additional docs
+        run: |
+          mkdir -p doc/guides
+          cp -r docs/* doc/guides/ 2>/dev/null || true
+          
+      - name: Create index page
+        run: |
+          cat > doc/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <title>Flutter Base 2025 Documentation</title>
+            <style>
+              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; }
+              h1 { color: #1976D2; }
+              .links { display: flex; gap: 1rem; flex-wrap: wrap; }
+              .link-card { padding: 1rem; border: 1px solid #ddd; border-radius: 8px; text-decoration: none; color: inherit; }
+              .link-card:hover { background: #f5f5f5; }
+            </style>
+          </head>
+          <body>
+            <h1>Flutter Base 2025 Documentation</h1>
+            <div class="links">
+              <a href="api/index.html" class="link-card">
+                <h3>API Reference</h3>
+                <p>Generated Dart documentation</p>
+              </a>
+              <a href="guides/architecture.md" class="link-card">
+                <h3>Architecture</h3>
+                <p>System architecture overview</p>
+              </a>
+              <a href="guides/getting-started.md" class="link-card">
+                <h3>Getting Started</h3>
+                <p>Setup and development guide</p>
+              </a>
+            </div>
+          </body>
+          </html>
+          EOF
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: doc
+
+  deploy-docs:
+    name: Deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: build-docs
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  check-docs:
+    name: Check Documentation Coverage
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Check for missing documentation
+        run: |
+          dart doc . --dry-run 2>&1 | tee dartdoc-check.txt
+          
+          WARNINGS=$(grep -c "warning" dartdoc-check.txt || echo "0")
+          
+          echo "## Documentation Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Warnings:** $WARNINGS" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "$WARNINGS" -gt "0" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Warnings:" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            grep "warning" dartdoc-check.txt >> $GITHUB_STEP_SUMMARY || true
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi

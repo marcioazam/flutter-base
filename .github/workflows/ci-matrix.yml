@@ -1,0 +1,67 @@
+name: CI Matrix
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'
+
+concurrency:
+  group: matrix-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test-matrix:
+    name: Test (${{ matrix.channel }}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        channel: [stable, beta]
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        exclude:
+          - channel: beta
+            os: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: ${{ matrix.channel }}
+          cache: true
+          cache-key: flutter-${{ matrix.channel }}-${{ matrix.os }}-${{ hashFiles('**/pubspec.lock') }}
+
+      - name: Get dependencies
+        run: flutter pub get
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build verification (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: flutter build web --release
+
+      - name: Build verification (macOS)
+        if: matrix.os == 'macos-latest'
+        run: flutter build macos --release
+
+      - name: Build verification (Windows)
+        if: matrix.os == 'windows-latest'
+        run: flutter build windows --release
+
+  matrix-summary:
+    name: Matrix Summary
+    runs-on: ubuntu-latest
+    needs: test-matrix
+    if: always()
+    steps:
+      - name: Check matrix results
+        run: |
+          if [ "${{ needs.test-matrix.result }}" == "failure" ]; then
+            echo "::warning::Some matrix jobs failed"
+            exit 0
+          fi
+          echo "All matrix jobs passed"

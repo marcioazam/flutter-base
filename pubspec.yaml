@@ -1,7 +1,7 @@
 name: flutter_base_2025
 description: Flutter Base 2025 - State of Art Frontend Template
 publish_to: 'none'
-version: 3.2.0+1
+version: 3.4.0+1
 
 environment:
   sdk: '>=3.10.0 <4.0.0'
@@ -92,4 +92,5 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-    - .env
+    # NOTE: .env files are loaded via flutter_dotenv from root
+    # DO NOT include .env in assets - security risk!

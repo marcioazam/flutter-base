@@ -1,0 +1,87 @@
+name: Golden Tests
+
+on:
+  pull_request:
+    paths:
+      - 'lib/**/*.dart'
+      - 'test/golden/**'
+      - 'pubspec.yaml'
+
+env:
+  FLUTTER_VERSION: '3.27.0'
+
+concurrency:
+  group: golden-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  golden-tests:
+    name: Golden Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Run Golden Tests
+        id: golden
+        run: |
+          flutter test test/golden/ --update-goldens=false 2>&1 | tee golden-output.txt
+          if grep -q "Some golden image tests have failed" golden-output.txt; then
+            echo "golden_failed=true" >> $GITHUB_OUTPUT
+          else
+            echo "golden_failed=false" >> $GITHUB_OUTPUT
+          fi
+        continue-on-error: true
+
+      - name: Generate Golden Diffs
+        if: steps.golden.outputs.golden_failed == 'true'
+        run: |
+          mkdir -p golden-failures
+          find test -name "*_testImage.png" -exec cp {} golden-failures/ \;
+          find test -name "*_masterImage.png" -exec cp {} golden-failures/ \;
+          find test -name "*_isolatedDiff.png" -exec cp {} golden-failures/ \;
+          find test -name "*_maskedDiff.png" -exec cp {} golden-failures/ \;
+
+      - name: Upload Golden Failures
+        if: steps.golden.outputs.golden_failed == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: golden-failures
+          path: golden-failures/
+          retention-days: 7
+
+      - name: Post Golden Test Results
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const goldenFailed = '${{ steps.golden.outputs.golden_failed }}' === 'true';
+            const icon = goldenFailed ? '❌' : '✅';
+            
+            let body = `## ${icon} Golden Test Results\n\n`;
+            
+            if (goldenFailed) {
+              body += `**Status:** Failed - Visual differences detected\n\n`;
+              body += `### How to fix:\n`;
+              body += `1. Download the \`golden-failures\` artifact to review differences\n`;
+              body += `2. If changes are intentional, run:\n`;
+              body += `   \`\`\`bash\n   flutter test test/golden/ --update-goldens\n   \`\`\`\n`;
+              body += `3. Commit the updated golden files\n`;
+            } else {
+              body += `**Status:** Passed - No visual differences detected\n`;
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+      - name: Fail if golden tests failed
+        if: steps.golden.outputs.golden_failed == 'true'
+        run: exit 1

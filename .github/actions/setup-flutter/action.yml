@@ -1,0 +1,66 @@
+name: 'Setup Flutter'
+description: 'Setup Flutter SDK with comprehensive caching for pub, gradle, and pods'
+
+inputs:
+  flutter-version:
+    description: 'Flutter SDK version'
+    required: false
+    default: '3.27.0'
+  channel:
+    description: 'Flutter channel (stable, beta, dev, master)'
+    required: false
+    default: 'stable'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Setup Flutter SDK
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ inputs.flutter-version }}
+        channel: ${{ inputs.channel }}
+        cache: true
+        cache-key: flutter-${{ inputs.flutter-version }}-${{ inputs.channel }}-${{ hashFiles('**/pubspec.lock') }}
+
+    - name: Cache Pub Dependencies
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.pub-cache
+          .dart_tool
+        key: pub-${{ runner.os }}-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          pub-${{ runner.os }}-
+
+    - name: Cache Gradle Dependencies
+      if: runner.os != 'Windows'
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          android/.gradle
+        key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          gradle-${{ runner.os }}-
+
+    - name: Cache CocoaPods
+      if: runner.os == 'macOS'
+      uses: actions/cache@v4
+      with:
+        path: |
+          ios/Pods
+          ~/Library/Caches/CocoaPods
+        key: pods-${{ runner.os }}-${{ hashFiles('ios/Podfile.lock') }}
+        restore-keys: |
+          pods-${{ runner.os }}-
+
+    - name: Get Flutter Dependencies
+      shell: bash
+      run: flutter pub get
+
+    - name: Verify Flutter Installation
+      shell: bash
+      run: |
+        flutter --version
+        dart --version

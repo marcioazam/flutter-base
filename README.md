@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="logo.png" alt="Flutter Base 2025" width="200"/>
+  <img src="logo.png" alt="Flutter Base" width="200"/>
 </p>
 
-<h1 align="center">Flutter Base 2025</h1>
+<h1 align="center">Flutter Base</h1>
 
 <p align="center">
   <strong>State of Art Flutter Template for Production-Ready Applications</strong>
@@ -21,18 +21,18 @@
   <img src="https://img.shields.io/badge/Dart-3.10+-0175C2?logo=dart" alt="Dart"/>
   <img src="https://img.shields.io/badge/Riverpod-3.0+-00D1B2" alt="Riverpod"/>
   <img src="https://img.shields.io/badge/License-MIT-green" alt="License"/>
-  <img src="https://img.shields.io/badge/Version-3.2.0-blue" alt="Version"/>
+  <img src="https://img.shields.io/badge/Version-3.4.0-blue" alt="Version"/>
 </p>
 
 ---
 
 ## Overview
 
-**Flutter Base 2025** is a production-ready Flutter template implementing Clean Architecture with modern best practices for 2025. Designed as a pure frontend consuming REST APIs, it provides a solid foundation for building scalable, maintainable, and testable mobile applications.
+**Flutter Base ** is a production-ready Flutter template implementing Clean Architecture with modern best practices for . Designed as a pure frontend consuming REST APIs, it provides a solid foundation for building scalable, maintainable, and testable mobile applications.
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    Flutter Base 2025 (Frontend)                  │
+│                    Flutter Base  (Frontend)                  │
 ├─────────────────────────────────────────────────────────────────┤
 │  • UI/UX Components          • State Management (Riverpod 3.0)  │
 │  • Navigation (go_router)    • API Consumption (Dio 5.x)        │
@@ -285,8 +285,8 @@ shared/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/flutter_base_2025.git
-cd flutter_base_2025
+git clone https://github.com/your-org/flutter_base_.git
+cd flutter_base_
 
 # 2. Install dependencies
 flutter pub get
@@ -552,6 +552,51 @@ Strict-Transport-Security: max-age=31536000
 | UI/UX | ✅ | - |
 | API Consumption | ✅ | - |
 | State Management | ✅ | - |
+
+---
+
+## CI/CD Configuration
+
+### Required GitHub Secrets
+
+Configure these secrets in your repository settings (`Settings > Secrets and variables > Actions`):
+
+| Secret | Required | Description |
+|--------|:--------:|-------------|
+| `CODECOV_TOKEN` | Optional | Codecov upload token for coverage reports |
+| `SLACK_WEBHOOK_URL` | Optional | Slack webhook for notifications |
+| `ANDROID_KEYSTORE_BASE64` | Release | Base64-encoded Android release keystore |
+| `ANDROID_KEY_ALIAS` | Release | Android keystore key alias |
+| `ANDROID_KEY_PASSWORD` | Release | Android key password |
+| `ANDROID_STORE_PASSWORD` | Release | Android keystore password |
+| `GITLEAKS_LICENSE` | Optional | Gitleaks license for secrets scanning |
+
+### Generating Android Keystore Secret
+
+```bash
+# Generate keystore (if not exists)
+keytool -genkey -v -keystore release.keystore -alias your-alias -keyalg RSA -keysize 2048 -validity 10000
+
+# Encode to base64
+base64 -i release.keystore | pbcopy  # macOS
+base64 release.keystore | clip       # Windows
+base64 release.keystore              # Linux (copy output)
+```
+
+### CI/CD Workflows
+
+| Workflow | Trigger | Description |
+|----------|---------|-------------|
+| `ci.yml` | PR, Push | Analyze, test, build |
+| `ci-matrix.yml` | PR to main | Multi-version/platform testing |
+| `security.yml` | PR, Push, Weekly | CodeQL, gitleaks, trivy |
+| `code-review.yml` | PR | Automated code review |
+| `pr-labeler.yml` | PR | Auto-labeling |
+| `release.yml` | Tag v* | Multi-platform release builds |
+| `release-drafter.yml` | Push to main | Draft release notes |
+| `stale.yml` | Daily | Manage stale issues/PRs |
+| `golden-tests.yml` | PR (widget changes) | Visual regression testing |
+| `docs.yml` | Push to main, Release | Generate and deploy docs |
 
 ---
 

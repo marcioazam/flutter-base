@@ -1,0 +1,204 @@
+name: Code Review Bot
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+concurrency:
+  group: review-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+env:
+  FLUTTER_VERSION: '3.27.0'
+
+jobs:
+  reviewdog:
+    name: Reviewdog Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Setup reviewdog
+        uses: reviewdog/action-setup@v1
+        with:
+          reviewdog_version: latest
+
+      - name: Run dart analyze with reviewdog
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          flutter analyze --write=analysis_results.txt 2>&1 || true
+          cat analysis_results.txt | reviewdog -efm="%f:%l:%c: %m" -name="dart-analyze" -reporter=github-pr-review -level=warning
+
+      - name: Run dart format check with reviewdog
+        env:
+          REVIEWDOG_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          dart format --set-exit-if-changed --output=none . 2>&1 | reviewdog -efm="%f" -name="dart-format" -reporter=github-pr-review -level=warning || true
+
+  pr-size-check:
+    name: PR Size Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check PR size
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            
+            let additions = 0;
+            let deletions = 0;
+            
+            for (const file of files) {
+              additions += file.additions;
+              deletions += file.deletions;
+            }
+            
+            const totalChanges = additions + deletions;
+            const fileCount = files.length;
+            
+            let sizeLabel = 'size/S';
+            let warning = '';
+            
+            if (totalChanges > 1000) {
+              sizeLabel = 'size/XL';
+              warning = '> **Warning:** This PR is very large (>1000 lines). Consider splitting it into smaller PRs for easier review.';
+            } else if (totalChanges > 500) {
+              sizeLabel = 'size/L';
+              warning = '> **Note:** This PR is large (>500 lines). Consider if it can be split into smaller PRs.';
+            } else if (totalChanges > 200) {
+              sizeLabel = 'size/M';
+            }
+            
+            // Add size label
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: [sizeLabel]
+              });
+            } catch (e) {
+              console.log('Could not add label:', e.message);
+            }
+            
+            // Post comment if PR is large
+            if (warning) {
+              const body = `## PR Size Analysis
+            
+            | Metric | Value |
+            |--------|-------|
+            | Files Changed | ${fileCount} |
+            | Additions | +${additions} |
+            | Deletions | -${deletions} |
+            | Total Changes | ${totalChanges} |
+            
+            ${warning}
+            
+            ### Tips for large PRs:
+            - Split by feature or component
+            - Separate refactoring from new features
+            - Extract infrastructure changes
+            `;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+  test-coverage-check:
+    name: Test Coverage Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed files
+        id: changed
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            
+            const libFiles = files
+              .filter(f => f.filename.startsWith('lib/') && f.filename.endsWith('.dart'))
+              .filter(f => !f.filename.includes('.g.dart') && !f.filename.includes('.freezed.dart'))
+              .map(f => f.filename);
+            
+            const testFiles = files
+              .filter(f => f.filename.startsWith('test/') && f.filename.endsWith('_test.dart'))
+              .map(f => f.filename);
+            
+            core.setOutput('lib_files', JSON.stringify(libFiles));
+            core.setOutput('test_files', JSON.stringify(testFiles));
+            core.setOutput('lib_count', libFiles.length);
+            core.setOutput('test_count', testFiles.length);
+
+      - name: Check test coverage for new files
+        if: steps.changed.outputs.lib_count > 0
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const libFiles = JSON.parse('${{ steps.changed.outputs.lib_files }}');
+            const testFiles = JSON.parse('${{ steps.changed.outputs.test_files }}');
+            
+            const missingTests = [];
+            
+            for (const libFile of libFiles) {
+              const expectedTest = libFile
+                .replace('lib/', 'test/')
+                .replace('.dart', '_test.dart');
+              
+              // Check if test exists in PR or in repo
+              const hasTest = testFiles.some(t => t.includes(expectedTest.split('/').pop()));
+              
+              if (!hasTest) {
+                missingTests.push({ lib: libFile, expected: expectedTest });
+              }
+            }
+            
+            if (missingTests.length > 0) {
+              let body = `## Test Coverage Review\n\n`;
+              body += `The following new/modified files may need tests:\n\n`;
+              body += `| Source File | Expected Test |\n`;
+              body += `|-------------|---------------|\n`;
+              
+              for (const { lib, expected } of missingTests) {
+                body += `| \`${lib}\` | \`${expected}\` |\n`;
+              }
+              
+              body += `\n> Consider adding tests for new functionality to maintain code quality.`;
+              
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }

@@ -1,0 +1,107 @@
+version: 2
+
+registries:
+  pub:
+    type: pub
+    url: https://pub.dev
+
+updates:
+  # Dart/Flutter dependencies
+  - package-ecosystem: "pub"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "dart"
+    commit-message:
+      prefix: "deps(dart):"
+    reviewers:
+      - "your-team"
+    groups:
+      flutter-sdk:
+        patterns:
+          - "flutter*"
+        update-types:
+          - "minor"
+          - "patch"
+      testing:
+        patterns:
+          - "*test*"
+          - "mockito"
+          - "mocktail"
+        update-types:
+          - "minor"
+          - "patch"
+      state-management:
+        patterns:
+          - "bloc"
+          - "flutter_bloc"
+          - "provider"
+          - "riverpod"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "ci/cd"
+    commit-message:
+      prefix: "ci(deps):"
+    groups:
+      github-actions:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Docker dependencies
+  - package-ecosystem: "docker"
+    directory: "/deployment/docker"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 3
+    labels:
+      - "dependencies"
+      - "docker"
+    commit-message:
+      prefix: "deps(docker):"
+
+  # Gradle dependencies (Android)
+  - package-ecosystem: "gradle"
+    directory: "/android"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "America/Sao_Paulo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "android"
+    commit-message:
+      prefix: "deps(android):"
+    groups:
+      android-gradle:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"

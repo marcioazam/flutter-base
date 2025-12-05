@@ -1,0 +1,110 @@
+name-template: 'v$RESOLVED_VERSION'
+tag-template: 'v$RESOLVED_VERSION'
+
+categories:
+  - title: 'Breaking Changes'
+    labels:
+      - 'breaking-change'
+      - 'breaking'
+  - title: 'New Features'
+    labels:
+      - 'feature'
+      - 'enhancement'
+  - title: 'Bug Fixes'
+    labels:
+      - 'bug'
+      - 'bugfix'
+      - 'fix'
+  - title: 'Performance Improvements'
+    labels:
+      - 'performance'
+      - 'optimization'
+  - title: 'Security'
+    labels:
+      - 'security'
+  - title: 'Documentation'
+    labels:
+      - 'documentation'
+      - 'docs'
+  - title: 'Dependencies'
+    labels:
+      - 'dependencies'
+    collapse-after: 5
+  - title: 'CI/CD'
+    labels:
+      - 'ci/cd'
+      - 'ci'
+    collapse-after: 3
+  - title: 'Other Changes'
+    labels:
+      - '*'
+
+change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
+change-title-escapes: '\<*_&'
+
+version-resolver:
+  major:
+    labels:
+      - 'breaking-change'
+      - 'breaking'
+  minor:
+    labels:
+      - 'feature'
+      - 'enhancement'
+  patch:
+    labels:
+      - 'bug'
+      - 'bugfix'
+      - 'fix'
+      - 'documentation'
+      - 'dependencies'
+      - 'ci/cd'
+  default: patch
+
+autolabeler:
+  - label: 'documentation'
+    files:
+      - '*.md'
+      - 'docs/**/*'
+  - label: 'ci/cd'
+    files:
+      - '.github/**/*'
+      - 'workflows/**/*'
+  - label: 'dependencies'
+    files:
+      - 'pubspec.yaml'
+      - 'pubspec.lock'
+  - label: 'tests'
+    files:
+      - 'test/**/*'
+  - label: 'feature'
+    files:
+      - 'lib/features/**/*'
+  - label: 'core'
+    files:
+      - 'lib/core/**/*'
+  - label: 'android'
+    files:
+      - 'android/**/*'
+  - label: 'ios'
+    files:
+      - 'ios/**/*'
+
+exclude-labels:
+  - 'skip-changelog'
+  - 'no-changelog'
+
+exclude-contributors:
+  - 'dependabot'
+  - 'dependabot[bot]'
+
+template: |
+  ## What's Changed
+
+  $CHANGES
+
+  ## Contributors
+
+  $CONTRIBUTORS
+
+  **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...v$RESOLVED_VERSION

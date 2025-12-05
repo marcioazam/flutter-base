@@ -5,6 +5,65 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [3.4.0] - 2025-12-05
+
+### Security
+- Added `.env.*` files to `.gitignore` - prevents secret leakage
+- Removed `.env` from Flutter assets - security vulnerability fix
+- Added comprehensive secrets patterns to `.gitignore`
+- Enhanced `.env.example` with security warnings and documentation
+
+### Fixed
+- Removed duplicate `analyzer` and `linter` sections in `analysis_options.yaml`
+- Updated deprecated `flutter pub run` to `dart run` in Makefile
+- Fixed `build.yaml` structure and added go_router_builder
+
+### Changed
+- Enhanced `analysis_options.yaml` with dart_code_metrics integration
+- Added complexity metrics (cyclomatic: 10, nesting: 4, params: 4)
+- Improved `.env` files with proper documentation headers
+- Added more generated file patterns to `.gitignore`
+
+### Documentation
+- Updated environment files with security warnings
+- Added proper headers to configuration files
+
+---
+
+## [3.3.0] - 2025-12-04
+
+### Added - CI/CD State of Art
+- Complete GitHub Actions CI/CD pipeline in `.github/workflows/`
+- Reusable Flutter setup composite action with comprehensive caching
+- Matrix testing for Flutter stable/beta on ubuntu/macos/windows
+- Golden tests workflow with visual diff artifacts
+- Security scanning with CodeQL, gitleaks, and trivy
+- Automated code review with reviewdog
+- PR size check and test coverage analysis
+- PR auto-labeling based on file paths
+- Dependabot configuration for pub, gradle, docker, and GitHub Actions
+- Release workflow with multi-platform builds (Web, Android APK/AAB)
+- Release Drafter for automated changelog generation
+- Stale bot for issue/PR management
+- Documentation workflow with GitHub Pages deployment
+- CODEOWNERS file for automatic review assignment
+- PR and Issue templates (bug report, feature request)
+- Slack and email notifications for CI failures and releases
+
+### CI/CD Workflows
+- `ci.yml` - Main CI pipeline (analyze, test, build)
+- `ci-matrix.yml` - Multi-version/platform testing
+- `security.yml` - SAST and dependency scanning
+- `code-review.yml` - Automated code review
+- `pr-labeler.yml` - Auto-labeling
+- `release.yml` - Multi-platform release builds
+- `release-drafter.yml` - Draft release notes
+- `stale.yml` - Stale issue/PR management
+- `golden-tests.yml` - Visual regression testing
+- `docs.yml` - Documentation generation
+
+---
+
 ## [3.2.0] - 2025-12-04
 
 ### Added

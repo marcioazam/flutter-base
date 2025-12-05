@@ -1,3 +1,10 @@
+# =============================================================================
+# Build Runner Configuration - Flutter Base 2025
+# =============================================================================
+# Optimized for fast code generation with Freezed, Riverpod, and Drift
+# Last updated: 2025-12-05
+# =============================================================================
+
 targets:
   $default:
     builders:
@@ -9,7 +16,7 @@ targets:
           field_rename: snake
           create_factory: true
           create_to_json: true
-          checked: false  # Disable runtime checks for production
+          checked: false
           any_map: false
           generic_argument_factories: true
 
@@ -23,8 +30,8 @@ targets:
           copy_with: true
           equal: true
           make_collections_unmodifiable: true
-          map: null  # Disable map generation unless needed
-          when: null  # Disable when generation unless needed
+          map: null
+          when: null
 
       # Riverpod - optimized provider generation
       riverpod_generator:
@@ -41,18 +48,16 @@ targets:
           named_parameters: true
           named_parameters_always_required: false
 
+      # go_router - type-safe routing
+      go_router_builder:
+        enabled: true
+
 # Global build options for faster builds
 global_options:
-  # Enable parallel builds
-  build_runner:
-    options:
-      delete_conflicting_outputs: true
-      enable_experiment: []
-
-  # Source generation optimization
   source_gen:combining_builder:
     options:
       ignore_for_file:
         - type=lint
         - unused_element
         - unnecessary_cast
+        - invalid_annotation_target

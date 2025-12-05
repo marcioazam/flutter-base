@@ -1,0 +1,48 @@
+# CODEOWNERS - Define code ownership for automatic review requests
+# https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default owners for everything in the repo
+* @your-org/maintainers
+
+# Core infrastructure
+/lib/core/ @your-org/core-team
+/lib/shared/ @your-org/core-team
+
+# Features - specific teams can own specific features
+/lib/features/ @your-org/feature-team
+
+# Integrations
+/lib/integrations/ @your-org/integrations-team
+
+# Platform-specific code
+/android/ @your-org/mobile-team
+/ios/ @your-org/mobile-team
+/web/ @your-org/web-team
+
+# CI/CD and DevOps
+/.github/ @your-org/devops-team
+/workflows/ @your-org/devops-team
+/deployment/ @your-org/devops-team
+/Makefile @your-org/devops-team
+
+# Documentation
+/docs/ @your-org/docs-team
+*.md @your-org/docs-team
+
+# Configuration files
+/pubspec.yaml @your-org/maintainers
+/analysis_options.yaml @your-org/maintainers
+/build.yaml @your-org/maintainers
+
+# Tests
+/test/ @your-org/qa-team
+/integration_test/ @your-org/qa-team
+
+# Localization
+/lib/l10n/ @your-org/l10n-team
+*.arb @your-org/l10n-team
+
+# Security-sensitive files require security team review
+/.env* @your-org/security-team
+/android/app/google-services.json @your-org/security-team
+/ios/Runner/GoogleService-Info.plist @your-org/security-team

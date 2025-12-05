@@ -1,0 +1,61 @@
+# =============================================================================
+# Docker Ignore - Flutter Web Build
+# Excludes unnecessary files from Docker build context
+# =============================================================================
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Build outputs (we rebuild in container)
+build/
+.dart_tool/
+.packages
+
+# Test files
+test/
+integration_test/
+coverage/
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# CI/CD
+.github/
+.kiro/
+
+# Environment files (secrets)
+.env
+.env.*
+!.env.example
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Deployment configs (copied explicitly)
+deployment/kubernetes/
+deployment/terraform/
+
+# Android/iOS (not needed for web)
+android/
+ios/
+macos/
+linux/
+windows/
+
+# Analysis
+analysis_options.yaml
+dart_code_metrics.yaml

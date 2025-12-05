@@ -1,0 +1,71 @@
+# PR Labeler Configuration
+# Automatically labels PRs based on file paths
+
+feature:
+  - changed-files:
+      - any-glob-to-any-file: 'lib/features/**/*'
+
+core:
+  - changed-files:
+      - any-glob-to-any-file: 'lib/core/**/*'
+
+shared:
+  - changed-files:
+      - any-glob-to-any-file: 'lib/shared/**/*'
+
+integrations:
+  - changed-files:
+      - any-glob-to-any-file: 'lib/integrations/**/*'
+
+tests:
+  - changed-files:
+      - any-glob-to-any-file: 'test/**/*'
+
+ci/cd:
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**/*'
+          - 'workflows/**/*'
+          - 'Makefile'
+
+documentation:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs/**/*'
+          - '*.md'
+          - 'README.md'
+          - 'CHANGELOG.md'
+
+config:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'pubspec.yaml'
+          - 'analysis_options.yaml'
+          - 'build.yaml'
+          - '.env*'
+
+android:
+  - changed-files:
+      - any-glob-to-any-file: 'android/**/*'
+
+ios:
+  - changed-files:
+      - any-glob-to-any-file: 'ios/**/*'
+
+web:
+  - changed-files:
+      - any-glob-to-any-file: 'web/**/*'
+
+l10n:
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'lib/l10n/**/*'
+          - '*.arb'
+
+deployment:
+  - changed-files:
+      - any-glob-to-any-file: 'deployment/**/*'
+
+golden-tests:
+  - changed-files:
+      - any-glob-to-any-file: 'test/golden/**/*'
