@@ -1,21 +1,20 @@
 /// User entity - Pure Dart, no external dependencies.
 /// Domain layer entities are immutable and contain business logic.
 class User {
+
+  const User({
+    required this.id,
+    required this.email,
+    required this.name,
+    required this.createdAt, this.avatarUrl,
+    this.updatedAt,
+  });
   final String id;
   final String email;
   final String name;
   final String? avatarUrl;
   final DateTime createdAt;
   final DateTime? updatedAt;
-
-  const User({
-    required this.id,
-    required this.email,
-    required this.name,
-    this.avatarUrl,
-    required this.createdAt,
-    this.updatedAt,
-  });
 
   /// Creates a copy with updated fields.
   User copyWith({
@@ -25,8 +24,7 @@ class User {
     String? avatarUrl,
     DateTime? createdAt,
     DateTime? updatedAt,
-  }) {
-    return User(
+  }) => User(
       id: id ?? this.id,
       email: email ?? this.email,
       name: name ?? this.name,
@@ -34,7 +32,6 @@ class User {
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
-  }
 
   @override
   bool operator ==(Object other) =>

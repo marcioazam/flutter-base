@@ -1,8 +1,10 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/constants/app_constants.dart';
 import 'package:flutter_base_2025/core/router/route_guards.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-base-2025, Property 6: Auth Guard Redirect**
 /// **Validates: Requirements 3.2**
@@ -61,7 +63,7 @@ void main() {
         });
       }
 
-      Glados<String>(iterations: 100).test(
+      Glados<String>(any.nonEmptyLetters, _explore).test(
         'any route starting with /auth is public',
         (suffix) {
           final route = '/auth/$suffix';

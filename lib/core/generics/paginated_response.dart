@@ -5,7 +5,7 @@ part 'paginated_response.g.dart';
 
 /// Generic paginated response from API.
 @Freezed(genericArgumentFactories: true)
-class PaginatedResponse<T> with _$PaginatedResponse<T> {
+sealed class PaginatedResponse<T> with _$PaginatedResponse<T> {
   const factory PaginatedResponse({
     required List<T> items,
     required int page,
@@ -25,7 +25,7 @@ class PaginatedResponse<T> with _$PaginatedResponse<T> {
 
 /// Generic API response wrapper.
 @Freezed(genericArgumentFactories: true)
-class ApiResponse<T> with _$ApiResponse<T> {
+sealed class ApiResponse<T> with _$ApiResponse<T> {
   const factory ApiResponse({
     required T data,
     required String message,

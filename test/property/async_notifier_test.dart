@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../helpers/riverpod_compat.dart';
+
 /// **Feature: flutter-modernization-2025, Property 6: AsyncNotifier State Preservation**
 /// **Validates: Requirements 3.12**
 

@@ -1,6 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/core/config/app_config.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-modernization-2025, Property 15: Flavor Config Isolation**
 /// **Validates: Requirements 18.1, 18.3**

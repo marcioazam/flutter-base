@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Video playback state.
 enum VideoPlaybackState {
@@ -16,11 +16,6 @@ enum VideoPlaybackState {
 
 /// Video player configuration.
 class VideoPlayerConfig {
-  final bool autoPlay;
-  final bool looping;
-  final double volume;
-  final bool showControls;
-  final Duration? startPosition;
 
   const VideoPlayerConfig({
     this.autoPlay = false,
@@ -29,17 +24,15 @@ class VideoPlayerConfig {
     this.showControls = true,
     this.startPosition,
   });
+  final bool autoPlay;
+  final bool looping;
+  final double volume;
+  final bool showControls;
+  final Duration? startPosition;
 }
 
 /// Video player state.
 class VideoPlayerState {
-  final VideoPlaybackState playbackState;
-  final Duration position;
-  final Duration duration;
-  final Duration buffered;
-  final double volume;
-  final bool isFullscreen;
-  final String? errorMessage;
 
   const VideoPlayerState({
     this.playbackState = VideoPlaybackState.idle,
@@ -50,6 +43,13 @@ class VideoPlayerState {
     this.isFullscreen = false,
     this.errorMessage,
   });
+  final VideoPlaybackState playbackState;
+  final Duration position;
+  final Duration duration;
+  final Duration buffered;
+  final double volume;
+  final bool isFullscreen;
+  final String? errorMessage;
 
   VideoPlayerState copyWith({
     VideoPlaybackState? playbackState,
@@ -59,8 +59,7 @@ class VideoPlayerState {
     double? volume,
     bool? isFullscreen,
     String? errorMessage,
-  }) {
-    return VideoPlayerState(
+  }) => VideoPlayerState(
       playbackState: playbackState ?? this.playbackState,
       position: position ?? this.position,
       duration: duration ?? this.duration,
@@ -69,7 +68,6 @@ class VideoPlayerState {
       isFullscreen: isFullscreen ?? this.isFullscreen,
       errorMessage: errorMessage ?? this.errorMessage,
     );
-  }
 
   double get progress {
     if (duration.inMilliseconds == 0) return 0;

@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import '../errors/failures.dart';
-import 'result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Update availability status.
 enum UpdateAvailability {
@@ -16,12 +16,6 @@ enum UpdateType { optional, mandatory }
 
 /// App version info.
 class AppVersionInfo {
-  final String currentVersion;
-  final String latestVersion;
-  final UpdateAvailability availability;
-  final UpdateType? updateType;
-  final String? releaseNotes;
-  final String? storeUrl;
 
   const AppVersionInfo({
     required this.currentVersion,
@@ -31,6 +25,12 @@ class AppVersionInfo {
     this.releaseNotes,
     this.storeUrl,
   });
+  final String currentVersion;
+  final String latestVersion;
+  final UpdateAvailability availability;
+  final UpdateType? updateType;
+  final String? releaseNotes;
+  final String? storeUrl;
 
   bool get needsUpdate => availability == UpdateAvailability.available;
   bool get isMandatory => updateType == UpdateType.mandatory;
@@ -51,10 +51,6 @@ abstract interface class AppUpdateService {
 /// App update service implementation.
 /// Note: Requires in_app_update package for Android in-app updates.
 class AppUpdateServiceImpl implements AppUpdateService {
-  final String currentVersion;
-  final Future<AppVersionInfo> Function()? checkVersionApi;
-  final String? androidPackageName;
-  final String? iosAppId;
 
   AppUpdateServiceImpl({
     required this.currentVersion,
@@ -62,6 +58,10 @@ class AppUpdateServiceImpl implements AppUpdateService {
     this.androidPackageName,
     this.iosAppId,
   });
+  final String currentVersion;
+  final Future<AppVersionInfo> Function()? checkVersionApi;
+  final String? androidPackageName;
+  final String? iosAppId;
 
   @override
   Future<Result<AppVersionInfo>> checkForUpdate() async {
@@ -126,11 +126,9 @@ AppUpdateService createAppUpdateService({
   Future<AppVersionInfo> Function()? checkVersionApi,
   String? androidPackageName,
   String? iosAppId,
-}) {
-  return AppUpdateServiceImpl(
+}) => AppUpdateServiceImpl(
     currentVersion: currentVersion,
     checkVersionApi: checkVersionApi,
     androidPackageName: androidPackageName,
     iosAppId: iosAppId,
   );
-}

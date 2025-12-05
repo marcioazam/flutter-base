@@ -6,15 +6,15 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Test state with multiple fields.
 class TestState {
-  final int count;
-  final String name;
-  final bool active;
 
   const TestState({
     required this.count,
     required this.name,
     required this.active,
   });
+  final int count;
+  final String name;
+  final bool active;
 
   TestState copyWith({int? count, String? name, bool? active}) => TestState(
         count: count ?? this.count,

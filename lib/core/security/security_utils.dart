@@ -3,13 +3,13 @@ import 'dart:io';
 
 /// Certificate pinning configuration.
 class CertificatePinConfig {
-  final List<String> pinnedCertificates;
-  final bool allowBadCertificates;
 
   const CertificatePinConfig({
     required this.pinnedCertificates,
     this.allowBadCertificates = false,
   });
+  final List<String> pinnedCertificates;
+  final bool allowBadCertificates;
 }
 
 /// Creates an HttpClient with certificate pinning.
@@ -32,49 +32,37 @@ HttpClient createPinnedHttpClient(CertificatePinConfig config) {
 /// Input sanitizer for security.
 abstract final class InputSanitizer {
   /// Sanitizes string input to prevent XSS.
-  static String sanitizeHtml(String input) {
-    return input
+  static String sanitizeHtml(String input) => input
         .replaceAll('&', '&amp;')
         .replaceAll('<', '&lt;')
         .replaceAll('>', '&gt;')
         .replaceAll('"', '&quot;')
         .replaceAll("'", '&#x27;')
         .replaceAll('/', '&#x2F;');
-  }
 
   /// Sanitizes input for SQL (use parameterized queries instead).
-  static String sanitizeSql(String input) {
-    return input
+  static String sanitizeSql(String input) => input
         .replaceAll("'", "''")
-        .replaceAll('\\', '\\\\')
+        .replaceAll(r'\', r'\\')
         .replaceAll('\x00', '')
-        .replaceAll('\n', '\\n')
-        .replaceAll('\r', '\\r')
-        .replaceAll('\x1a', '\\Z');
-  }
+        .replaceAll('\n', r'\n')
+        .replaceAll('\r', r'\r')
+        .replaceAll('\x1a', r'\Z');
 
   /// Sanitizes input for JSON.
-  static String sanitizeJson(String input) {
-    return jsonEncode(input).replaceAll(RegExp(r'^"|"$'), '');
-  }
+  static String sanitizeJson(String input) => jsonEncode(input).replaceAll(RegExp(r'^"|"$'), '');
 
   /// Sanitizes URL parameter.
-  static String sanitizeUrlParam(String input) {
-    return Uri.encodeComponent(input);
-  }
+  static String sanitizeUrlParam(String input) => Uri.encodeComponent(input);
 
   /// Removes control characters.
-  static String removeControlChars(String input) {
-    return input.replaceAll(RegExp(r'[\x00-\x1F\x7F]'), '');
-  }
+  static String removeControlChars(String input) => input.replaceAll(RegExp(r'[\x00-\x1F\x7F]'), '');
 
   /// Sanitizes filename.
-  static String sanitizeFilename(String input) {
-    return input
+  static String sanitizeFilename(String input) => input
         .replaceAll(RegExp(r'[<>:"/\\|?*]'), '_')
         .replaceAll(RegExp(r'\.{2,}'), '.')
         .replaceAll(RegExp(r'^\.+|\.+$'), '');
-  }
 
   /// Validates and sanitizes email.
   static String? sanitizeEmail(String input) {
@@ -92,9 +80,7 @@ abstract final class InputSanitizer {
   }
 
   /// Strips all HTML tags.
-  static String stripHtmlTags(String input) {
-    return input.replaceAll(RegExp(r'<[^>]*>'), '');
-  }
+  static String stripHtmlTags(String input) => input.replaceAll(RegExp('<[^>]*>'), '');
 
   /// Limits string length.
   static String limitLength(String input, int maxLength) {
@@ -103,14 +89,10 @@ abstract final class InputSanitizer {
   }
 
   /// Validates input against whitelist pattern.
-  static bool matchesWhitelist(String input, RegExp pattern) {
-    return pattern.hasMatch(input);
-  }
+  static bool matchesWhitelist(String input, RegExp pattern) => pattern.hasMatch(input);
 
   /// Alphanumeric only.
-  static String alphanumericOnly(String input) {
-    return input.replaceAll(RegExp(r'[^a-zA-Z0-9]'), '');
-  }
+  static String alphanumericOnly(String input) => input.replaceAll(RegExp('[^a-zA-Z0-9]'), '');
 }
 
 /// Deep link validator.
@@ -190,7 +172,5 @@ abstract final class SecureRandom {
   }
 
   /// Generates a secure token.
-  static String generateToken() {
-    return generateString(32);
-  }
+  static String generateToken() => generateString(32);
 }

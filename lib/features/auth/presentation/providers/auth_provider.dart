@@ -1,32 +1,26 @@
 import 'dart:async';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_base_2025/core/network/api_client.dart';
+import 'package:flutter_base_2025/core/storage/token_storage.dart';
+import 'package:flutter_base_2025/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:flutter_base_2025/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:flutter_base_2025/features/auth/domain/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../../../core/network/api_client.dart';
-import '../../../../core/storage/token_storage.dart';
-import '../../data/datasources/auth_remote_datasource.dart';
-import '../../data/repositories/auth_repository_impl.dart';
-import '../../domain/repositories/auth_repository.dart';
+export '../../domain/repositories/auth_repository.dart' show AuthState, AuthStateExtension, AuthStateAuthenticated, AuthStateUnauthenticated, AuthStateLoading, AuthStateError;
 
 part 'auth_provider.g.dart';
 
-export '../../domain/repositories/auth_repository.dart' show AuthState;
-
 /// Provider for AuthRemoteDataSource.
 @riverpod
-AuthRemoteDataSource authRemoteDataSource(Ref ref) {
-  return AuthRemoteDataSourceImpl(ref.watch(apiClientProvider));
-}
+AuthRemoteDataSource authRemoteDataSource(Ref ref) => AuthRemoteDataSourceImpl(ref.watch(apiClientProvider));
 
 /// Provider for AuthRepository.
 @riverpod
-AuthRepository authRepository(Ref ref) {
-  return AuthRepositoryImpl(
+AuthRepository authRepository(Ref ref) => AuthRepositoryImpl(
     remoteDataSource: ref.watch(authRemoteDataSourceProvider),
     tokenStorage: ref.watch(tokenStorageProvider),
   );
-}
 
 /// Provider for auth state stream with cleanup.
 @riverpod
@@ -47,9 +41,7 @@ Stream<AuthState> authState(Ref ref) {
 
 /// Provider for checking if user is authenticated.
 @riverpod
-Future<bool> isAuthenticated(Ref ref) async {
-  return ref.watch(authRepositoryProvider).isAuthenticated();
-}
+Future<bool> isAuthenticated(Ref ref) async => ref.watch(authRepositoryProvider).isAuthenticated();
 
 /// Notifier for login operations with cleanup.
 @riverpod

@@ -8,6 +8,19 @@ import 'package:flutter/material.dart';
 /// Note: Requires lottie package. This is a wrapper that provides
 /// a consistent API for Lottie animations.
 class LottieWidget extends StatefulWidget {
+
+  const LottieWidget({
+    required this.asset, super.key,
+    this.url,
+    this.width,
+    this.height,
+    this.fit = BoxFit.contain,
+    this.repeat = true,
+    this.reverse = false,
+    this.autoPlay = true,
+    this.onControllerReady,
+    this.onComplete,
+  });
   /// Asset path for the Lottie animation.
   final String asset;
 
@@ -37,20 +50,6 @@ class LottieWidget extends StatefulWidget {
 
   /// Callback when animation completes.
   final VoidCallback? onComplete;
-
-  const LottieWidget({
-    super.key,
-    required this.asset,
-    this.url,
-    this.width,
-    this.height,
-    this.fit = BoxFit.contain,
-    this.repeat = true,
-    this.reverse = false,
-    this.autoPlay = true,
-    this.onControllerReady,
-    this.onComplete,
-  });
 
   @override
   State<LottieWidget> createState() => _LottieWidgetState();
@@ -95,8 +94,7 @@ class _LottieWidgetState extends State<LottieWidget>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return SizedBox(
+  Widget build(BuildContext context) => SizedBox(
       width: widget.width,
       height: widget.height,
       child: const Placeholder(
@@ -105,7 +103,6 @@ class _LottieWidgetState extends State<LottieWidget>
         ),
       ),
     );
-  }
 }
 
 /// Custom page route with configurable transitions.
@@ -113,10 +110,6 @@ class _LottieWidgetState extends State<LottieWidget>
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 31.2**
 class CustomPageRoute<T> extends PageRouteBuilder<T> {
-  final Widget page;
-  final PageTransitionType transitionType;
-  final Duration transitionDuration;
-  final Curve curve;
 
   CustomPageRoute({
     required this.page,
@@ -128,15 +121,18 @@ class CustomPageRoute<T> extends PageRouteBuilder<T> {
           pageBuilder: (context, animation, secondaryAnimation) => page,
           transitionDuration: transitionDuration,
           reverseTransitionDuration: transitionDuration,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return _buildTransition(
+          transitionsBuilder: (context, animation, secondaryAnimation, child) => _buildTransition(
               transitionType,
               animation,
               curve,
               child,
-            );
-          },
+            ),
         );
+  final Widget page;
+  final PageTransitionType transitionType;
+  @override
+  final Duration transitionDuration;
+  final Curve curve;
 
   static Widget _buildTransition(
     PageTransitionType type,
@@ -196,7 +192,7 @@ class CustomPageRoute<T> extends PageRouteBuilder<T> {
         return FadeTransition(
           opacity: curvedAnimation,
           child: ScaleTransition(
-            scale: Tween<double>(begin: 0.8, end: 1.0).animate(curvedAnimation),
+            scale: Tween<double>(begin: 0.8, end: 1).animate(curvedAnimation),
             child: child,
           ),
         );
@@ -220,6 +216,16 @@ enum PageTransitionType {
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 31.3**
 class StaggeredListView extends StatefulWidget {
+
+  const StaggeredListView({
+    required this.itemCount, required this.itemBuilder, super.key,
+    this.staggerDelay = const Duration(milliseconds: 50),
+    this.itemDuration = const Duration(milliseconds: 300),
+    this.curve = Curves.easeOut,
+    this.controller,
+    this.padding,
+    this.physics,
+  });
   final int itemCount;
   final Widget Function(BuildContext, int, Animation<double>) itemBuilder;
   final Duration staggerDelay;
@@ -228,18 +234,6 @@ class StaggeredListView extends StatefulWidget {
   final ScrollController? controller;
   final EdgeInsetsGeometry? padding;
   final ScrollPhysics? physics;
-
-  const StaggeredListView({
-    super.key,
-    required this.itemCount,
-    required this.itemBuilder,
-    this.staggerDelay = const Duration(milliseconds: 50),
-    this.itemDuration = const Duration(milliseconds: 300),
-    this.curve = Curves.easeOut,
-    this.controller,
-    this.padding,
-    this.physics,
-  });
 
   @override
   State<StaggeredListView> createState() => _StaggeredListViewState();
@@ -303,8 +297,7 @@ class _StaggeredListViewState extends State<StaggeredListView>
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
+  Widget build(BuildContext context) => ListView.builder(
       controller: widget.controller,
       padding: widget.padding,
       physics: widget.physics,
@@ -314,32 +307,27 @@ class _StaggeredListViewState extends State<StaggeredListView>
           return widget.itemBuilder(
             context,
             index,
-            const AlwaysStoppedAnimation(1.0),
+            const AlwaysStoppedAnimation(1),
           );
         }
         return AnimatedBuilder(
           animation: _animations[index],
-          builder: (context, child) {
-            return widget.itemBuilder(context, index, _animations[index]);
-          },
+          builder: (context, child) => widget.itemBuilder(context, index, _animations[index]),
         );
       },
     );
-  }
 }
 
 /// Staggered item wrapper with common animations.
 class StaggeredItem extends StatelessWidget {
+
+  const StaggeredItem({
+    required this.animation, required this.child, super.key,
+    this.type = StaggeredItemType.fadeSlide,
+  });
   final Animation<double> animation;
   final Widget child;
   final StaggeredItemType type;
-
-  const StaggeredItem({
-    super.key,
-    required this.animation,
-    required this.child,
-    this.type = StaggeredItemType.fadeSlide,
-  });
 
   @override
   Widget build(BuildContext context) {
@@ -366,7 +354,7 @@ class StaggeredItem extends StatelessWidget {
         return FadeTransition(
           opacity: animation,
           child: ScaleTransition(
-            scale: Tween<double>(begin: 0.8, end: 1.0).animate(animation),
+            scale: Tween<double>(begin: 0.8, end: 1).animate(animation),
             child: child,
           ),
         );

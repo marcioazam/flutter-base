@@ -1,19 +1,18 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_base_2025/core/config/app_config.dart';
+import 'package:flutter_base_2025/core/storage/token_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../config/app_config.dart';
-import '../../storage/token_storage.dart';
 
 /// Interceptor for handling authentication tokens.
 /// Automatically adds auth header and handles token refresh on 401.
 class AuthInterceptor extends QueuedInterceptor {
+
+  AuthInterceptor(this._ref);
   final Ref _ref;
   bool _isRefreshing = false;
 
-  AuthInterceptor(this._ref);
-
   @override
-  void onRequest(
+  Future<void> onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
@@ -32,7 +31,7 @@ class AuthInterceptor extends QueuedInterceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401 && !_isRefreshing) {
       _isRefreshing = true;
       final refreshed = await _refreshToken();

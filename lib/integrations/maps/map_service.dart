@@ -1,17 +1,21 @@
 import 'package:flutter/widgets.dart';
 
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Map provider type.
 enum MapProvider { google, mapbox }
 
 /// Geographic coordinates.
 class LatLng {
-  final double latitude;
-  final double longitude;
 
   const LatLng(this.latitude, this.longitude);
+
+  factory LatLng.fromJson(Map<String, dynamic> json) => LatLng(
+      (json['latitude'] as num).toDouble(),
+      (json['longitude'] as num).toDouble(),
+    );
+  final double latitude;
+  final double longitude;
 
   @override
   bool operator ==(Object other) =>
@@ -30,23 +34,10 @@ class LatLng {
         'latitude': latitude,
         'longitude': longitude,
       };
-
-  factory LatLng.fromJson(Map<String, dynamic> json) {
-    return LatLng(
-      (json['latitude'] as num).toDouble(),
-      (json['longitude'] as num).toDouble(),
-    );
-  }
 }
 
 /// Map marker configuration.
 class MapMarker {
-  final String id;
-  final LatLng position;
-  final String? title;
-  final String? snippet;
-  final String? iconAsset;
-  final void Function()? onTap;
 
   const MapMarker({
     required this.id,
@@ -56,14 +47,16 @@ class MapMarker {
     this.iconAsset,
     this.onTap,
   });
+  final String id;
+  final LatLng position;
+  final String? title;
+  final String? snippet;
+  final String? iconAsset;
+  final void Function()? onTap;
 }
 
 /// Map polyline configuration.
 class MapPolyline {
-  final String id;
-  final List<LatLng> points;
-  final Color color;
-  final double width;
 
   const MapPolyline({
     required this.id,
@@ -71,16 +64,14 @@ class MapPolyline {
     this.color = const Color(0xFF0000FF),
     this.width = 3.0,
   });
+  final String id;
+  final List<LatLng> points;
+  final Color color;
+  final double width;
 }
 
 /// Map configuration.
 class MapConfig {
-  final LatLng initialCenter;
-  final double initialZoom;
-  final bool myLocationEnabled;
-  final bool myLocationButtonEnabled;
-  final bool zoomControlsEnabled;
-  final bool compassEnabled;
 
   const MapConfig({
     required this.initialCenter,
@@ -90,6 +81,12 @@ class MapConfig {
     this.zoomControlsEnabled = true,
     this.compassEnabled = true,
   });
+  final LatLng initialCenter;
+  final double initialZoom;
+  final bool myLocationEnabled;
+  final bool myLocationButtonEnabled;
+  final bool zoomControlsEnabled;
+  final bool compassEnabled;
 }
 
 /// Abstract map service interface.
@@ -182,8 +179,12 @@ class GoogleMapService implements MapService {
 
   double _taylorSin(double x) {
     // Normalize to [-pi, pi]
-    while (x > 3.141592653589793) x -= 2 * 3.141592653589793;
-    while (x < -3.141592653589793) x += 2 * 3.141592653589793;
+    while (x > 3.141592653589793) {
+      x -= 2 * 3.141592653589793;
+    }
+    while (x < -3.141592653589793) {
+      x += 2 * 3.141592653589793;
+    }
     // Taylor series approximation
     final x2 = x * x;
     return x * (1 - x2 / 6 * (1 - x2 / 20 * (1 - x2 / 42)));
@@ -218,9 +219,7 @@ class GoogleMapService implements MapService {
 /// Note: Requires mapbox_gl package.
 class MapboxService implements MapService {
   @override
-  Future<Result<void>> initialize() async {
-    return const Success(null);
-  }
+  Future<Result<void>> initialize() async => const Success(null);
 
   @override
   Widget buildMap({
@@ -229,25 +228,17 @@ class MapboxService implements MapService {
     List<MapPolyline> polylines = const [],
     void Function(LatLng)? onTap,
     void Function(LatLng)? onCameraMove,
-  }) {
-    return const Center(child: Text('Mapbox placeholder'));
-  }
+  }) => const Center(child: Text('Mapbox placeholder'));
 
   @override
-  Future<Result<List<LatLng>>> getRoute(LatLng from, LatLng to) async {
-    return const Success([]);
-  }
+  Future<Result<List<LatLng>>> getRoute(LatLng from, LatLng to) async => const Success([]);
 
   @override
-  double calculateDistance(LatLng from, LatLng to) {
-    return GoogleMapService().calculateDistance(from, to);
-  }
+  double calculateDistance(LatLng from, LatLng to) => GoogleMapService().calculateDistance(from, to);
 }
 
 /// Map service factory.
-MapService createMapService(MapProvider provider) {
-  return switch (provider) {
+MapService createMapService(MapProvider provider) => switch (provider) {
     MapProvider.google => GoogleMapService(),
     MapProvider.mapbox => MapboxService(),
   };
-}

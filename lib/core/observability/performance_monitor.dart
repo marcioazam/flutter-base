@@ -1,12 +1,12 @@
 /// Performance trace for timing operations.
 class PerformanceTrace {
+
+  PerformanceTrace(this.name) : startTime = DateTime.now();
   final String name;
   final DateTime startTime;
   DateTime? _endTime;
   final Map<String, dynamic> _attributes = {};
   final Map<String, int> _metrics = {};
-
-  PerformanceTrace(this.name) : startTime = DateTime.now();
 
   /// Stops the trace and returns duration.
   Duration stop() {
@@ -43,14 +43,14 @@ class PerformanceTrace {
 
 /// Performance monitor for tracking operation timing.
 class PerformanceMonitor {
+
+  PerformanceMonitor._({int maxCompletedTraces = 100})
+      : _maxCompletedTraces = maxCompletedTraces;
   final Map<String, PerformanceTrace> _activeTraces = {};
   final List<PerformanceTrace> _completedTraces = [];
   final int _maxCompletedTraces;
 
   static PerformanceMonitor? _instance;
-
-  PerformanceMonitor._({int maxCompletedTraces = 100})
-      : _maxCompletedTraces = maxCompletedTraces;
 
   /// Gets or creates singleton instance.
   static PerformanceMonitor get instance {

@@ -1,15 +1,16 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/errors/exceptions.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-production-ready-2025, Property 21: Exception to Failure Mapping**
 /// **Validates: Requirements 11.1**
 
 /// Maps AppException to AppFailure (same logic as ApiRepository)
-AppFailure mapExceptionToFailure(AppException e) {
-  return switch (e) {
+AppFailure mapExceptionToFailure(AppException e) => switch (e) {
     NetworkException() => NetworkFailure(e.message),
     ServerException() => ServerFailure(e.message, statusCode: e.statusCode),
     ValidationException(:final fieldErrors) =>
@@ -20,14 +21,13 @@ AppFailure mapExceptionToFailure(AppException e) {
     RateLimitException() => RateLimitFailure(e.message),
     CacheException() => CacheFailure(e.message),
   };
-}
 
 void main() {
   group('Exception to Failure Mapping Properties', () {
     /// **Property 21: Exception to Failure Mapping**
     /// *For any* AppException, mapping should produce the correct AppFailure subtype.
     
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'NetworkException maps to NetworkFailure',
       (message) {
         final exception = NetworkException(message);
@@ -38,7 +38,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'ServerException maps to ServerFailure with statusCode',
       (message) {
         final exception = ServerException(message, statusCode: 500);
@@ -50,7 +50,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'ValidationException maps to ValidationFailure with fieldErrors',
       (message) {
         final fieldErrors = {'email': ['Invalid format']};
@@ -88,14 +88,14 @@ void main() {
     });
 
     test('RateLimitException maps to RateLimitFailure', () {
-      final exception = RateLimitException('Too many requests');
+      final exception = RateLimitException();
       final failure = mapExceptionToFailure(exception);
 
       expect(failure, isA<RateLimitFailure>());
       expect(failure.message, equals('Too many requests'));
     });
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'CacheException maps to CacheFailure',
       (message) {
         final exception = CacheException(message);
@@ -131,21 +131,21 @@ void main() {
   /// **Feature: flutter-production-ready-2025, Property 22: Generator Produces Valid Instances**
   /// **Validates: Requirements 8.2**
   group('Generator Validity Properties', () {
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'int generator produces valid integers',
       (value) {
         expect(value, isA<int>());
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'string generator produces valid strings',
       (value) {
         expect(value, isA<String>());
       },
     );
 
-    Glados<double>(iterations: 100).test(
+    Glados<double>(any.double, _explore).test(
       'double generator produces valid doubles',
       (value) {
         expect(value, isA<double>());
@@ -153,7 +153,7 @@ void main() {
       },
     );
 
-    Glados<bool>(iterations: 100).test(
+    Glados<bool>(any.bool, _explore).test(
       'bool generator produces valid booleans',
       (value) {
         expect(value, isA<bool>());
@@ -161,7 +161,7 @@ void main() {
       },
     );
 
-    Glados<List<int>>(iterations: 100).test(
+    Glados<List<int>>(any.list(any.int), _explore).test(
       'list generator produces valid lists',
       (value) {
         expect(value, isA<List<int>>());

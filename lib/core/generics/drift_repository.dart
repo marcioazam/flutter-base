@@ -1,9 +1,8 @@
 import 'package:drift/drift.dart';
-
-import '../errors/failures.dart';
-import '../utils/result.dart';
-import 'base_repository.dart';
-import 'paginated_list.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/generics/base_repository.dart';
+import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Generic Drift repository for local database operations.
 /// T = Entity type, D = Drift DataClass, C = Companion class
@@ -146,11 +145,9 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
   }
 
   /// Watches all entities for changes.
-  Stream<List<T>> watchAll() {
-    return database.select(table).watch().map(
+  Stream<List<T>> watchAll() => database.select(table).watch().map(
           (rows) => rows.map(fromRow).toList(),
         );
-  }
 
   /// Checks if entity exists by ID.
   Future<Result<bool>> exists(String id) async {

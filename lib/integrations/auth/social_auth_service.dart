@@ -1,17 +1,11 @@
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Social auth provider type.
 enum SocialProvider { google, apple, facebook }
 
 /// Social credential returned after successful authentication.
 class SocialCredential {
-  final SocialProvider provider;
-  final String token;
-  final String? email;
-  final String? name;
-  final String? photoUrl;
-  final String? userId;
 
   const SocialCredential({
     required this.provider,
@@ -21,6 +15,12 @@ class SocialCredential {
     this.photoUrl,
     this.userId,
   });
+  final SocialProvider provider;
+  final String token;
+  final String? email;
+  final String? name;
+  final String? photoUrl;
+  final String? userId;
 
   Map<String, dynamic> toJson() => {
         'provider': provider.name,

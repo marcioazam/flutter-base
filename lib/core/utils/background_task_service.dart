@@ -177,14 +177,10 @@ class InMemoryBackgroundTaskService implements BackgroundTaskService {
   }
 
   @override
-  Future<bool> isTaskRegistered(String taskId) async {
-    return _tasks.containsKey(taskId);
-  }
+  Future<bool> isTaskRegistered(String taskId) async => _tasks.containsKey(taskId);
 
   @override
-  BackgroundTaskStatus getTaskStatus(String taskId) {
-    return _tasks[taskId]?.status ?? BackgroundTaskStatus.idle;
-  }
+  BackgroundTaskStatus getTaskStatus(String taskId) => _tasks[taskId]?.status ?? BackgroundTaskStatus.idle;
 
   @override
   Stream<BackgroundTaskResult<dynamic>> get taskCompletionStream =>
@@ -197,7 +193,7 @@ class InMemoryBackgroundTaskService implements BackgroundTaskService {
 }
 
 @Riverpod(keepAlive: true)
-BackgroundTaskService backgroundTaskService(BackgroundTaskServiceRef ref) {
+BackgroundTaskService backgroundTaskService(Ref ref) {
   final service = InMemoryBackgroundTaskService();
   ref.onDispose(service.dispose);
   return service;

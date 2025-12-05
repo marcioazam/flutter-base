@@ -125,13 +125,13 @@ class AccessibilityTestUtils {
 
 /// Result of accessibility audit.
 class AccessibilityReport {
-  final bool passed;
-  final List<String> issues;
 
   const AccessibilityReport({
     required this.passed,
     this.issues = const [],
   });
+  final bool passed;
+  final List<String> issues;
 
   @override
   String toString() {
@@ -153,9 +153,7 @@ class _AccessibilityMatcher extends Matcher {
   }
 
   @override
-  Description describe(Description description) {
-    return description.add('meets accessibility guidelines');
-  }
+  Description describe(Description description) => description.add('meets accessibility guidelines');
 
   @override
   Description describeMismatch(

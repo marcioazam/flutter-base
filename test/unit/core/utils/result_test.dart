@@ -1,8 +1,10 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
-import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-base-2025, Property 21: Result Type Consistency**
 /// **Validates: Requirements 13.1**
@@ -110,7 +112,7 @@ void main() {
     group('Property Tests', () {
       /// **Property 21: Result Type Consistency**
       /// For any operation failure, the return type SHALL be Result.Failure with typed AppFailure.
-      Glados<int>(iterations: 100).test(
+      Glados<int>(any.int, _explore).test(
         'Success.fold always calls onSuccess callback',
         (value) {
           final result = Success(value);
@@ -127,7 +129,7 @@ void main() {
         },
       );
 
-      Glados<String>(iterations: 100).test(
+      Glados<String>(any.nonEmptyLetters, _explore).test(
         'Failure.fold always calls onFailure callback',
         (message) {
           final result = Failure<int>(NetworkFailure(message));
@@ -144,7 +146,7 @@ void main() {
         },
       );
 
-      Glados<int>(iterations: 100).test(
+      Glados<int>(any.int, _explore).test(
         'Success.map preserves Success type',
         (value) {
           final result = Success(value);
@@ -155,7 +157,7 @@ void main() {
         },
       );
 
-      Glados<String>(iterations: 100).test(
+      Glados<String>(any.nonEmptyLetters, _explore).test(
         'Failure.map preserves Failure type and failure value',
         (message) {
           final failure = NetworkFailure(message);
@@ -167,7 +169,7 @@ void main() {
         },
       );
 
-      Glados<int>(iterations: 100).test(
+      Glados<int>(any.int, _explore).test(
         'Success equality is based on value',
         (value) {
           final result1 = Success(value);

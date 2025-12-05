@@ -1,18 +1,17 @@
-import '../errors/failures.dart';
-import '../utils/result.dart';
-import 'paginated_list.dart';
+import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Filter specification for repository queries.
 class Filter<T> {
-  final Map<String, dynamic> conditions;
   const Filter(this.conditions);
+  final Map<String, dynamic> conditions;
 }
 
 /// Sort specification for repository queries.
 class Sort<T> {
+  const Sort(this.field, {this.ascending = true});
   final String field;
   final bool ascending;
-  const Sort(this.field, {this.ascending = true});
 }
 
 /// Generic repository interface with CRUD operations.

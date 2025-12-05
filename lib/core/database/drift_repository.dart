@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
-import '../errors/failures.dart';
-import '../utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Generic repository interface for Drift database operations.
 /// T = Entity type (DataClass), ID = Identifier type

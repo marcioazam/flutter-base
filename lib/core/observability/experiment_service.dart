@@ -2,25 +2,24 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_base_2025/core/observability/analytics_service.dart';
+import 'package:flutter_base_2025/core/observability/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'analytics_service.dart';
-import 'app_logger.dart';
 
 /// Typed variant for A/B testing.
 /// 
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 22.2**
 class Variant<T> {
-  final String name;
-  final T value;
-  final double weight;
 
   const Variant({
     required this.name,
     required this.value,
     this.weight = 1.0,
   });
+  final String name;
+  final T value;
+  final double weight;
 
   Map<String, dynamic> toMap() => {
         'name': name,
@@ -31,12 +30,6 @@ class Variant<T> {
 
 /// Experiment configuration.
 class Experiment<T> {
-  final String id;
-  final String name;
-  final List<Variant<T>> variants;
-  final bool isActive;
-  final DateTime? startDate;
-  final DateTime? endDate;
 
   const Experiment({
     required this.id,
@@ -46,6 +39,12 @@ class Experiment<T> {
     this.startDate,
     this.endDate,
   });
+  final String id;
+  final String name;
+  final List<Variant<T>> variants;
+  final bool isActive;
+  final DateTime? startDate;
+  final DateTime? endDate;
 
   bool get isRunning {
     if (!isActive) return false;
@@ -66,10 +65,6 @@ class Experiment<T> {
 
 /// User assignment to an experiment variant.
 class ExperimentAssignment<T> {
-  final String experimentId;
-  final String variantName;
-  final T value;
-  final DateTime assignedAt;
 
   const ExperimentAssignment({
     required this.experimentId,
@@ -77,6 +72,10 @@ class ExperimentAssignment<T> {
     required this.value,
     required this.assignedAt,
   });
+  final String experimentId;
+  final String variantName;
+  final T value;
+  final DateTime assignedAt;
 
   Map<String, dynamic> toMap() => {
         'experimentId': experimentId,
@@ -125,6 +124,9 @@ abstract interface class ExperimentService {
 
 /// Local experiment service implementation.
 class LocalExperimentService implements ExperimentService {
+
+  LocalExperimentService({AnalyticsService? analyticsService})
+      : _analyticsService = analyticsService;
   final Map<String, Experiment<dynamic>> _experiments = {};
   final Map<String, String> _assignments = {};
   final Map<String, String> _forcedVariants = {};
@@ -134,14 +136,11 @@ class LocalExperimentService implements ExperimentService {
   SharedPreferences? _prefs;
   static const String _assignmentsKey = 'experiment_assignments';
 
-  LocalExperimentService({AnalyticsService? analyticsService})
-      : _analyticsService = analyticsService;
-
   @override
   Future<void> initialize() async {
     _prefs = await SharedPreferences.getInstance();
     _loadAssignments();
-    AppLogger.info('ExperimentService initialized');
+    AppLogger.instance.info('ExperimentService initialized');
   }
 
   void _loadAssignments() {
@@ -151,7 +150,7 @@ class LocalExperimentService implements ExperimentService {
         final decoded = jsonDecode(stored) as Map<String, dynamic>;
         _assignments.addAll(decoded.cast<String, String>());
       } catch (e) {
-        AppLogger.warning('Failed to load experiment assignments: $e');
+        AppLogger.instance.warning('Failed to load experiment assignments: $e');
       }
     }
   }
@@ -163,7 +162,7 @@ class LocalExperimentService implements ExperimentService {
   @override
   void registerExperiment<T>(Experiment<T> experiment) {
     _experiments[experiment.id] = experiment;
-    AppLogger.debug('Experiment registered: ${experiment.id}');
+    AppLogger.instance.debug('Experiment registered: ${experiment.id}');
   }
 
   @override
@@ -202,20 +201,18 @@ class LocalExperimentService implements ExperimentService {
   }
 
   @override
-  T? getVariantValue<T>(String experimentId) {
-    return getVariant<T>(experimentId)?.value;
-  }
+  T? getVariantValue<T>(String experimentId) => getVariant<T>(experimentId)?.value;
 
   @override
   void forceVariant(String experimentId, String variantName) {
     _forcedVariants[experimentId] = variantName;
-    AppLogger.debug('Forced variant: $experimentId -> $variantName');
+    AppLogger.instance.debug('Forced variant: $experimentId -> $variantName');
   }
 
   @override
   void clearForcedVariant(String experimentId) {
     _forcedVariants.remove(experimentId);
-    AppLogger.debug('Cleared forced variant: $experimentId');
+    AppLogger.instance.debug('Cleared forced variant: $experimentId');
   }
 
   @override
@@ -233,14 +230,12 @@ class LocalExperimentService implements ExperimentService {
       ...?params,
     };
 
-    await _analyticsService?.track(eventName, eventParams);
-    AppLogger.debug('Experiment event: $eventName - $eventParams');
+    await _analyticsService?.logEvent(name: eventName, parameters: eventParams);
+    AppLogger.instance.debug('Experiment event: $eventName - $eventParams');
   }
 
   @override
-  List<Experiment<dynamic>> getActiveExperiments() {
-    return _experiments.values.where((e) => e.isRunning).toList();
-  }
+  List<Experiment<dynamic>> getActiveExperiments() => _experiments.values.where((e) => e.isRunning).toList();
 
   @override
   bool isInVariant(String experimentId, String variantName) {

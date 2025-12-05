@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/shared/widgets/predictive_pop_scope.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-2025-final-polish, Property 1: PopScope Navigation Control**
 /// **Validates: Requirements 4.3**
@@ -11,7 +10,6 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: PredictivePopScope(
-            canPop: true,
             child: Text('Content'),
           ),
         ),

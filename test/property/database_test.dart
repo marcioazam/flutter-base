@@ -1,11 +1,13 @@
 import 'dart:async';
 
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/database/drift_repository.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-2025-final-polish, Property 3: Repository CRUD Result Type**
 /// **Validates: Requirements 8.2**
@@ -14,7 +16,7 @@ import 'package:flutter_base_2025/core/utils/result.dart';
 /// **Validates: Requirements 7.5, 8.3**
 void main() {
   group('DriftRepository Properties', () {
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'CRUD operations return Result type - Success case',
       (value) {
         // Simulate successful operation
@@ -27,7 +29,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'CRUD operations return Result type - Failure case',
       (errorMessage) {
         // Simulate failed operation
@@ -80,7 +82,7 @@ void main() {
     /// **Feature: flutter-2025-final-polish, Property 2: Drift Reactive Stream Emission**
     /// **Validates: Requirements 7.5, 8.3**
 
-    Glados<List<String>>(iterations: 100).test(
+    Glados<List<String>>(any.list(any.nonEmptyLetters), _explore).test(
       'Stream emits updated list when data changes',
       (items) async {
         // Simulate a reactive stream controller
@@ -124,7 +126,7 @@ void main() {
       controller.add(['item1']);
       await Future.delayed(Duration.zero);
 
-      expect(emissions, contains(['item1']));
+      expect(emissions.any((e) => e.length == 1 && e.first == 'item1'), isTrue);
 
       await controller.close();
     });

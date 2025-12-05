@@ -1,8 +1,10 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/utils/form_controller.dart';
 import 'package:flutter_base_2025/core/utils/validators.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-state-of-art-2025, Property 6: Form Validation Composition**
 /// **Validates: Requirements 25.2**
@@ -53,7 +55,7 @@ void main() {
       /// Property 6: Form Validation Composition
       /// For any composed validators, validation SHALL fail on first error
       /// and return that error message.
-      Glados<String>(iterations: 100).test(
+      Glados<String>(any.nonEmptyLetters, _explore).test(
         'compose returns first error',
         (value) {
           final validator = FormValidators.combine([

@@ -2,20 +2,15 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
-import '../observability/app_logger.dart';
+import 'package:flutter_base_2025/core/observability/app_logger.dart';
 
 /// Device information.
 /// 
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 35.1**
 class DeviceInfo {
-  final String model;
-  final String osVersion;
-  final String platform;
-  final String uniqueId;
-  final bool isPhysicalDevice;
-  final String? manufacturer;
 
   const DeviceInfo({
     required this.model,
@@ -25,6 +20,12 @@ class DeviceInfo {
     required this.isPhysicalDevice,
     this.manufacturer,
   });
+  final String model;
+  final String osVersion;
+  final String platform;
+  final String uniqueId;
+  final bool isPhysicalDevice;
+  final String? manufacturer;
 
   Map<String, dynamic> toMap() => {
         'model': model,
@@ -41,10 +42,6 @@ class DeviceInfo {
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 35.2**
 class AppInfo {
-  final String version;
-  final String buildNumber;
-  final String packageName;
-  final String appName;
 
   const AppInfo({
     required this.version,
@@ -52,6 +49,10 @@ class AppInfo {
     required this.packageName,
     required this.appName,
   });
+  final String version;
+  final String buildNumber;
+  final String packageName;
+  final String appName;
 
   String get fullVersion => '$version+$buildNumber';
 
@@ -69,11 +70,6 @@ class AppInfo {
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 35.3**
 class ScreenInfo {
-  final double width;
-  final double height;
-  final double pixelRatio;
-  final EdgeInsets safeAreas;
-  final Brightness brightness;
 
   const ScreenInfo({
     required this.width,
@@ -82,6 +78,11 @@ class ScreenInfo {
     required this.safeAreas,
     required this.brightness,
   });
+  final double width;
+  final double height;
+  final double pixelRatio;
+  final EdgeInsets safeAreas;
+  final Brightness brightness;
 
   double get physicalWidth => width * pixelRatio;
   double get physicalHeight => height * pixelRatio;
@@ -105,13 +106,13 @@ class ScreenInfo {
 
 /// Battery information.
 class BatteryInfo {
-  final int level;
-  final BatteryState state;
 
   const BatteryInfo({
     required this.level,
     required this.state,
   });
+  final int level;
+  final BatteryState state;
 
   bool get isCharging =>
       state == BatteryState.charging || state == BatteryState.full;
@@ -135,13 +136,6 @@ enum BatteryState {
 
 /// Device capabilities.
 class DeviceCapabilities {
-  final bool hasNfc;
-  final bool hasBiometrics;
-  final bool hasCamera;
-  final bool hasFrontCamera;
-  final bool hasGps;
-  final bool hasAccelerometer;
-  final bool hasGyroscope;
 
   const DeviceCapabilities({
     this.hasNfc = false,
@@ -152,6 +146,13 @@ class DeviceCapabilities {
     this.hasAccelerometer = false,
     this.hasGyroscope = false,
   });
+  final bool hasNfc;
+  final bool hasBiometrics;
+  final bool hasCamera;
+  final bool hasFrontCamera;
+  final bool hasGps;
+  final bool hasAccelerometer;
+  final bool hasGyroscope;
 
   Map<String, dynamic> toMap() => {
         'hasNfc': hasNfc,
@@ -220,14 +221,12 @@ class MockDeviceInfoService implements DeviceInfoService {
   }
 
   @override
-  Future<AppInfo> getAppInfo() async {
-    return const AppInfo(
+  Future<AppInfo> getAppInfo() async => const AppInfo(
       version: '1.0.0',
       buildNumber: '1',
       packageName: 'com.example.flutter_base_2025',
       appName: 'Flutter Base 2025',
     );
-  }
 
   @override
   ScreenInfo getScreenInfo() {
@@ -245,16 +244,13 @@ class MockDeviceInfoService implements DeviceInfoService {
   }
 
   @override
-  Future<BatteryInfo> getBatteryInfo() async {
-    return const BatteryInfo(
+  Future<BatteryInfo> getBatteryInfo() async => const BatteryInfo(
       level: 85,
       state: BatteryState.discharging,
     );
-  }
 
   @override
-  Future<DeviceCapabilities> getCapabilities() async {
-    return const DeviceCapabilities(
+  Future<DeviceCapabilities> getCapabilities() async => const DeviceCapabilities(
       hasNfc: true,
       hasBiometrics: true,
       hasCamera: true,
@@ -263,12 +259,9 @@ class MockDeviceInfoService implements DeviceInfoService {
       hasAccelerometer: true,
       hasGyroscope: true,
     );
-  }
 
   @override
-  Future<String> getDeviceId() async {
-    return 'mock-device-id-12345';
-  }
+  Future<String> getDeviceId() async => 'mock-device-id-12345';
 }
 
 /// Singleton for global access.

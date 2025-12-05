@@ -32,8 +32,7 @@ class DotShorthandsExample extends StatelessWidget {
   const DotShorthandsExample({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       // Dot shorthand for MainAxisAlignment.center
       mainAxisAlignment: .center,
       // Dot shorthand for CrossAxisAlignment.start
@@ -49,7 +48,6 @@ class DotShorthandsExample extends StatelessWidget {
         const SizedBox(height: 16),
         // Dot shorthand for Alignment.center
         Align(
-          alignment: .center,
           child: Container(
             width: 100,
             height: 100,
@@ -70,10 +68,8 @@ class DotShorthandsExample extends StatelessWidget {
         ),
       ],
     );
-  }
 
-  Widget _buildButton(BuildContext context, String label) {
-    return ElevatedButton(
+  Widget _buildButton(BuildContext context, String label) => ElevatedButton(
       onPressed: () {},
       // Dot shorthand for ButtonStyle properties
       style: ElevatedButton.styleFrom(
@@ -82,16 +78,15 @@ class DotShorthandsExample extends StatelessWidget {
       ),
       child: Text(label),
     );
-  }
 }
 
 /// Example of dot shorthands with enums.
 enum Status { pending, active, completed, cancelled }
 
 class StatusWidget extends StatelessWidget {
-  final Status status;
 
-  const StatusWidget({super.key, required this.status});
+  const StatusWidget({required this.status, super.key});
+  final Status status;
 
   @override
   Widget build(BuildContext context) {
@@ -122,8 +117,7 @@ class NamedConstructorExample extends StatelessWidget {
   const NamedConstructorExample({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return Column(
+  Widget build(BuildContext context) => Column(
       children: [
         // Dot shorthand for EdgeInsets.all (when type is inferrable)
         Padding(
@@ -142,7 +136,6 @@ class NamedConstructorExample extends StatelessWidget {
         ),
       ],
     );
-  }
 }
 
 /// Migration guide for existing code:

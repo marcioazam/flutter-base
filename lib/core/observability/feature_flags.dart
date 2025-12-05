@@ -1,15 +1,10 @@
-import 'app_logger.dart';
+import 'package:flutter_base_2025/core/observability/app_logger.dart';
 
 /// User context for feature flag segmentation.
 /// 
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 21.5**
 class UserSegment {
-  final String? userId;
-  final String? deviceType;
-  final String? appVersion;
-  final String? platform;
-  final Map<String, dynamic> customAttributes;
 
   const UserSegment({
     this.userId,
@@ -18,6 +13,11 @@ class UserSegment {
     this.platform,
     this.customAttributes = const {},
   });
+  final String? userId;
+  final String? deviceType;
+  final String? appVersion;
+  final String? platform;
+  final Map<String, dynamic> customAttributes;
 
   Map<String, dynamic> toMap() => {
         if (userId != null) 'userId': userId,
@@ -30,15 +30,15 @@ class UserSegment {
 
 /// Rule for targeting specific user segments.
 class TargetingRule {
-  final String attribute;
-  final TargetingOperator operator;
-  final dynamic value;
 
   const TargetingRule({
     required this.attribute,
     required this.operator,
     required this.value,
   });
+  final String attribute;
+  final TargetingOperator operator;
+  final dynamic value;
 
   bool evaluate(Map<String, dynamic> context) {
     final contextValue = context[attribute];
@@ -60,10 +60,10 @@ class TargetingRule {
       case TargetingOperator.lessThan:
         return _compareNumeric(contextValue, value) < 0;
       case TargetingOperator.inList:
-        if (value is List) return value.contains(contextValue);
+        if (value is List) return value.contains(contextValue) == true;
         return false;
       case TargetingOperator.notInList:
-        if (value is List) return !value.contains(contextValue);
+        if (value is List) return value.contains(contextValue) != true;
         return true;
       case TargetingOperator.versionGreaterThan:
         return _compareVersions(contextValue.toString(), value.toString()) > 0;
@@ -109,10 +109,6 @@ enum TargetingOperator {
 
 /// Feature flag configuration with targeting rules.
 class FeatureFlagConfig {
-  final String name;
-  final dynamic defaultValue;
-  final List<TargetingRule> rules;
-  final dynamic targetedValue;
 
   const FeatureFlagConfig({
     required this.name,
@@ -120,6 +116,10 @@ class FeatureFlagConfig {
     this.rules = const [],
     this.targetedValue,
   });
+  final String name;
+  final dynamic defaultValue;
+  final List<TargetingRule> rules;
+  final dynamic targetedValue;
 
   dynamic evaluate(Map<String, dynamic> context) {
     if (rules.isEmpty) return defaultValue;
@@ -175,24 +175,22 @@ class LocalFeatureFlags implements FeatureFlags {
   @override
   Future<void> initialize() async {
     _flags.addAll(_defaults);
-    AppLogger.info('FeatureFlags initialized (local mode)');
+    AppLogger.instance.info('FeatureFlags initialized (local mode)');
   }
 
   @override
   Future<void> fetch() async {
-    AppLogger.debug('FeatureFlags: fetch called (no-op in local mode)');
+    AppLogger.instance.debug('FeatureFlags: fetch called (no-op in local mode)');
   }
 
   @override
   void setUserSegment(UserSegment segment) {
     _currentSegment = segment;
-    AppLogger.debug('FeatureFlags: segment updated - ${segment.toMap()}');
+    AppLogger.instance.debug('FeatureFlags: segment updated - ${segment.toMap()}');
   }
 
   @override
-  bool isEnabled(String flagName) {
-    return isEnabledForSegment(flagName, _currentSegment);
-  }
+  bool isEnabled(String flagName) => isEnabledForSegment(flagName, _currentSegment);
 
   @override
   bool isEnabledForSegment(String flagName, UserSegment segment) {
@@ -208,9 +206,7 @@ class LocalFeatureFlags implements FeatureFlags {
   }
 
   @override
-  T getValue<T>(String flagName, T defaultValue) {
-    return getValueForSegment(flagName, defaultValue, _currentSegment);
-  }
+  T getValue<T>(String flagName, T defaultValue) => getValueForSegment(flagName, defaultValue, _currentSegment);
 
   @override
   T getValueForSegment<T>(
@@ -232,13 +228,13 @@ class LocalFeatureFlags implements FeatureFlags {
   /// Sets a flag value (for testing/development).
   void setFlag(String flagName, dynamic value) {
     _flags[flagName] = value;
-    AppLogger.debug('FeatureFlags: $flagName = $value');
+    AppLogger.instance.debug('FeatureFlags: $flagName = $value');
   }
 
   /// Sets a flag configuration with targeting rules.
   void setFlagConfig(FeatureFlagConfig config) {
     _configs[config.name] = config;
-    AppLogger.debug('FeatureFlags: config set for ${config.name}');
+    AppLogger.instance.debug('FeatureFlags: config set for ${config.name}');
   }
 
   /// Resets all flags to defaults.
@@ -248,7 +244,7 @@ class LocalFeatureFlags implements FeatureFlags {
       ..addAll(_defaults);
     _configs.clear();
     _currentSegment = const UserSegment();
-    AppLogger.debug('FeatureFlags: reset to defaults');
+    AppLogger.instance.debug('FeatureFlags: reset to defaults');
   }
 }
 

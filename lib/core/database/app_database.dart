@@ -54,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
   Future<void> setCachedItem(String key, String value, {DateTime? expiresAt}) =>
       into(cachedItems).insertOnConflictUpdate(
         CachedItemsCompanion.insert(
-          id: Value(key),
+          id: key,
           key: key,
           value: value,
           expiresAt: Value(expiresAt),

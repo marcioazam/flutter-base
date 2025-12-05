@@ -1,12 +1,19 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_base_2025/core/observability/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../observability/app_logger.dart';
 
 /// Rate and review service configuration.
 class RateReviewConfig {
+
+  const RateReviewConfig({
+    this.minLaunches = 5,
+    this.minDaysSinceInstall = 7,
+    this.minDaysBetweenPrompts = 30,
+    this.maxPromptsPerYear = 3,
+    this.customConditions = const [],
+  });
   /// Minimum app launches before showing review.
   final int minLaunches;
 
@@ -21,14 +28,6 @@ class RateReviewConfig {
 
   /// Custom conditions that must be met.
   final List<bool Function()> customConditions;
-
-  const RateReviewConfig({
-    this.minLaunches = 5,
-    this.minDaysSinceInstall = 7,
-    this.minDaysBetweenPrompts = 30,
-    this.maxPromptsPerYear = 3,
-    this.customConditions = const [],
-  });
 }
 
 /// Rate and review service.
@@ -87,7 +86,7 @@ class LocalRateReviewService implements RateReviewService {
     _prefs = await SharedPreferences.getInstance();
 
     _loadData();
-    AppLogger.info('RateReviewService initialized');
+    AppLogger.instance.info('RateReviewService initialized');
   }
 
   void _loadData() {
@@ -120,7 +119,7 @@ class LocalRateReviewService implements RateReviewService {
   @override
   Future<bool> requestReview() async {
     if (!await shouldRequestReview()) {
-      AppLogger.debug('Review conditions not met');
+      AppLogger.instance.debug('Review conditions not met');
       return false;
     }
 
@@ -128,9 +127,7 @@ class LocalRateReviewService implements RateReviewService {
   }
 
   @override
-  Future<bool> forceReview() async {
-    return _showReview();
-  }
+  Future<bool> forceReview() async => _showReview();
 
   Future<bool> _showReview() async {
     try {
@@ -143,10 +140,10 @@ class LocalRateReviewService implements RateReviewService {
           _lastPromptKey, _lastPromptDate!.millisecondsSinceEpoch);
       await _prefs?.setInt(_promptCountKey, _promptCount);
 
-      AppLogger.info('Review prompt shown');
+      AppLogger.instance.info('Review prompt shown');
       return true;
     } catch (e) {
-      AppLogger.error('Failed to show review', error: e);
+      AppLogger.instance.error('Failed to show review', error: e);
       return false;
     }
   }
@@ -154,10 +151,10 @@ class LocalRateReviewService implements RateReviewService {
   @override
   Future<bool> openStoreListing() async {
     try {
-      AppLogger.info('Opening store listing');
+      AppLogger.instance.info('Opening store listing');
       return true;
     } catch (e) {
-      AppLogger.error('Failed to open store listing', error: e);
+      AppLogger.instance.error('Failed to open store listing', error: e);
       return false;
     }
   }
@@ -165,7 +162,7 @@ class LocalRateReviewService implements RateReviewService {
   @override
   Future<bool> shouldRequestReview() async {
     if (_launchCount < _config.minLaunches) {
-      AppLogger.debug(
+      AppLogger.instance.debug(
           'Not enough launches: $_launchCount < ${_config.minLaunches}');
       return false;
     }
@@ -173,7 +170,7 @@ class LocalRateReviewService implements RateReviewService {
     if (_installDate != null) {
       final daysSinceInstall = DateTime.now().difference(_installDate!).inDays;
       if (daysSinceInstall < _config.minDaysSinceInstall) {
-        AppLogger.debug(
+        AppLogger.instance.debug(
             'Not enough days since install: $daysSinceInstall < ${_config.minDaysSinceInstall}');
         return false;
       }
@@ -183,21 +180,21 @@ class LocalRateReviewService implements RateReviewService {
       final daysSincePrompt =
           DateTime.now().difference(_lastPromptDate!).inDays;
       if (daysSincePrompt < _config.minDaysBetweenPrompts) {
-        AppLogger.debug(
+        AppLogger.instance.debug(
             'Not enough days since last prompt: $daysSincePrompt < ${_config.minDaysBetweenPrompts}');
         return false;
       }
     }
 
     if (_promptCount >= _config.maxPromptsPerYear) {
-      AppLogger.debug(
+      AppLogger.instance.debug(
           'Max prompts reached: $_promptCount >= ${_config.maxPromptsPerYear}');
       return false;
     }
 
     for (final condition in _config.customConditions) {
       if (!condition()) {
-        AppLogger.debug('Custom condition not met');
+        AppLogger.instance.debug('Custom condition not met');
         return false;
       }
     }
@@ -209,12 +206,12 @@ class LocalRateReviewService implements RateReviewService {
   Future<void> recordLaunch() async {
     _launchCount++;
     await _prefs?.setInt(_launchCountKey, _launchCount);
-    AppLogger.debug('Launch recorded: $_launchCount');
+    AppLogger.instance.debug('Launch recorded: $_launchCount');
   }
 
   @override
   Future<void> recordSignificantEvent(String eventName) async {
-    AppLogger.debug('Significant event recorded: $eventName');
+    AppLogger.instance.debug('Significant event recorded: $eventName');
   }
 
   @override

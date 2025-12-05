@@ -1,4 +1,4 @@
-import '../errors/failures.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
 
 /// Result type para operações que podem falhar.
 /// Implementa Either pattern simplificado com sealed classes do Dart 3.
@@ -59,27 +59,21 @@ sealed class Result<T> {
   Result<T> tapFailure(void Function(AppFailure) action);
 
   /// Zip two Results into a tuple.
-  static Result<(A, B)> zip<A, B>(Result<A> a, Result<B> b) {
-    return a.flatMap((va) => b.map((vb) => (va, vb)));
-  }
+  static Result<(A, B)> zip<A, B>(Result<A> a, Result<B> b) => a.flatMap((va) => b.map((vb) => (va, vb)));
 
   /// Zip three Results into a tuple.
   static Result<(A, B, C)> zip3<A, B, C>(
     Result<A> a,
     Result<B> b,
     Result<C> c,
-  ) {
-    return a.flatMap((va) => b.flatMap((vb) => c.map((vc) => (va, vb, vc))));
-  }
+  ) => a.flatMap((va) => b.flatMap((vb) => c.map((vc) => (va, vb, vc))));
 
   /// Zip with a combiner function.
   static Result<R> zipWith<A, B, R>(
     Result<A> a,
     Result<B> b,
     R Function(A, B) combiner,
-  ) {
-    return a.flatMap((va) => b.map((vb) => combiner(va, vb)));
-  }
+  ) => a.flatMap((va) => b.map((vb) => combiner(va, vb)));
 
   /// Sequence a list of Results into a Result of list.
   static Result<List<T>> sequence<T>(List<Result<T>> results) {
@@ -97,9 +91,7 @@ sealed class Result<T> {
   static Result<List<R>> traverse<T, R>(
     List<T> items,
     Result<R> Function(T) fn,
-  ) {
-    return sequence(items.map(fn).toList());
-  }
+  ) => sequence(items.map(fn).toList());
 
   /// Creates a Result from a nullable value.
   /// Returns Success if value is not null, Failure otherwise.
@@ -161,16 +153,14 @@ sealed class Result<T> {
   }
 
   /// Combines multiple Results, returning first failure or all successes.
-  static Result<List<T>> combine<T>(List<Result<T>> results) {
-    return sequence(results);
-  }
+  static Result<List<T>> combine<T>(List<Result<T>> results) => sequence(results);
 }
 
 /// Representa uma operação bem-sucedida com um valor.
 final class Success<T> extends Result<T> {
-  final T value;
 
   const Success(this.value);
+  final T value;
 
   @override
   R fold<R>(
@@ -247,9 +237,9 @@ final class Success<T> extends Result<T> {
 
 /// Representa uma operação que falhou com uma AppFailure.
 final class Failure<T> extends Result<T> {
-  final AppFailure failure;
 
   const Failure(this.failure);
+  final AppFailure failure;
 
   @override
   R fold<R>(

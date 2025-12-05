@@ -1,13 +1,12 @@
 import 'package:dio/dio.dart';
 
-import '../errors/failures.dart';
-import '../utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Handles network errors and converts them to typed failures.
 class NetworkErrorHandler {
   /// Converts DioException to AppFailure.
-  static AppFailure handleDioException(DioException e) {
-    return switch (e.type) {
+  static AppFailure handleDioException(DioException e) => switch (e.type) {
       DioExceptionType.connectionTimeout ||
       DioExceptionType.sendTimeout ||
       DioExceptionType.receiveTimeout =>
@@ -34,7 +33,6 @@ class NetworkErrorHandler {
           stackTrace: e.stackTrace,
         ),
     };
-  }
 
   static AppFailure _handleStatusCode(DioException e) {
     final statusCode = e.response?.statusCode;
@@ -68,7 +66,7 @@ class NetworkErrorHandler {
           stackTrace: e.stackTrace,
           retryAfter: _parseRetryAfter(e.response?.headers),
         ),
-      >= 500 => ServerFailure(
+      _ when statusCode != null && statusCode >= 500 => ServerFailure(
           'Server error',
           statusCode: statusCode,
           code: 'SERVER_ERROR',
@@ -94,8 +92,9 @@ class NetworkErrorHandler {
             fieldErrors[key] = [value];
           }
         });
+        final message = data['message'];
         return ValidationFailure(
-          data['message'] ?? 'Validation failed',
+          message is String ? message : 'Validation failed',
           fieldErrors: fieldErrors,
           code: 'VALIDATION_ERROR',
           stackTrace: stack,

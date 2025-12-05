@@ -12,58 +12,82 @@ final class MutationIdle<T> extends MutationState<T> {
 
 /// Mutation is in progress.
 final class MutationLoading<T> extends MutationState<T> {
-  final double? progress;
   const MutationLoading({this.progress});
+  final double? progress;
 }
 
 /// Mutation completed successfully.
 final class MutationSuccess<T> extends MutationState<T> {
-  final T data;
   const MutationSuccess(this.data);
+  final T data;
 }
 
 /// Mutation failed with error.
 final class MutationError<T> extends MutationState<T> {
+  const MutationError(this.error, this.stackTrace);
   final Object error;
   final StackTrace stackTrace;
-  const MutationError(this.error, this.stackTrace);
 }
 
 /// Mutation controller for managing side-effect operations with UI feedback.
-class Mutation<T> extends StateNotifier<MutationState<T>> {
-  Mutation() : super(const MutationIdle());
+/// Uses a simple class-based approach compatible with Riverpod 3.0.
+class MutationController<T> {
+  MutationController() : _state = const MutationIdle();
+
+  MutationState<T> _state;
+  final List<void Function(MutationState<T>)> _listeners = [];
+
+  /// Current mutation state.
+  MutationState<T> get state => _state;
 
   /// Whether mutation is currently loading.
-  bool get isLoading => state is MutationLoading<T>;
+  bool get isLoading => _state is MutationLoading<T>;
 
   /// Whether mutation completed successfully.
-  bool get isSuccess => state is MutationSuccess<T>;
+  bool get isSuccess => _state is MutationSuccess<T>;
 
   /// Whether mutation failed.
-  bool get isError => state is MutationError<T>;
+  bool get isError => _state is MutationError<T>;
 
   /// Whether mutation is idle.
-  bool get isIdle => state is MutationIdle<T>;
+  bool get isIdle => _state is MutationIdle<T>;
 
   /// Gets the success data if available.
-  T? get data => state is MutationSuccess<T> 
-      ? (state as MutationSuccess<T>).data 
+  T? get data => _state is MutationSuccess<T> 
+      ? (_state as MutationSuccess<T>).data 
       : null;
 
   /// Gets the error if available.
-  Object? get error => state is MutationError<T> 
-      ? (state as MutationError<T>).error 
+  Object? get error => _state is MutationError<T> 
+      ? (_state as MutationError<T>).error 
       : null;
+
+  void _setState(MutationState<T> newState) {
+    _state = newState;
+    for (final listener in _listeners) {
+      listener(newState);
+    }
+  }
+
+  /// Adds a listener for state changes.
+  void addListener(void Function(MutationState<T>) listener) {
+    _listeners.add(listener);
+  }
+
+  /// Removes a listener.
+  void removeListener(void Function(MutationState<T>) listener) {
+    _listeners.remove(listener);
+  }
 
   /// Executes a mutation operation.
   Future<T?> mutate(Future<T> Function() operation) async {
-    state = const MutationLoading();
+    _setState(MutationLoading<T>());
     try {
       final result = await operation();
-      state = MutationSuccess(result);
+      _setState(MutationSuccess<T>(result));
       return result;
     } catch (e, st) {
-      state = MutationError(e, st);
+      _setState(MutationError<T>(e, st));
       return null;
     }
   }
@@ -72,35 +96,42 @@ class Mutation<T> extends StateNotifier<MutationState<T>> {
   Future<T?> mutateWithProgress(
     Future<T> Function(void Function(double) onProgress) operation,
   ) async {
-    state = const MutationLoading(progress: 0);
+    _setState(MutationLoading<T>(progress: 0));
     try {
       final result = await operation((progress) {
-        state = MutationLoading(progress: progress);
+        _setState(MutationLoading<T>(progress: progress));
       });
-      state = MutationSuccess(result);
+      _setState(MutationSuccess<T>(result));
       return result;
     } catch (e, st) {
-      state = MutationError(e, st);
+      _setState(MutationError<T>(e, st));
       return null;
     }
   }
 
   /// Resets mutation to idle state.
   void reset() {
-    state = const MutationIdle();
+    _setState(MutationIdle<T>());
+  }
+
+  /// Disposes the controller.
+  void dispose() {
+    _listeners.clear();
   }
 }
 
-/// Provider family for creating mutation instances.
-final mutationProvider = StateNotifierProvider.family<Mutation<dynamic>, 
-    MutationState<dynamic>, String>(
-  (ref, key) => Mutation<dynamic>(),
+/// Provider for creating mutation controller instances.
+final mutationControllerProvider = Provider.family<MutationController<dynamic>, String>(
+  (ref, key) {
+    final controller = MutationController<dynamic>();
+    ref.onDispose(controller.dispose);
+    return controller;
+  },
 );
 
 /// Extension for using mutations with Ref.
 extension MutationRefExtension on Ref {
-  /// Creates or gets a mutation by key.
-  Mutation<T> mutation<T>(String key) {
-    return read(mutationProvider(key)) as Mutation<T>;
-  }
+  /// Creates or gets a mutation controller by key.
+  MutationController<T> mutation<T>(String key) => 
+      read(mutationControllerProvider(key)) as MutationController<T>;
 }

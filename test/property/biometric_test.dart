@@ -1,6 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/integrations/auth/biometric_service.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-state-of-art-2025, Property 3: Biometric Fallback**
 /// **Validates: Requirements 13.2**
@@ -68,7 +67,6 @@ void main() {
       // When biometrics not available and biometricOnly is false
       final result = await service.authenticate(
         reason: 'Test fallback',
-        biometricOnly: false,
       );
 
       // Should succeed with fallback (simulated)

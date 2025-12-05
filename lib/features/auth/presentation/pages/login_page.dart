@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/errors/failures.dart';
-import '../providers/auth_provider.dart';
-
 class LoginPage extends ConsumerStatefulWidget {
-  final bool isRegister;
 
   const LoginPage({super.key, this.isRegister = false});
+  final bool isRegister;
 
   @override
   ConsumerState<LoginPage> createState() => _LoginPageState();
@@ -31,10 +30,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final loginState = ref.watch(loginNotifierProvider);
+    final loginState = ref.watch(loginProvider);
     final isLoading = loginState.isLoading;
 
-    ref.listen(loginNotifierProvider, (_, state) {
+    ref.listen(loginProvider, (_, state) {
       state.whenOrNull(
         error: (error, _) {
           final message = error is AppFailure ? error.userMessage : '$error';
@@ -171,7 +170,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
-      ref.read(loginNotifierProvider.notifier).login(
+      ref.read(loginProvider.notifier).login(
             _emailController.text.trim(),
             _passwordController.text,
           );
@@ -179,10 +178,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   void _loginWithGoogle() {
-    ref.read(loginNotifierProvider.notifier).loginWithGoogle();
+    ref.read(loginProvider.notifier).loginWithGoogle();
   }
 
   void _loginWithApple() {
-    ref.read(loginNotifierProvider.notifier).loginWithApple();
+    ref.read(loginProvider.notifier).loginWithApple();
   }
 }

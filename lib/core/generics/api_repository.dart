@@ -1,16 +1,16 @@
-import '../errors/exceptions.dart';
-import '../errors/failures.dart';
-import '../network/api_client.dart';
-import '../utils/result.dart';
-import 'paginated_list.dart';
+import 'package:flutter_base_2025/core/errors/exceptions.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/network/api_client.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Generic repository for API consumption.
 /// T = Entity type, D = DTO type, ID = Identifier type
 abstract class ApiRepository<T, D, ID> {
-  final ApiClient _apiClient;
-  final String _basePath;
 
   ApiRepository(this._apiClient, this._basePath);
+  final ApiClient _apiClient;
+  final String _basePath;
 
   /// Converts DTO to Entity.
   T fromDto(D dto);
@@ -29,7 +29,7 @@ abstract class ApiRepository<T, D, ID> {
     try {
       final dto = await _apiClient.get<D>(
         '$_basePath/$id',
-        fromJson: (json) => dtoFromJson(json),
+        fromJson: dtoFromJson,
       );
       return Success(fromDto(dto));
     } on AppException catch (e) {
@@ -49,7 +49,7 @@ abstract class ApiRepository<T, D, ID> {
         page: page,
         pageSize: pageSize,
         queryParameters: queryParams,
-        fromJson: (json) => dtoFromJson(json),
+        fromJson: dtoFromJson,
       );
 
       return Success(
@@ -71,7 +71,7 @@ abstract class ApiRepository<T, D, ID> {
       final dto = await _apiClient.post<D>(
         _basePath,
         data: toDto(entity),
-        fromJson: (json) => dtoFromJson(json),
+        fromJson: dtoFromJson,
       );
       return Success(fromDto(dto));
     } on AppException catch (e) {
@@ -86,7 +86,7 @@ abstract class ApiRepository<T, D, ID> {
       final dto = await _apiClient.put<D>(
         '$_basePath/$id',
         data: toDto(entity),
-        fromJson: (json) => dtoFromJson(json),
+        fromJson: dtoFromJson,
       );
       return Success(fromDto(dto));
     } on AppException catch (e) {
@@ -105,8 +105,7 @@ abstract class ApiRepository<T, D, ID> {
   }
 
   /// Maps exceptions to failures.
-  AppFailure _mapExceptionToFailure(AppException e) {
-    return switch (e) {
+  AppFailure _mapExceptionToFailure(AppException e) => switch (e) {
       NetworkException() => NetworkFailure(e.message),
       ServerException() => ServerFailure(e.message, statusCode: e.statusCode),
       ValidationException(:final fieldErrors) =>
@@ -117,5 +116,4 @@ abstract class ApiRepository<T, D, ID> {
       RateLimitException() => RateLimitFailure(e.message),
       CacheException() => CacheFailure(e.message),
     };
-  }
 }

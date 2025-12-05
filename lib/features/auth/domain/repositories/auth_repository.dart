@@ -1,5 +1,5 @@
-import '../../../../core/utils/result.dart';
-import '../entities/user.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
 
 /// Authentication repository interface.
 /// Defined in domain layer - no external dependencies.
@@ -45,8 +45,8 @@ sealed class AuthState {
 }
 
 final class AuthStateAuthenticated extends AuthState {
-  final User user;
   const AuthStateAuthenticated(this.user);
+  final User user;
 }
 
 final class AuthStateUnauthenticated extends AuthState {
@@ -58,8 +58,8 @@ final class AuthStateLoading extends AuthState {
 }
 
 final class AuthStateError extends AuthState {
-  final String message;
   const AuthStateError(this.message);
+  final String message;
 }
 
 /// Extension for checking auth state.

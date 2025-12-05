@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/observability/crash_reporter.dart';
+import 'package:flutter_base_2025/core/observability/crash_reporter.dart';
 
 // Widget Previewer annotations for IDE preview support (Flutter 3.38+)
 // @Preview(name: 'Error State', width: 400, height: 300)
@@ -8,19 +8,18 @@ import '../../core/observability/crash_reporter.dart';
 
 /// Error boundary widget that catches and displays errors gracefully.
 class ErrorBoundary extends StatefulWidget {
+
+  const ErrorBoundary({
+    required this.child, super.key,
+    this.errorBuilder,
+    this.onError,
+    this.crashReporter,
+  });
   final Widget child;
   final Widget Function(Object error, StackTrace? stack, VoidCallback retry)?
       errorBuilder;
   final void Function(Object error, StackTrace? stack)? onError;
   final CrashReporter? crashReporter;
-
-  const ErrorBoundary({
-    super.key,
-    required this.child,
-    this.errorBuilder,
-    this.onError,
-    this.crashReporter,
-  });
 
   @override
   State<ErrorBoundary> createState() => _ErrorBoundaryState();
@@ -37,7 +36,7 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
     });
 
     widget.onError?.call(error, stack);
-    widget.crashReporter?.reportError(error, stack);
+    widget.crashReporter?.reportError(error, stack ?? StackTrace.current);
   }
 
   void _retry() {
@@ -62,17 +61,15 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
 }
 
 class _ErrorBoundaryInherited extends InheritedWidget {
-  final void Function(Object, StackTrace?) onError;
 
   const _ErrorBoundaryInherited({
     required this.onError,
     required super.child,
   });
+  final void Function(Object, StackTrace?) onError;
 
-  static _ErrorBoundaryInherited? of(BuildContext context) {
-    return context
+  static _ErrorBoundaryInherited? of(BuildContext context) => context
         .dependOnInheritedWidgetOfExactType<_ErrorBoundaryInherited>();
-  }
 
   @override
   bool updateShouldNotify(_ErrorBoundaryInherited oldWidget) => false;
@@ -87,14 +84,12 @@ extension ErrorBoundaryContext on BuildContext {
 
 /// Default error widget with retry button.
 class DefaultErrorWidget extends StatelessWidget {
-  final Object error;
-  final VoidCallback onRetry;
 
   const DefaultErrorWidget({
-    super.key,
-    required this.error,
-    required this.onRetry,
+    required this.error, required this.onRetry, super.key,
   });
+  final Object error;
+  final VoidCallback onRetry;
 
   @override
   Widget build(BuildContext context) {
@@ -150,14 +145,13 @@ class DefaultErrorWidget extends StatelessWidget {
 
 /// Compact error widget for inline use.
 class CompactErrorWidget extends StatelessWidget {
-  final String message;
-  final VoidCallback? onRetry;
 
   const CompactErrorWidget({
-    super.key,
-    required this.message,
+    required this.message, super.key,
     this.onRetry,
   });
+  final String message;
+  final VoidCallback? onRetry;
 
   @override
   Widget build(BuildContext context) {

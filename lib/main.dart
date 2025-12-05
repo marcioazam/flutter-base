@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_base_2025/core/config/app_config.dart';
+import 'package:flutter_base_2025/core/router/app_router.dart';
+import 'package:flutter_base_2025/core/theme/app_theme.dart';
+import 'package:flutter_base_2025/shared/providers/locale_provider.dart';
+import 'package:flutter_base_2025/shared/providers/theme_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'core/config/app_config.dart';
-import 'core/router/app_router.dart';
-import 'core/theme/app_theme.dart';
-import 'shared/providers/locale_provider.dart';
-import 'shared/providers/theme_provider.dart';
 
 /// Main entry point - use flavor-specific main files for different environments.
 void main() async {

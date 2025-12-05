@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/shared/widgets/responsive_builder.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-base-2025, Property 24: Responsive Layout Adaptation**
 /// **Validates: Requirements 6.3**
@@ -111,7 +113,7 @@ void main() {
     group('Property Tests', () {
       /// **Property 24: Responsive Layout Adaptation**
       /// For any screen size change, the layout SHALL adapt according to defined breakpoints.
-      Glados<int>(iterations: 100).test(
+      Glados<int>(any.int, _explore).test(
         'screen size determines correct ScreenSize enum',
         (width) {
           final normalizedWidth = (width.abs() % 2000) + 100;

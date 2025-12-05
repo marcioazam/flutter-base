@@ -1,20 +1,13 @@
 import 'dart:async';
 
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Notification importance level.
 enum NotificationImportance { min, low, normal, high, max }
 
 /// Notification channel configuration.
 class NotificationChannel {
-  final String id;
-  final String name;
-  final String? description;
-  final NotificationImportance importance;
-  final bool playSound;
-  final bool enableVibration;
-  final bool showBadge;
 
   const NotificationChannel({
     required this.id,
@@ -25,18 +18,17 @@ class NotificationChannel {
     this.enableVibration = true,
     this.showBadge = true,
   });
+  final String id;
+  final String name;
+  final String? description;
+  final NotificationImportance importance;
+  final bool playSound;
+  final bool enableVibration;
+  final bool showBadge;
 }
 
 /// Local notification configuration.
 class LocalNotification {
-  final int id;
-  final String title;
-  final String body;
-  final String? channelId;
-  final String? payload;
-  final String? iconPath;
-  final String? soundPath;
-  final bool ongoing;
 
   const LocalNotification({
     required this.id,
@@ -48,12 +40,18 @@ class LocalNotification {
     this.soundPath,
     this.ongoing = false,
   });
+  final int id;
+  final String title;
+  final String body;
+  final String? channelId;
+  final String? payload;
+  final String? iconPath;
+  final String? soundPath;
+  final bool ongoing;
 }
 
 /// Scheduled notification configuration.
 class ScheduledNotification extends LocalNotification {
-  final DateTime scheduledDate;
-  final bool allowWhileIdle;
 
   const ScheduledNotification({
     required super.id,
@@ -66,12 +64,12 @@ class ScheduledNotification extends LocalNotification {
     super.soundPath,
     this.allowWhileIdle = true,
   });
+  final DateTime scheduledDate;
+  final bool allowWhileIdle;
 }
 
 /// Recurring notification configuration.
 class RecurringNotification extends LocalNotification {
-  final Duration interval;
-  final DateTime? startDate;
 
   const RecurringNotification({
     required super.id,
@@ -84,6 +82,8 @@ class RecurringNotification extends LocalNotification {
     super.iconPath,
     super.soundPath,
   });
+  final Duration interval;
+  final DateTime? startDate;
 }
 
 /// Abstract local notification service interface.

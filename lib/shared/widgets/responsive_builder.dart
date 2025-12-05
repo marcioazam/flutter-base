@@ -26,37 +26,32 @@ extension ScreenSizeExtension on BuildContext {
 
 /// Responsive builder widget.
 class ResponsiveBuilder extends StatelessWidget {
+
+  const ResponsiveBuilder({required this.builder, super.key});
   final Widget Function(BuildContext context, ScreenSize screenSize) builder;
 
-  const ResponsiveBuilder({super.key, required this.builder});
-
   @override
-  Widget build(BuildContext context) {
-    return builder(context, context.screenSize);
-  }
+  Widget build(BuildContext context) => builder(context, context.screenSize);
 }
 
 /// Responsive layout widget with different builders for each size.
 class ResponsiveLayout extends StatelessWidget {
+
+  const ResponsiveLayout({
+    required this.mobile, super.key,
+    this.tablet,
+    this.desktop,
+  });
   final Widget mobile;
   final Widget? tablet;
   final Widget? desktop;
 
-  const ResponsiveLayout({
-    super.key,
-    required this.mobile,
-    this.tablet,
-    this.desktop,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return switch (context.screenSize) {
+  Widget build(BuildContext context) => switch (context.screenSize) {
       ScreenSize.desktop => desktop ?? tablet ?? mobile,
       ScreenSize.tablet => tablet ?? mobile,
       ScreenSize.mobile => mobile,
     };
-  }
 }
 
 /// Responsive value helper.
@@ -65,28 +60,25 @@ T responsiveValue<T>(
   required T mobile,
   T? tablet,
   T? desktop,
-}) {
-  return switch (context.screenSize) {
+}) => switch (context.screenSize) {
     ScreenSize.desktop => desktop ?? tablet ?? mobile,
     ScreenSize.tablet => tablet ?? mobile,
     ScreenSize.mobile => mobile,
   };
-}
 
 /// Responsive padding.
 class ResponsivePadding extends StatelessWidget {
-  final Widget child;
-  final EdgeInsets? mobile;
-  final EdgeInsets? tablet;
-  final EdgeInsets? desktop;
 
   const ResponsivePadding({
-    super.key,
-    required this.child,
+    required this.child, super.key,
     this.mobile,
     this.tablet,
     this.desktop,
   });
+  final Widget child;
+  final EdgeInsets? mobile;
+  final EdgeInsets? tablet;
+  final EdgeInsets? desktop;
 
   @override
   Widget build(BuildContext context) {

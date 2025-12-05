@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
-import 'app_typography.dart';
+import 'package:flutter_base_2025/core/theme/app_colors.dart';
+import 'package:flutter_base_2025/core/theme/app_typography.dart';
 
 /// App theme configuration with Material 3.
 /// 
@@ -65,11 +65,8 @@ abstract final class AppTheme {
     if (isDark) {
       return const ColorScheme.dark(
         primary: Colors.white,
-        onPrimary: Colors.black,
         secondary: Colors.yellow,
-        onSecondary: Colors.black,
         surface: Colors.black,
-        onSurface: Colors.white,
         error: Colors.red,
         onError: Colors.white,
         outline: Colors.white,
@@ -78,13 +75,9 @@ abstract final class AppTheme {
 
     return const ColorScheme.light(
       primary: Colors.black,
-      onPrimary: Colors.white,
       secondary: Color(0xFF0000AA),
       onSecondary: Colors.white,
-      surface: Colors.white,
-      onSurface: Colors.black,
       error: Color(0xFFAA0000),
-      onError: Colors.white,
       outline: Colors.black,
     );
   }
@@ -108,7 +101,7 @@ abstract final class AppTheme {
         backgroundColor: colorScheme.surface,
         foregroundColor: colorScheme.onSurface,
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
@@ -179,7 +172,7 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.circular(8),
         ),
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
@@ -208,45 +201,38 @@ abstract final class AppTheme {
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 32.4**
 class AnimatedAppTheme extends StatelessWidget {
+
+  const AnimatedAppTheme({
+    required this.theme, required this.child, super.key,
+    this.duration = const Duration(milliseconds: 300),
+    this.curve = Curves.easeInOut,
+  });
   final ThemeData theme;
   final Duration duration;
   final Curve curve;
   final Widget child;
 
-  const AnimatedAppTheme({
-    super.key,
-    required this.theme,
-    this.duration = const Duration(milliseconds: 300),
-    this.curve = Curves.easeInOut,
-    required this.child,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return AnimatedTheme(
+  Widget build(BuildContext context) => AnimatedTheme(
       data: theme,
       duration: duration,
       curve: curve,
       child: child,
     );
-  }
 }
 
 /// Custom theme extension for additional colors.
 class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
+
+  AppThemeExtension({
+    required this.isDark,
+    required this.success, required this.warning, required this.info, this.isHighContrast = false,
+  });
   final bool isDark;
   final bool isHighContrast;
   final Color success;
   final Color warning;
   final Color info;
-
-  AppThemeExtension({
-    required this.isDark,
-    this.isHighContrast = false,
-    required this.success,
-    required this.warning,
-    required this.info,
-  });
 
   @override
   ThemeExtension<AppThemeExtension> copyWith({
@@ -255,15 +241,13 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     Color? success,
     Color? warning,
     Color? info,
-  }) {
-    return AppThemeExtension(
+  }) => AppThemeExtension(
       isDark: isDark ?? this.isDark,
       isHighContrast: isHighContrast ?? this.isHighContrast,
       success: success ?? this.success,
       warning: warning ?? this.warning,
       info: info ?? this.info,
     );
-  }
 
   @override
   ThemeExtension<AppThemeExtension> lerp(

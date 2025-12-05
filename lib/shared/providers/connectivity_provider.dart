@@ -1,14 +1,11 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:flutter_base_2025/core/observability/app_logger.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/observability/app_logger.dart';
-
 /// Provider for Connectivity instance.
-final connectivityProvider = Provider<Connectivity>((ref) {
-  return Connectivity();
-});
+final connectivityProvider = Provider<Connectivity>((ref) => Connectivity());
 
 /// Provider for current connectivity status.
 final connectivityStatusProvider =
@@ -27,9 +24,7 @@ final isOnlineProvider = Provider<bool>((ref) {
 });
 
 /// Provider for connectivity service with additional utilities.
-final connectivityServiceProvider = Provider<ConnectivityService>((ref) {
-  return ConnectivityService(ref.watch(connectivityProvider));
-});
+final connectivityServiceProvider = Provider<ConnectivityService>((ref) => ConnectivityService(ref.watch(connectivityProvider)));
 
 /// Callback type for sync operations.
 typedef SyncCallback = Future<void> Function();
@@ -39,14 +34,14 @@ typedef SyncCallback = Future<void> Function();
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 36.4**
 class ConnectivityService {
-  final Connectivity _connectivity;
-  final List<SyncCallback> _syncCallbacks = [];
-  StreamSubscription<List<ConnectivityResult>>? _subscription;
-  bool _wasOffline = false;
 
   ConnectivityService(this._connectivity) {
     _initConnectivityListener();
   }
+  final Connectivity _connectivity;
+  final List<SyncCallback> _syncCallbacks = [];
+  StreamSubscription<List<ConnectivityResult>>? _subscription;
+  bool _wasOffline = false;
 
   void _initConnectivityListener() {
     _subscription = _connectivity.onConnectivityChanged.listen((results) {
@@ -61,13 +56,13 @@ class ConnectivityService {
   }
 
   Future<void> _triggerSync() async {
-    AppLogger.info('Connectivity restored, triggering sync operations');
+    AppLogger.instance.info('Connectivity restored, triggering sync operations');
 
     for (final callback in _syncCallbacks) {
       try {
         await callback();
       } catch (e, stack) {
-        AppLogger.error('Sync callback failed', error: e, stackTrace: stack);
+        AppLogger.instance.error('Sync callback failed', error: e, stackTrace: stack);
       }
     }
   }
@@ -75,13 +70,13 @@ class ConnectivityService {
   /// Registers a callback to be called when connectivity is restored.
   void registerSyncCallback(SyncCallback callback) {
     _syncCallbacks.add(callback);
-    AppLogger.debug('Sync callback registered');
+    AppLogger.instance.debug('Sync callback registered');
   }
 
   /// Unregisters a sync callback.
   void unregisterSyncCallback(SyncCallback callback) {
     _syncCallbacks.remove(callback);
-    AppLogger.debug('Sync callback unregistered');
+    AppLogger.instance.debug('Sync callback unregistered');
   }
 
   /// Manually triggers all sync callbacks.
@@ -113,15 +108,12 @@ class ConnectivityService {
   }
 
   /// Stream of connectivity changes.
-  Stream<bool> get onConnectivityChanged {
-    return _connectivity.onConnectivityChanged.map(
+  Stream<bool> get onConnectivityChanged => _connectivity.onConnectivityChanged.map(
       (results) => !results.contains(ConnectivityResult.none),
     );
-  }
 
   /// Stream of connection type changes.
-  Stream<ConnectionType> get onConnectionTypeChanged {
-    return _connectivity.onConnectivityChanged.map((results) {
+  Stream<ConnectionType> get onConnectionTypeChanged => _connectivity.onConnectivityChanged.map((results) {
       if (results.contains(ConnectivityResult.wifi)) {
         return ConnectionType.wifi;
       } else if (results.contains(ConnectivityResult.mobile)) {
@@ -134,7 +126,6 @@ class ConnectivityService {
         return ConnectionType.none;
       }
     });
-  }
 
   /// Disposes resources.
   void dispose() {

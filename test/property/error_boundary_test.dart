@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/shared/widgets/error_boundary_widget.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-2025-final-polish, Property 9: Error Boundary Recovery**
 /// **Validates: Requirements 14.1, 14.2, 14.4**

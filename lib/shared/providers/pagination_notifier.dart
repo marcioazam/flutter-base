@@ -1,14 +1,12 @@
+import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../core/generics/paginated_list.dart';
-import '../../core/utils/result.dart';
+/// Sentinel value for copyWith to distinguish between null and not provided.
+const _sentinel = Object();
 
 /// State for paginated data.
 class PaginationState<T> {
-  final PaginatedList<T> data;
-  final bool isLoadingMore;
-  final bool isRefreshing;
-  final String? error;
 
   const PaginationState({
     required this.data,
@@ -20,20 +18,22 @@ class PaginationState<T> {
   factory PaginationState.initial() => PaginationState(
         data: PaginatedList.empty(),
       );
+  final PaginatedList<T> data;
+  final bool isLoadingMore;
+  final bool isRefreshing;
+  final String? error;
 
   PaginationState<T> copyWith({
     PaginatedList<T>? data,
     bool? isLoadingMore,
     bool? isRefreshing,
-    String? error,
-  }) {
-    return PaginationState(
+    Object? error = _sentinel,
+  }) => PaginationState(
       data: data ?? this.data,
       isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       isRefreshing: isRefreshing ?? this.isRefreshing,
-      error: error,
+      error: error == _sentinel ? this.error : error as String?,
     );
-  }
 
   /// Returns true if initial load is in progress.
   bool get isInitialLoading => data.isEmpty && !isLoadingMore && error == null;
@@ -54,11 +54,11 @@ class PaginationState<T> {
 /// Generic pagination notifier for infinite scroll.
 /// T = Item type
 abstract class PaginationNotifier<T>
-    extends AutoDisposeAsyncNotifier<PaginationState<T>> {
-  int _currentPage = 1;
-  final int _pageSize;
+    extends AsyncNotifier<PaginationState<T>> {
 
   PaginationNotifier({int pageSize = 20}) : _pageSize = pageSize;
+  int _currentPage = 1;
+  final int _pageSize;
 
   /// Fetches a page of data. Override in subclass.
   Future<Result<PaginatedList<T>>> fetchPage(int page, int pageSize);
@@ -145,20 +145,26 @@ abstract class PaginationNotifier<T>
   }
 }
 
+/// Extension to add valueOrNull to AsyncValue for Riverpod 3.0 compatibility.
+extension AsyncValueNullable<T> on AsyncValue<T> {
+  /// Returns the value if available, null otherwise.
+  T? get valueOrNull => whenOrNull(data: (v) => v);
+}
+
 /// Extension for easy pagination state handling in widgets.
 extension PaginationStateExtension<T> on AsyncValue<PaginationState<T>> {
   /// Returns items or empty list.
-  List<T> get items => valueOrNull?.data.items ?? [];
+  List<T> get items => whenOrNull(data: (s) => s.data.items) ?? [];
 
   /// Returns true if loading more.
-  bool get isLoadingMore => valueOrNull?.isLoadingMore ?? false;
+  bool get isLoadingMore => whenOrNull(data: (s) => s.isLoadingMore) ?? false;
 
   /// Returns true if refreshing.
-  bool get isRefreshing => valueOrNull?.isRefreshing ?? false;
+  bool get isRefreshing => whenOrNull(data: (s) => s.isRefreshing) ?? false;
 
   /// Returns true if can load more.
-  bool get canLoadMore => valueOrNull?.canLoadMore ?? false;
+  bool get canLoadMore => whenOrNull(data: (s) => s.canLoadMore) ?? false;
 
   /// Returns error message or null.
-  String? get errorMessage => valueOrNull?.error;
+  String? get errorMessage => whenOrNull(data: (s) => s.error);
 }

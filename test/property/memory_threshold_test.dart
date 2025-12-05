@@ -1,130 +1,120 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/observability/performance_monitor.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
 
-/// **Feature: flutter-2025-final-polish, Property 8: Memory Threshold Cache Cleanup**
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
+
+/// **Feature: flutter-2025-final-polish, Property 8: Performance Monitor Tests**
 /// **Validates: Requirements 12.4**
 void main() {
-  group('Memory Threshold Properties', () {
-    late MemoryMonitor monitor;
-    late bool cleanupCalled;
+  group('PerformanceMonitor Properties', () {
+    late PerformanceMonitor monitor;
 
     setUp(() {
-      cleanupCalled = false;
-      monitor = MemoryMonitor(
-        thresholdBytes: 100 * 1024 * 1024, // 100MB
-        onThresholdExceeded: () => cleanupCalled = true,
-      );
+      monitor = PerformanceMonitor.instance;
+      monitor.clear();
     });
 
-    tearDown(() {
-      monitor.dispose();
+    test('startTrace creates a new trace', () {
+      final trace = monitor.startTrace('test_operation');
+
+      expect(trace, isNotNull);
+      expect(trace.name, equals('test_operation'));
+      expect(trace.isRunning, isTrue);
     });
 
-    Glados<int>(iterations: 100).test(
-      'Cleanup callback is triggered when memory exceeds threshold',
-      (memoryMB) async {
-        // Ensure positive memory value
-        final memoryBytes = (memoryMB.abs() % 500 + 1) * 1024 * 1024;
-        final threshold = 100 * 1024 * 1024; // 100MB
+    test('stopTrace returns duration', () {
+      monitor.startTrace('test_operation');
+      final duration = monitor.stopTrace('test_operation');
 
-        cleanupCalled = false;
-        monitor.reportMemoryUsage(memoryBytes);
-        await monitor.checkMemory();
+      expect(duration, isNotNull);
+      expect(duration!.inMicroseconds, greaterThanOrEqualTo(0));
+    });
 
-        if (memoryBytes > threshold) {
-          expect(cleanupCalled, isTrue,
-              reason: 'Cleanup should be called when memory ($memoryBytes) > threshold ($threshold)');
-        } else {
-          expect(cleanupCalled, isFalse,
-              reason: 'Cleanup should NOT be called when memory ($memoryBytes) <= threshold ($threshold)');
-        }
+    test('stopTrace returns null for non-existent trace', () {
+      final duration = monitor.stopTrace('non_existent');
+      expect(duration, isNull);
+    });
+
+    Glados<String>(any.nonEmptyLetters, _explore).test(
+      'Trace names are preserved correctly',
+      (name) {
+        final safeName = name.replaceAll(RegExp(r'[^\w]'), '_');
+        final trace = monitor.startTrace(safeName);
+
+        expect(trace.name, equals(safeName));
+        monitor.stopTrace(safeName);
       },
     );
 
-    test('Cleanup is NOT triggered when memory is below threshold', () async {
-      monitor.reportMemoryUsage(50 * 1024 * 1024); // 50MB
-      final result = await monitor.checkMemory();
+    test('measure captures operation duration', () {
+      final result = monitor.measure('sync_op', () {
+        var sum = 0;
+        for (var i = 0; i < 1000; i++) {
+          sum += i;
+        }
+        return sum;
+      });
 
-      expect(result.exceeded, isFalse);
-      expect(cleanupCalled, isFalse);
+      expect(result, equals(499500));
+      expect(monitor.completedTraces.any((t) => t.name == 'sync_op'), isTrue);
     });
 
-    test('Cleanup IS triggered when memory exceeds threshold', () async {
-      monitor.reportMemoryUsage(150 * 1024 * 1024); // 150MB
-      final result = await monitor.checkMemory();
+    test('measureAsync captures async operation duration', () async {
+      final result = await monitor.measureAsync('async_op', () async {
+        await Future<void>.delayed(const Duration(milliseconds: 10));
+        return 42;
+      });
 
-      expect(result.exceeded, isTrue);
-      expect(cleanupCalled, isTrue);
+      expect(result, equals(42));
+      expect(monitor.completedTraces.any((t) => t.name == 'async_op'), isTrue);
     });
 
-    test('Cleanup is triggered at exact threshold boundary', () async {
-      // At exactly threshold, should NOT trigger (> not >=)
-      monitor.reportMemoryUsage(100 * 1024 * 1024); // Exactly 100MB
-      final result = await monitor.checkMemory();
+    test('averageDuration calculates correctly', () {
+      for (var i = 0; i < 5; i++) {
+        monitor.startTrace('repeated_op');
+        monitor.stopTrace('repeated_op');
+      }
 
-      expect(result.exceeded, isFalse);
-      expect(cleanupCalled, isFalse);
+      final avg = monitor.averageDuration('repeated_op');
+      expect(avg, isNotNull);
     });
 
-    test('Cleanup is triggered just above threshold', () async {
-      monitor.reportMemoryUsage(100 * 1024 * 1024 + 1); // 100MB + 1 byte
-      final result = await monitor.checkMemory();
-
-      expect(result.exceeded, isTrue);
-      expect(cleanupCalled, isTrue);
+    test('averageDuration returns null for unknown trace', () {
+      final avg = monitor.averageDuration('unknown_op');
+      expect(avg, isNull);
     });
 
-    test('MemoryCheckResult calculates usage percentage correctly', () async {
-      monitor.reportMemoryUsage(75 * 1024 * 1024); // 75MB
-      final result = await monitor.checkMemory();
+    test('clear removes all traces', () {
+      monitor.startTrace('op1');
+      monitor.stopTrace('op1');
+      monitor.startTrace('op2');
+      monitor.stopTrace('op2');
 
-      expect(result.usagePercentage, closeTo(75.0, 0.1));
+      monitor.clear();
+
+      expect(monitor.completedTraces, isEmpty);
     });
 
-    test('simulateMemoryPressure triggers check', () async {
-      monitor.simulateMemoryPressure(200 * 1024 * 1024); // 200MB
+    test('PerformanceTrace attributes work correctly', () {
+      final trace = PerformanceTrace('test');
+      trace.setAttribute('key1', 'value1');
+      trace.setAttribute('key2', 42);
 
-      // Give async callback time to execute
-      await Future.delayed(Duration.zero);
-
-      expect(cleanupCalled, isTrue);
+      expect(trace.isRunning, isTrue);
+      trace.stop();
+      expect(trace.isRunning, isFalse);
     });
 
-    test('Custom threshold is respected', () async {
-      final customMonitor = MemoryMonitor(
-        thresholdBytes: 50 * 1024 * 1024, // 50MB threshold
-        onThresholdExceeded: () => cleanupCalled = true,
-      );
+    test('PerformanceTrace metrics work correctly', () {
+      final trace = PerformanceTrace('test');
+      trace.incrementMetric('counter');
+      trace.incrementMetric('counter');
+      trace.incrementMetric('counter', 5);
 
-      cleanupCalled = false;
-      customMonitor.reportMemoryUsage(60 * 1024 * 1024); // 60MB
-      await customMonitor.checkMemory();
-
-      expect(cleanupCalled, isTrue);
-
-      customMonitor.dispose();
-    });
-  });
-
-  group('MemoryMonitorService', () {
-    test('Singleton instance is created', () {
-      final instance1 = MemoryMonitorService.instance;
-      final instance2 = MemoryMonitorService.instance;
-
-      expect(identical(instance1, instance2), isTrue);
-    });
-
-    test('Configure creates new instance with settings', () {
-      var called = false;
-      MemoryMonitorService.configure(
-        thresholdBytes: 200 * 1024 * 1024,
-        onThresholdExceeded: () => called = true,
-      );
-
-      final instance = MemoryMonitorService.instance;
-      expect(instance.thresholdBytes, equals(200 * 1024 * 1024));
+      expect(trace.getMetric('counter'), equals(7));
+      expect(trace.getMetric('unknown'), isNull);
     });
   });
 }

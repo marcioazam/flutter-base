@@ -1,24 +1,30 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_base_2025/core/constants/app_constants.dart';
+import 'package:flutter_base_2025/core/router/route_guards.dart';
+import 'package:flutter_base_2025/features/auth/presentation/pages/login_page.dart';
+import 'package:flutter_base_2025/features/auth/presentation/providers/auth_provider.dart';
+import 'package:flutter_base_2025/features/home/presentation/pages/home_page.dart';
+import 'package:flutter_base_2025/features/settings/presentation/pages/settings_page.dart';
+import 'package:flutter_base_2025/shared/widgets/main_shell.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/auth/presentation/pages/login_page.dart';
-import '../../features/auth/presentation/providers/auth_provider.dart';
-import '../../features/home/presentation/pages/home_page.dart';
-import '../../features/settings/presentation/pages/settings_page.dart';
-import '../../shared/widgets/main_shell.dart';
-import '../constants/app_constants.dart';
-import 'route_guards.dart';
-
 /// Provider for GoRouter instance.
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authStateProvider);
+  // Watch auth state changes to trigger router refresh
+  ref.watch(authStateProvider);
   final routeGuard = RouteGuard(ref);
+
+  // Create a simple notifier that triggers on auth changes
+  final refreshNotifier = _RouterRefreshNotifier();
+  ref.listen(authStateProvider, (_, __) => refreshNotifier.notify());
 
   return GoRouter(
     initialLocation: RoutePaths.home,
     debugLogDiagnostics: true,
-    refreshListenable: GoRouterRefreshStream(authState),
+    refreshListenable: refreshNotifier,
     redirect: routeGuard.redirect,
     routes: [
       // Auth routes (no shell)
@@ -69,10 +75,29 @@ final routerProvider = Provider<GoRouter>((ref) {
   );
 });
 
+/// Simple notifier for GoRouter refresh.
+class _RouterRefreshNotifier extends ChangeNotifier {
+  void notify() => notifyListeners();
+}
+
 /// Stream that notifies GoRouter when auth state changes.
+/// @deprecated Use _RouterRefreshNotifier instead
 class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream(AsyncValue<AuthState> authState) {
+  GoRouterRefreshStream([Stream<dynamic>? stream]) {
     notifyListeners();
+    if (stream != null) {
+      _subscription = stream.asBroadcastStream().listen((_) {
+        notifyListeners();
+      });
+    }
+  }
+
+  StreamSubscription<dynamic>? _subscription;
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 }
 

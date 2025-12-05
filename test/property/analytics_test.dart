@@ -1,8 +1,10 @@
 import 'package:flutter/widgets.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/observability/analytics_service.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-modernization-2025, Property 11: Analytics Screen View Logging**
 /// **Validates: Requirements 22.1**
@@ -83,10 +85,7 @@ class TestRoute extends PageRoute<void> {
   final String routeName;
 
   @override
-  String? get settings => null;
-
-  @override
-  RouteSettings get settings_ => RouteSettings(name: routeName);
+  RouteSettings get settings => RouteSettings(name: routeName);
 
   @override
   Color? get barrierColor => null;
@@ -119,9 +118,10 @@ void main() {
       observer = AnalyticsNavigatorObserver(analytics);
     });
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'logScreenView records screen name correctly',
       (screenName) async {
+        analytics.clear(); // Clear state for each iteration
         final validName = '/${screenName.replaceAll(RegExp(r'[^\w]'), '_')}';
         await analytics.logScreenView(screenName: validName);
 
@@ -130,9 +130,10 @@ void main() {
       },
     );
 
-    Glados2<String, String>(iterations: 100).test(
+    Glados2<String, String>(any.lowercaseLetters, any.lowercaseLetters, _explore).test(
       'logScreenView records screen name and class',
       (screenName, screenClass) async {
+        analytics.clear(); // Clear state for each iteration
         final validName = '/${screenName.replaceAll(RegExp(r'[^\w]'), '_')}';
         final validClass = screenClass.replaceAll(RegExp(r'[^\w]'), '');
 
@@ -179,9 +180,10 @@ void main() {
       expect(analytics.screenViews[2]['screenName'], equals('/profile'));
     });
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'logEvent records event name correctly',
       (eventName) async {
+        analytics.clear(); // Clear state for each iteration
         final validName = eventName.replaceAll(RegExp(r'[^\w]'), '_');
         await analytics.logEvent(name: validName);
 

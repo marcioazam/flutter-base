@@ -1,11 +1,5 @@
 /// Paginated list for domain layer.
 class PaginatedList<T> {
-  final List<T> items;
-  final int page;
-  final int pageSize;
-  final int totalItems;
-  final int totalPages;
-  final bool hasMore;
 
   const PaginatedList({
     required this.items,
@@ -43,6 +37,12 @@ class PaginatedList<T> {
       hasMore: page < totalPages,
     );
   }
+  final List<T> items;
+  final int page;
+  final int pageSize;
+  final int totalItems;
+  final int totalPages;
+  final bool hasMore;
 
   /// Returns true if list is empty.
   bool get isEmpty => items.isEmpty;
@@ -70,8 +70,7 @@ class PaginatedList<T> {
       );
 
   /// Concatenates with another paginated list (for infinite scroll).
-  PaginatedList<T> concat(PaginatedList<T> other) {
-    return PaginatedList(
+  PaginatedList<T> concat(PaginatedList<T> other) => PaginatedList(
       items: [...items, ...other.items],
       page: other.page,
       pageSize: pageSize,
@@ -79,7 +78,6 @@ class PaginatedList<T> {
       totalPages: other.totalPages,
       hasMore: other.hasMore,
     );
-  }
 
   /// Filters items while preserving pagination metadata.
   PaginatedList<T> where(bool Function(T) test) => PaginatedList(
@@ -102,8 +100,7 @@ class PaginatedList<T> {
     int? totalItems,
     int? totalPages,
     bool? hasMore,
-  }) {
-    return PaginatedList(
+  }) => PaginatedList(
       items: items ?? this.items,
       page: page ?? this.page,
       pageSize: pageSize ?? this.pageSize,
@@ -111,7 +108,6 @@ class PaginatedList<T> {
       totalPages: totalPages ?? this.totalPages,
       hasMore: hasMore ?? this.hasMore,
     );
-  }
 
   @override
   String toString() =>

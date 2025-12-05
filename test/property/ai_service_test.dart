@@ -1,7 +1,6 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/integrations/ai/ai_service.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-2025-final-polish, Property 5: AI Error Mapping**
 /// **Validates: Requirements 10.4**

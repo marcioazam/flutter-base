@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 
 /// Skeleton shimmer animation widget.
 class SkeletonWidget extends StatefulWidget {
-  final double? width;
-  final double? height;
-  final BorderRadius? borderRadius;
-  final EdgeInsets? margin;
-  final bool isCircle;
 
   const SkeletonWidget({
     super.key,
@@ -19,8 +14,7 @@ class SkeletonWidget extends StatefulWidget {
 
   /// Creates a circular skeleton.
   const SkeletonWidget.circle({
-    super.key,
-    required double size,
+    required double size, super.key,
     this.margin,
   })  : width = size,
         height = size,
@@ -33,15 +27,18 @@ class SkeletonWidget extends StatefulWidget {
     double? width,
     double height = 16,
     EdgeInsets? margin,
-  }) {
-    return SkeletonWidget(
+  }) => SkeletonWidget(
       key: key,
       width: width,
       height: height,
       borderRadius: BorderRadius.circular(4),
       margin: margin,
     );
-  }
+  final double? width;
+  final double? height;
+  final BorderRadius? borderRadius;
+  final EdgeInsets? margin;
+  final bool isCircle;
 
   @override
   State<SkeletonWidget> createState() => _SkeletonWidgetState();
@@ -79,8 +76,7 @@ class _SkeletonWidgetState extends State<SkeletonWidget>
 
     return AnimatedBuilder(
       animation: _animation,
-      builder: (context, child) {
-        return Container(
+      builder: (context, child) => Container(
           width: widget.width,
           height: widget.height,
           margin: widget.margin,
@@ -88,8 +84,6 @@ class _SkeletonWidgetState extends State<SkeletonWidget>
             shape: widget.isCircle ? BoxShape.circle : BoxShape.rectangle,
             borderRadius: widget.isCircle ? null : widget.borderRadius,
             gradient: LinearGradient(
-              begin: Alignment.centerLeft,
-              end: Alignment.centerRight,
               colors: [baseColor, highlightColor, baseColor],
               stops: [
                 0.0,
@@ -98,18 +92,13 @@ class _SkeletonWidgetState extends State<SkeletonWidget>
               ],
             ),
           ),
-        );
-      },
+        ),
     );
   }
 }
 
 /// Skeleton list item.
 class SkeletonListItem extends StatelessWidget {
-  final bool hasLeading;
-  final bool hasTrailing;
-  final int titleLines;
-  final int subtitleLines;
 
   const SkeletonListItem({
     super.key,
@@ -118,10 +107,13 @@ class SkeletonListItem extends StatelessWidget {
     this.titleLines = 1,
     this.subtitleLines = 1,
   });
+  final bool hasLeading;
+  final bool hasTrailing;
+  final int titleLines;
+  final int subtitleLines;
 
   @override
-  Widget build(BuildContext context) {
-    return Padding(
+  Widget build(BuildContext context) => Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Row(
         children: [
@@ -158,15 +150,10 @@ class SkeletonListItem extends StatelessWidget {
         ],
       ),
     );
-  }
 }
 
 /// Skeleton card.
 class SkeletonCard extends StatelessWidget {
-  final double? width;
-  final double? height;
-  final bool hasImage;
-  final int contentLines;
 
   const SkeletonCard({
     super.key,
@@ -175,10 +162,13 @@ class SkeletonCard extends StatelessWidget {
     this.hasImage = true,
     this.contentLines = 3,
   });
+  final double? width;
+  final double? height;
+  final bool hasImage;
+  final int contentLines;
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
+  Widget build(BuildContext context) => Card(
       child: SizedBox(
         width: width,
         height: height,
@@ -212,23 +202,18 @@ class SkeletonCard extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// Skeleton builder for custom layouts.
 class SkeletonBuilder<T> extends StatelessWidget {
+
+  const SkeletonBuilder({
+    required this.isLoading, required this.data, required this.builder, required this.skeletonBuilder, super.key,
+  });
   final bool isLoading;
   final T? data;
   final Widget Function(BuildContext context, T data) builder;
   final Widget Function(BuildContext context) skeletonBuilder;
-
-  const SkeletonBuilder({
-    super.key,
-    required this.isLoading,
-    required this.data,
-    required this.builder,
-    required this.skeletonBuilder,
-  });
 
   @override
   Widget build(BuildContext context) {

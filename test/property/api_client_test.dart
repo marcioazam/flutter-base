@@ -1,15 +1,13 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:dio/dio.dart';
-
 import 'package:flutter_base_2025/core/errors/exceptions.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-state-of-art-2025-final, Property 9: Exception to Failure Mapping**
 /// **Feature: flutter-state-of-art-2025-final, Property 10: HTTP Status to Exception Mapping**
 /// **Validates: Requirements 6.3, 6.4**
 
 /// Helper to simulate ApiClient error handling logic.
-AppException handleDioError(DioException e) {
-  return switch (e.type) {
+AppException handleDioError(DioException e) => switch (e.type) {
     DioExceptionType.connectionTimeout ||
     DioExceptionType.sendTimeout ||
     DioExceptionType.receiveTimeout =>
@@ -20,13 +18,12 @@ AppException handleDioError(DioException e) {
     DioExceptionType.cancel => NetworkException('Request cancelled'),
     _ => NetworkException(e.message ?? 'Unknown network error'),
   };
-}
 
 AppException _handleBadResponse(Response? response) {
   final statusCode = response?.statusCode ?? 500;
   final data = response?.data;
 
-  String message = 'Server error';
+  var message = 'Server error';
   Map<String, List<String>>? fieldErrors;
 
   if (data is Map<String, dynamic>) {

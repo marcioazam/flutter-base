@@ -1,6 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/core/utils/app_lifecycle_service.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-state-of-art-2025, Property 10: Lifecycle Refresh Trigger**
 /// **Validates: Requirements 35.2**
@@ -45,7 +44,7 @@ void main() {
         // Cannot test directly without mocking WidgetsBinding
         // This tests the config logic
         const config = AppLifecycleConfig(
-          staleDataThreshold: Duration(minutes: 5),
+          
         );
 
         expect(config.staleDataThreshold.inMinutes, equals(5));

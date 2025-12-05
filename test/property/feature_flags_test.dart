@@ -1,7 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/observability/feature_flags.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-modernization-2025, Property 9: Feature Flag Consistency**
 /// **Validates: Requirements 21.4**
@@ -34,7 +36,7 @@ void main() {
       expect(result, isFalse);
     });
 
-    Glados<bool>(iterations: 100).test(
+    Glados<bool>(any.bool, _explore).test(
       'setFlag and isEnabled are consistent',
       (value) {
         const flagName = 'dynamic_flag';
@@ -44,7 +46,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'getValue returns correct int value',
       (value) {
         const flagName = 'int_flag';
@@ -54,7 +56,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'getValue returns correct string value',
       (value) {
         const flagName = 'string_flag';
@@ -64,7 +66,7 @@ void main() {
       },
     );
 
-    Glados<double>(iterations: 100).test(
+    Glados<double>(any.double, _explore).test(
       'getValue returns correct double value',
       (value) {
         if (value.isNaN || value.isInfinite) return;
@@ -72,7 +74,7 @@ void main() {
         const flagName = 'double_flag';
         featureFlags.setFlag(flagName, value);
 
-        expect(featureFlags.getValue<double>(flagName, 0.0), equals(value));
+        expect(featureFlags.getValue<double>(flagName, 0), equals(value));
       },
     );
 

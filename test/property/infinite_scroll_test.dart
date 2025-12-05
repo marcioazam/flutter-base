@@ -1,7 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/shared/widgets/infinite_list.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-state-of-art-2025, Property 7: Pagination Load Trigger**
 /// **Validates: Requirements 28.1**
@@ -19,7 +21,6 @@ void main() {
             return List.generate(pageSize, (i) => (page - 1) * pageSize + i);
           },
           pageSize: 10,
-          loadThreshold: 0.8,
         );
       });
 
@@ -135,7 +136,7 @@ void main() {
       /// Property 7: Pagination Load Trigger
       /// For any scrollable list at 80% scroll position,
       /// the system SHALL trigger next page load automatically.
-      Glados<double>(iterations: 100).test(
+      Glados<double>(any.double, _explore).test(
         'load threshold triggers at correct position',
         (scrollPosition) {
           final normalizedPosition = scrollPosition.abs() % 1.0;

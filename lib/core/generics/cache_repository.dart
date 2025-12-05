@@ -1,17 +1,17 @@
-import '../errors/failures.dart';
-import '../utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Cache entry with value and metadata.
 class CacheEntry<T> {
-  final T value;
-  final DateTime cachedAt;
-  final DateTime? expiresAt;
 
   CacheEntry({
     required this.value,
     required this.cachedAt,
     this.expiresAt,
   });
+  final T value;
+  final DateTime cachedAt;
+  final DateTime? expiresAt;
 
   /// Returns true if entry has expired.
   bool get isExpired {
@@ -54,11 +54,11 @@ class CacheStats {
 /// Generic cache repository with TTL support.
 /// T = Entity type, ID = Identifier type
 abstract class CacheRepository<T, ID> {
+
+  CacheRepository({this.defaultTtl});
   final Map<ID, CacheEntry<T>> _cache = {};
   final CacheStats _stats = CacheStats();
   final Duration? defaultTtl;
-
-  CacheRepository({this.defaultTtl});
 
   /// Gets cache statistics.
   CacheStats get stats => _stats;
@@ -81,7 +81,7 @@ abstract class CacheRepository<T, ID> {
     final result = await fetcher();
 
     return result.fold(
-      (failure) => Failure(failure),
+      Failure.new,
       (value) {
         _cacheValue(id, value, ttl: ttl ?? defaultTtl);
         return Success(value);

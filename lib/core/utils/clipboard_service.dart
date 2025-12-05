@@ -2,18 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-import '../errors/failures.dart';
-import 'result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Clipboard service configuration.
 class ClipboardConfig {
-  final Duration sensitiveDataTimeout;
-  final bool showCopyConfirmation;
 
   const ClipboardConfig({
     this.sensitiveDataTimeout = const Duration(seconds: 30),
     this.showCopyConfirmation = true,
   });
+  final Duration sensitiveDataTimeout;
+  final bool showCopyConfirmation;
 }
 
 /// Abstract clipboard service interface.
@@ -36,12 +36,12 @@ abstract interface class ClipboardService {
 
 /// Clipboard service implementation.
 class ClipboardServiceImpl implements ClipboardService {
-  final ClipboardConfig config;
-  Timer? _clearTimer;
 
   ClipboardServiceImpl({
     this.config = const ClipboardConfig(),
   });
+  final ClipboardConfig config;
+  Timer? _clearTimer;
 
   @override
   Future<Result<void>> copyText(String text) async {
@@ -62,9 +62,7 @@ class ClipboardServiceImpl implements ClipboardService {
       _clearTimer?.cancel();
 
       // Schedule auto-clear after timeout
-      _clearTimer = Timer(config.sensitiveDataTimeout, () {
-        clear();
-      });
+      _clearTimer = Timer(config.sensitiveDataTimeout, clear);
 
       return const Success(null);
     } catch (e) {
@@ -107,6 +105,4 @@ class ClipboardServiceImpl implements ClipboardService {
 /// Clipboard service factory.
 ClipboardService createClipboardService({
   ClipboardConfig config = const ClipboardConfig(),
-}) {
-  return ClipboardServiceImpl(config: config);
-}
+}) => ClipboardServiceImpl(config: config);

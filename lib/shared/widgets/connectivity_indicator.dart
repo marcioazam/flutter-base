@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_base_2025/shared/providers/connectivity_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../providers/connectivity_provider.dart';
 
 /// Widget that shows connectivity status indicator.
 class ConnectivityIndicator extends ConsumerWidget {
-  final Widget child;
 
-  const ConnectivityIndicator({super.key, required this.child});
+  const ConnectivityIndicator({required this.child, super.key});
+  final Widget child;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -43,9 +42,9 @@ class ConnectivityIndicator extends ConsumerWidget {
 
 /// Snackbar-based connectivity indicator.
 class ConnectivitySnackbar extends ConsumerStatefulWidget {
-  final Widget child;
 
-  const ConnectivitySnackbar({super.key, required this.child});
+  const ConnectivitySnackbar({required this.child, super.key});
+  final Widget child;
 
   @override
   ConsumerState<ConnectivitySnackbar> createState() =>

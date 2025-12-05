@@ -1,122 +1,117 @@
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/core/network/websocket_client.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-state-of-art-2025, Property 4: WebSocket Auto-Reconnect**
 /// **Validates: Requirements 15.2**
 void main() {
-  group('WebSocket Service Properties', () {
-    late WebSocketService service;
-
-    setUp(() {
-      service = WebSocketServiceImpl();
+  group('WebSocket Client Properties', () {
+    test('WebSocketState enum has all expected values', () {
+      expect(WebSocketState.values, contains(WebSocketState.disconnected));
+      expect(WebSocketState.values, contains(WebSocketState.connecting));
+      expect(WebSocketState.values, contains(WebSocketState.connected));
+      expect(WebSocketState.values, contains(WebSocketState.reconnecting));
     });
 
-    tearDown(() {
-      service.dispose();
-    });
-
-    test('ConnectionState enum has all expected values', () {
-      expect(ConnectionState.values, contains(ConnectionState.disconnected));
-      expect(ConnectionState.values, contains(ConnectionState.connecting));
-      expect(ConnectionState.values, contains(ConnectionState.connected));
-      expect(ConnectionState.values, contains(ConnectionState.reconnecting));
-    });
-
-    test('initial state is disconnected', () {
-      expect(service.currentState, equals(ConnectionState.disconnected));
-    });
-
-    test('connectionState stream emits state changes', () async {
-      final states = <ConnectionState>[];
-      final subscription = service.connectionState.listen(states.add);
-
-      await service.connect('ws://localhost:8080');
-      await Future.delayed(const Duration(milliseconds: 100));
-
-      expect(states, isNotEmpty);
-      await subscription.cancel();
-    });
-
-    test('messages stream is available', () {
-      expect(service.messages, isA<Stream<WebSocketMessage>>());
-    });
-
-    test('disconnect sets state to disconnected', () async {
-      await service.disconnect();
-      expect(service.currentState, equals(ConnectionState.disconnected));
-    });
-
-    test('WebSocketMessage serialization', () {
-      final message = WebSocketMessage(
-        type: 'test',
-        data: {'key': 'value'},
+    test('WebSocketClient initial state is disconnected', () {
+      final client = WebSocketClient<String>(
+        url: 'ws://localhost:8080',
+        fromJson: (json) => json.toString(),
       );
 
-      final json = message.toJson();
-      expect(json['type'], equals('test'));
-      expect(json['data'], equals({'key': 'value'}));
-      expect(json['timestamp'], isNotNull);
+      expect(client.state, equals(WebSocketState.disconnected));
+      expect(client.isConnected, isFalse);
+
+      client.dispose();
     });
 
-    test('WebSocketMessage deserialization', () {
-      final json = {
-        'type': 'test',
-        'data': {'key': 'value'},
-        'timestamp': DateTime.now().toIso8601String(),
-      };
-
-      final message = WebSocketMessage.fromJson(json);
-      expect(message.type, equals('test'));
-      expect(message.data, equals({'key': 'value'}));
-    });
-
-    test('WebSocketConfig has default values', () {
-      const config = WebSocketConfig();
-      expect(config.pingInterval, equals(const Duration(seconds: 30)));
-      expect(config.reconnectDelay, equals(const Duration(seconds: 1)));
-      expect(config.maxReconnectAttempts, equals(5));
-      expect(config.connectionTimeout, equals(const Duration(seconds: 10)));
-    });
-
-    test('WebSocketConfig custom values', () {
-      const config = WebSocketConfig(
-        pingInterval: Duration(seconds: 60),
-        reconnectDelay: Duration(seconds: 2),
-        maxReconnectAttempts: 10,
-        connectionTimeout: Duration(seconds: 20),
+    test('WebSocketClient has configurable reconnect settings', () {
+      final client = WebSocketClient<String>(
+        url: 'ws://localhost:8080',
+        fromJson: (json) => json.toString(),
+        reconnectDelay: const Duration(seconds: 2),
+        pingInterval: const Duration(seconds: 60),
       );
 
-      expect(config.pingInterval, equals(const Duration(seconds: 60)));
-      expect(config.reconnectDelay, equals(const Duration(seconds: 2)));
-      expect(config.maxReconnectAttempts, equals(10));
-      expect(config.connectionTimeout, equals(const Duration(seconds: 20)));
+      expect(client.maxReconnectAttempts, equals(10));
+      expect(client.reconnectDelay, equals(const Duration(seconds: 2)));
+      expect(client.pingInterval, equals(const Duration(seconds: 60)));
+
+      client.dispose();
+    });
+
+    test('WebSocketClient default reconnect settings', () {
+      final client = WebSocketClient<String>(
+        url: 'ws://localhost:8080',
+        fromJson: (json) => json.toString(),
+      );
+
+      expect(client.maxReconnectAttempts, equals(10));
+      expect(client.reconnectDelay, equals(const Duration(seconds: 1)));
+      expect(client.pingInterval, equals(const Duration(seconds: 30)));
+
+      client.dispose();
+    });
+
+    test('WebSocketClient messages stream is available', () {
+      final client = WebSocketClient<String>(
+        url: 'ws://localhost:8080',
+        fromJson: (json) => json.toString(),
+      );
+
+      expect(client.messages, isA<Stream<String>>());
+
+      client.dispose();
+    });
+
+    test('WebSocketClient stateChanges stream is available', () {
+      final client = WebSocketClient<String>(
+        url: 'ws://localhost:8080',
+        fromJson: (json) => json.toString(),
+      );
+
+      expect(client.stateChanges, isA<Stream<WebSocketState>>());
+
+      client.dispose();
+    });
+
+    test('StringWebSocketClient is a convenience wrapper', () {
+      final client = StringWebSocketClient(
+        url: 'ws://localhost:8080',
+      );
+
+      expect(client, isA<WebSocketClient<String>>());
+      expect(client.state, equals(WebSocketState.disconnected));
+
+      client.dispose();
     });
 
     /// Property 4: WebSocket Auto-Reconnect
     /// For any WebSocket disconnection, the service SHALL attempt reconnection
     /// with exponential backoff up to max attempts.
-    test('service has reconnect configuration', () {
-      final impl = service as WebSocketServiceImpl;
-      expect(impl.config.maxReconnectAttempts, greaterThan(0));
-      expect(impl.config.reconnectDelay.inMilliseconds, greaterThan(0));
-    });
-
-    test('createWebSocketService factory works', () {
-      final newService = createWebSocketService();
-      expect(newService, isA<WebSocketService>());
-      newService.dispose();
-    });
-
-    test('createWebSocketService with custom config', () {
-      const customConfig = WebSocketConfig(maxReconnectAttempts: 10);
-      final newService = createWebSocketService(config: customConfig);
-      expect(newService, isA<WebSocketService>());
-      expect(
-        (newService as WebSocketServiceImpl).config.maxReconnectAttempts,
-        equals(10),
+    test('WebSocketClient has reconnect configuration for auto-reconnect', () {
+      final client = WebSocketClient<String>(
+        url: 'ws://localhost:8080',
+        fromJson: (json) => json.toString(),
+        maxReconnectAttempts: 5,
+        reconnectDelay: const Duration(milliseconds: 500),
       );
-      newService.dispose();
+
+      expect(client.maxReconnectAttempts, greaterThan(0));
+      expect(client.reconnectDelay.inMilliseconds, greaterThan(0));
+
+      client.dispose();
+    });
+
+    test('disconnect sets state to disconnected', () async {
+      final client = WebSocketClient<String>(
+        url: 'ws://localhost:8080',
+        fromJson: (json) => json.toString(),
+      );
+
+      await client.disconnect();
+      expect(client.state, equals(WebSocketState.disconnected));
+
+      await client.dispose();
     });
   });
 }

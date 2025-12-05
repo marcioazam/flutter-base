@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/core/theme/app_theme.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-base-2025, Property 23: Theme Mode Switch**
 /// **Validates: Requirements 6.2**

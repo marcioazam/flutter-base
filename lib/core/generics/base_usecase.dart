@@ -1,5 +1,4 @@
-import '../errors/failures.dart';
-import '../utils/result.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Generic use case interface.
 /// Params = Input parameters type, R = Result type
@@ -31,10 +30,10 @@ final class NoParams {
 /// **Feature: flutter-2025-state-of-art-review**
 /// **Validates: Requirements 2.4**
 class CompositeUseCase<Params, R> implements UseCase<Params, R> {
-  final List<UseCase<dynamic, dynamic>> _useCases;
-  final R Function(dynamic) _finalMapper;
 
   CompositeUseCase(this._useCases, this._finalMapper);
+  final List<UseCase<dynamic, dynamic>> _useCases;
+  final R Function(dynamic) _finalMapper;
 
   @override
   Future<Result<R>> call(Params params) async {
@@ -60,16 +59,57 @@ abstract interface class NoParamsStreamUseCase<R> {
   Stream<Result<R>> call();
 }
 
-/// Use case that can be cancelled.
-abstract class CancellableUseCase<Params, R> implements UseCase<Params, R> {
+/// Cancellation token for use cases.
+class CancellationToken {
   bool _isCancelled = false;
 
-  /// Cancels the use case execution.
-  void cancel() => _isCancelled = true;
-
-  /// Returns true if the use case was cancelled.
+  /// Returns true if cancellation was requested.
   bool get isCancelled => _isCancelled;
 
-  /// Resets the cancellation state.
+  /// Requests cancellation.
+  void cancel() => _isCancelled = true;
+
+  /// Resets the token.
   void reset() => _isCancelled = false;
+
+  /// Throws if cancelled.
+  void throwIfCancelled() {
+    if (_isCancelled) {
+      throw CancelledException();
+    }
+  }
+}
+
+/// Exception thrown when operation is cancelled.
+class CancelledException implements Exception {
+  const CancelledException([this.message = 'Operation cancelled']);
+  final String message;
+
+  @override
+  String toString() => 'CancelledException: $message';
+}
+
+/// Use case that can be cancelled.
+abstract class CancellableUseCase<Params, R> implements UseCase<Params, R> {
+  CancellationToken? _token;
+
+  /// Cancels the use case execution.
+  void cancel() => _token?.cancel();
+
+  /// Returns true if the use case was cancelled.
+  bool get isCancelled => _token?.isCancelled ?? false;
+
+  /// Resets the cancellation state.
+  void reset() => _token?.reset();
+
+  /// Executes with cancellation support.
+  Future<Result<R>> callWithToken(Params params, CancellationToken token) {
+    _token = token;
+    return call(params);
+  }
+
+  /// Checks if cancelled and throws if so.
+  void checkCancellation() {
+    _token?.throwIfCancelled();
+  }
 }

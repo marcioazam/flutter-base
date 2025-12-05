@@ -1,7 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-base-2025, Property 22: Validation Failure Detail**
 /// **Validates: Requirements 13.5**
@@ -113,7 +115,7 @@ void main() {
     group('Property Tests', () {
       /// **Property 22: Validation Failure Detail**
       /// For any validation failure, the ValidationFailure SHALL contain field-specific error messages.
-      Glados2<String, String>(iterations: 100).test(
+      Glados2<String, String>(any.nonEmptyLetters, any.nonEmptyLetters, _explore).test(
         'ValidationFailure preserves all field errors',
         (fieldName, errorMessage) {
           final failure = ValidationFailure(
@@ -127,7 +129,7 @@ void main() {
         },
       );
 
-      Glados<List<String>>(iterations: 100).test(
+      Glados<List<String>>(any.list(any.nonEmptyLetters), _explore).test(
         'ValidationFailure preserves multiple errors per field',
         (errors) {
           if (errors.isEmpty) return;
@@ -142,7 +144,7 @@ void main() {
         },
       );
 
-      Glados<String>(iterations: 100).test(
+      Glados<String>(any.nonEmptyLetters, _explore).test(
         'All failures preserve message',
         (message) {
           final failures = [
@@ -164,7 +166,7 @@ void main() {
         },
       );
 
-      Glados<String>(iterations: 100).test(
+      Glados<String>(any.nonEmptyLetters, _explore).test(
         'All failures have non-empty userMessage',
         (message) {
           final failures = [
@@ -186,7 +188,7 @@ void main() {
         },
       );
 
-      Glados2<String, String>(iterations: 100).test(
+      Glados2<String, String>(any.nonEmptyLetters, any.nonEmptyLetters, _explore).test(
         'Failures with same message and code are equal',
         (message, code) {
           final failure1 = NetworkFailure(message, code: code);

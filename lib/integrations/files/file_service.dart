@@ -1,14 +1,11 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// File upload progress.
 class UploadProgress {
-  final int bytesSent;
-  final int totalBytes;
-  final double percentage;
 
   const UploadProgress({
     required this.bytesSent,
@@ -16,20 +13,18 @@ class UploadProgress {
     required this.percentage,
   });
 
-  factory UploadProgress.fromBytes(int sent, int total) {
-    return UploadProgress(
+  factory UploadProgress.fromBytes(int sent, int total) => UploadProgress(
       bytesSent: sent,
       totalBytes: total,
       percentage: total > 0 ? (sent / total) * 100 : 0,
     );
-  }
+  final int bytesSent;
+  final int totalBytes;
+  final double percentage;
 }
 
 /// File download progress.
 class DownloadProgress {
-  final int bytesReceived;
-  final int totalBytes;
-  final double percentage;
 
   const DownloadProgress({
     required this.bytesReceived,
@@ -37,13 +32,14 @@ class DownloadProgress {
     required this.percentage,
   });
 
-  factory DownloadProgress.fromBytes(int received, int total) {
-    return DownloadProgress(
+  factory DownloadProgress.fromBytes(int received, int total) => DownloadProgress(
       bytesReceived: received,
       totalBytes: total,
       percentage: total > 0 ? (received / total) * 100 : 0,
     );
-  }
+  final int bytesReceived;
+  final int totalBytes;
+  final double percentage;
 }
 
 /// File type filter.
@@ -51,10 +47,6 @@ enum FileType { any, image, video, audio, document, custom }
 
 /// File picker configuration.
 class FilePickerConfig {
-  final FileType type;
-  final List<String>? allowedExtensions;
-  final bool allowMultiple;
-  final bool withData;
 
   const FilePickerConfig({
     this.type = FileType.any,
@@ -62,23 +54,26 @@ class FilePickerConfig {
     this.allowMultiple = false,
     this.withData = true,
   });
+  final FileType type;
+  final List<String>? allowedExtensions;
+  final bool allowMultiple;
+  final bool withData;
 }
 
 /// Picked file result.
 class PickedFile {
+
+  const PickedFile({
+    required this.name,
+    required this.size, this.path,
+    this.bytes,
+    this.extension,
+  });
   final String name;
   final String? path;
   final int size;
   final Uint8List? bytes;
   final String? extension;
-
-  const PickedFile({
-    required this.name,
-    this.path,
-    required this.size,
-    this.bytes,
-    this.extension,
-  });
 }
 
 /// Abstract file service interface.
@@ -184,9 +179,9 @@ class FileServiceImpl implements FileService {
       // Simulated progress
       final total = bytes.length;
       for (var i = 0; i <= 10; i++) {
-        if (_cancelTokens[operationId] == true) break;
+        if (_cancelTokens[operationId] ?? false) break;
         await Future.delayed(const Duration(milliseconds: 100));
-        yield UploadProgress.fromBytes((total * i ~/ 10), total);
+        yield UploadProgress.fromBytes(total * i ~/ 10, total);
       }
 
       onComplete?.call(const Success('upload_complete'));
@@ -248,7 +243,7 @@ class FileServiceImpl implements FileService {
       // Simulated progress
       const total = 1000000;
       for (var i = 0; i <= 10; i++) {
-        if (_cancelTokens[operationId] == true) break;
+        if (_cancelTokens[operationId] ?? false) break;
         await Future.delayed(const Duration(milliseconds: 100));
         yield DownloadProgress.fromBytes(startByte + (total * i ~/ 10), total);
       }

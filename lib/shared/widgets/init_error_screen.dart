@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/init/app_initializer.dart';
+import 'package:flutter_base_2025/core/init/app_initializer.dart';
 
 /// Screen shown when app initialization fails.
 class InitErrorScreen extends StatelessWidget {

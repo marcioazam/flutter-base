@@ -1,5 +1,5 @@
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// AI service abstraction for generative AI integrations.
 abstract interface class AIService {
@@ -30,8 +30,7 @@ enum AIErrorType {
 }
 
 /// Maps AI errors to AppFailure hierarchy.
-AppFailure mapAIError(AIErrorType type, [String? message]) {
-  return switch (type) {
+AppFailure mapAIError(AIErrorType type, [String? message]) => switch (type) {
     AIErrorType.invalidApiKey => AuthFailure(
         message ?? 'Invalid AI API key',
         code: 'AI_INVALID_KEY',
@@ -57,7 +56,6 @@ AppFailure mapAIError(AIErrorType type, [String? message]) {
         code: 'AI_UNKNOWN_ERROR',
       ),
   };
-}
 
 /// Mock AI service for development/testing.
 class MockAIService implements AIService {

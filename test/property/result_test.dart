@@ -1,14 +1,16 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
-import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-modernization-2025, Property 14: Result Type Fold Exhaustiveness**
 /// **Validates: Requirements 2.2, 14.3**
 void main() {
   group('Result Type Properties', () {
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Result.fold executes exactly one handler for Success',
       (value) {
         var successCalled = false;
@@ -25,7 +27,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'Result.fold executes exactly one handler for Failure',
       (message) {
         var successCalled = false;
@@ -42,7 +44,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Success.map transforms value correctly',
       (value) {
         final result = Success(value);
@@ -53,7 +55,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Failure.map preserves failure',
       (value) {
         final failure = NetworkFailure('error');
@@ -65,7 +67,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Success.flatMap chains correctly',
       (value) {
         final result = Success(value);
@@ -76,7 +78,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Success.getOrElse returns value',
       (value) {
         final result = Success(value);
@@ -84,7 +86,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Failure.getOrElse returns default',
       (defaultValue) {
         final Result<int> result = Failure(NetworkFailure('error'));
@@ -92,7 +94,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Success.orElse returns original',
       (value) {
         final result = Success(value);
@@ -102,7 +104,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Failure.orElse returns alternative',
       (alternativeValue) {
         final Result<int> result = Failure(NetworkFailure('error'));
@@ -112,7 +114,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Success.recover returns original',
       (value) {
         final result = Success(value);
@@ -122,7 +124,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Failure.recover returns recovered value',
       (recoveryValue) {
         final Result<int> result = Failure(NetworkFailure('error'));
@@ -155,7 +157,7 @@ void main() {
     Result<String> intToStringResult(int x) => Success(x.toString());
     Result<int> stringToIntResult(String s) => Success(s.length);
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Left Identity: Success(a).flatMap(f) == f(a)',
       (value) {
         // Left identity: return a >>= f  ≡  f a
@@ -170,25 +172,25 @@ void main() {
 
     /// **Feature: flutter-state-of-art-2025, Property 4: Result Monad Right Identity**
     /// **Validates: Requirements 4.1, 10.4**
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Right Identity: m.flatMap(Success) == m',
       (value) {
         // Right identity: m >>= return  ≡  m
         // m.flatMap(Success) should equal m
         final m = Success(value);
-        final leftSide = m.flatMap((x) => Success(x));
+        final leftSide = m.flatMap(Success.new);
 
         expect(leftSide.isSuccess, equals(m.isSuccess));
         expect(leftSide.valueOrNull, equals(m.valueOrNull));
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'Right Identity for Failure: m.flatMap(Success) == m',
       (message) {
         final failure = NetworkFailure(message);
         final Result<int> m = Failure(failure);
-        final leftSide = m.flatMap((x) => Success(x));
+        final leftSide = m.flatMap(Success.new);
 
         expect(leftSide.isFailure, equals(m.isFailure));
         expect(leftSide.failureOrNull, equals(m.failureOrNull));
@@ -197,7 +199,7 @@ void main() {
 
     /// **Feature: flutter-state-of-art-2025, Property 5: Result Monad Associativity**
     /// **Validates: Requirements 4.1, 10.4**
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Associativity: (m.flatMap(f)).flatMap(g) == m.flatMap((x) => f(x).flatMap(g))',
       (value) {
         // Associativity: (m >>= f) >>= g  ≡  m >>= (λx → f x >>= g)
@@ -214,7 +216,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'Associativity for Failure propagates correctly',
       (message) {
         final failure = NetworkFailure(message);
@@ -233,7 +235,7 @@ void main() {
   /// **Feature: flutter-state-of-art-2025-final, Property 4: Failure Propagation**
   /// **Validates: Requirements 3.4**
   group('Failure Propagation Properties', () {
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'Failure.map preserves original failure through any mapper',
       (message) {
         final failure = NetworkFailure(message);
@@ -249,7 +251,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'Failure.flatMap preserves original failure through any chain',
       (message) {
         final failure = ServerFailure(message, statusCode: 500);
@@ -269,7 +271,7 @@ void main() {
   /// **Feature: flutter-state-of-art-2025-final, New Combinators Tests**
   /// **Validates: Requirements 3.1, 3.2, 3.3, 3.4**
   group('Result New Combinators', () {
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Result.fromNullable returns Success for non-null values',
       (value) {
         final result = Result.fromNullable<int>(value);
@@ -284,7 +286,7 @@ void main() {
       expect(result.failureOrNull, isA<NotFoundFailure>());
     });
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Result.tryCatch returns Success for non-throwing computation',
       (value) {
         final result = Result.tryCatch(() => value * 2);
@@ -299,7 +301,7 @@ void main() {
       expect(result.failureOrNull, isA<UnexpectedFailure>());
     });
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Result.fromCondition returns Success when condition is true',
       (value) {
         final result = Result.fromCondition(true, () => value);
@@ -308,7 +310,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Result.fromCondition returns Failure when condition is false',
       (value) {
         final result = Result.fromCondition(false, () => value);

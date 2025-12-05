@@ -1,22 +1,21 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/generics/base_repository.dart';
 import 'package:flutter_base_2025/core/generics/base_usecase.dart';
 import 'package:flutter_base_2025/core/generics/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
 /// **Feature: flutter-state-of-art-2025-final, Integration Tests**
 /// **Validates: Requirements 16.3**
 
 // Test entities
 class User {
+
+  const User({required this.id, required this.name, required this.email});
   final String id;
   final String name;
   final String email;
-
-  const User({required this.id, required this.name, required this.email});
 
   @override
   bool operator ==(Object other) =>
@@ -32,27 +31,27 @@ class MockUserRepository extends Mock implements BaseRepository<User, String> {}
 
 // Use case implementation
 class GetUserUseCase implements UseCase<String, User> {
-  final BaseRepository<User, String> repository;
 
   GetUserUseCase(this.repository);
+  final BaseRepository<User, String> repository;
 
   @override
   Future<Result<User>> call(String id) => repository.getById(id);
 }
 
 class GetUsersUseCase implements NoParamsUseCase<PaginatedList<User>> {
-  final BaseRepository<User, String> repository;
 
   GetUsersUseCase(this.repository);
+  final BaseRepository<User, String> repository;
 
   @override
   Future<Result<PaginatedList<User>>> call() => repository.getAll();
 }
 
 class CreateUserUseCase implements UseCase<User, User> {
-  final BaseRepository<User, String> repository;
 
   CreateUserUseCase(this.repository);
+  final BaseRepository<User, String> repository;
 
   @override
   Future<Result<User>> call(User user) => repository.create(user);
@@ -137,7 +136,7 @@ void main() {
 
       expect(result.isFailure, isTrue);
       expect(result.failureOrNull, isA<ValidationFailure>());
-      final failure = result.failureOrNull as ValidationFailure;
+      final failure = result.failureOrNull! as ValidationFailure;
       expect(failure.fieldErrors['email'], contains('Invalid email format'));
     });
   });
@@ -171,7 +170,7 @@ void main() {
 
       expect(result.isFailure, isTrue);
       expect(result.failureOrNull, isA<ServerFailure>());
-      expect((result.failureOrNull as ServerFailure).statusCode, equals(500));
+      expect((result.failureOrNull! as ServerFailure).statusCode, equals(500));
     });
 
     test('AuthFailure propagates for unauthorized access', () async {

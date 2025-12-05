@@ -42,22 +42,20 @@ import 'package:flutter/material.dart';
 
 /// Preview wrapper widget for testing widget previews.
 class PreviewWrapper extends StatelessWidget {
+
+  const PreviewWrapper({
+    required this.child, super.key,
+    this.width = 400,
+    this.height = 300,
+    this.themeMode = ThemeMode.light,
+  });
   final Widget child;
   final double width;
   final double height;
   final ThemeMode themeMode;
 
-  const PreviewWrapper({
-    super.key,
-    required this.child,
-    this.width = 400,
-    this.height = 300,
-    this.themeMode = ThemeMode.light,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context) => MaterialApp(
       debugShowCheckedModeBanner: false,
       themeMode: themeMode,
       theme: ThemeData.light(useMaterial3: true),
@@ -72,7 +70,6 @@ class PreviewWrapper extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// Preview configurations for AccessibleButton

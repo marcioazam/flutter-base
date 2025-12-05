@@ -1,14 +1,16 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
-import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-state-of-art-2025, Property 2: Result Chaining Preserves Type**
 /// **Validates: Requirements 4.2**
 void main() {
   group('Result Chaining Properties', () {
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'andThen chains Success correctly',
       (value) {
         final result = Success(value);
@@ -19,7 +21,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'andThen preserves Failure',
       (value) {
         final failure = NetworkFailure('error');
@@ -31,7 +33,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'tap executes side effect on Success',
       (value) {
         var sideEffectValue = 0;
@@ -43,7 +45,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'tap does not execute on Failure',
       (value) {
         var sideEffectCalled = false;
@@ -54,7 +56,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'tapFailure executes side effect on Failure',
       (value) {
         var sideEffectCalled = false;
@@ -65,7 +67,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'tapFailure does not execute on Success',
       (value) {
         var sideEffectCalled = false;
@@ -76,7 +78,7 @@ void main() {
       },
     );
 
-    Glados2<int, String>(iterations: 100).test(
+    Glados2<int, String>(any.int, any.lowercaseLetters, _explore).test(
       'zip combines two Success results',
       (a, b) {
         final resultA = Success(a);
@@ -88,7 +90,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'zip returns Failure if first is Failure',
       (value) {
         final failure = NetworkFailure('error');
@@ -101,7 +103,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'zip returns Failure if second is Failure',
       (value) {
         final failure = NetworkFailure('error');
@@ -114,7 +116,7 @@ void main() {
       },
     );
 
-    Glados2<int, String>(iterations: 100).test(
+    Glados2<int, String>(any.int, any.lowercaseLetters, _explore).test(
       'zipWith combines with custom function',
       (a, b) {
         final resultA = Success(a);
@@ -147,7 +149,7 @@ void main() {
       expect(sequenced.failureOrNull, equals(failure));
     });
 
-    Glados<List<int>>(iterations: 100).test(
+    Glados<List<int>>(any.list(any.int), _explore).test(
       'traverse maps and sequences correctly',
       (values) {
         final result = Result.traverse(values, (v) => Success(v * 2));
@@ -157,7 +159,7 @@ void main() {
       },
     );
 
-    Glados3<int, int, int>(iterations: 100).test(
+    Glados3<int, int, int>(any.int, any.int, any.int, _explore).test(
       'zip3 combines three Success results',
       (a, b, c) {
         final resultA = Success(a);
@@ -170,7 +172,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'chaining multiple andThen preserves type',
       (value) {
         final result = Success(value)

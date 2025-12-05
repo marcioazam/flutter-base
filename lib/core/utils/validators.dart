@@ -6,38 +6,28 @@ abstract final class Validators {
   );
 
   /// Validates email format.
-  static bool isValidEmail(String email) {
-    return _emailRegex.hasMatch(email.trim());
-  }
+  static bool isValidEmail(String email) => _emailRegex.hasMatch(email.trim());
 
   /// Validates password strength.
-  static bool isValidPassword(String password) {
-    return password.length >= 6;
-  }
+  static bool isValidPassword(String password) => password.length >= 6;
 
   /// Validates strong password (8+ chars, upper, lower, number).
   static bool isStrongPassword(String password) {
     if (password.length < 8) return false;
-    if (!password.contains(RegExp(r'[A-Z]'))) return false;
-    if (!password.contains(RegExp(r'[a-z]'))) return false;
-    if (!password.contains(RegExp(r'[0-9]'))) return false;
+    if (!password.contains(RegExp('[A-Z]'))) return false;
+    if (!password.contains(RegExp('[a-z]'))) return false;
+    if (!password.contains(RegExp('[0-9]'))) return false;
     return true;
   }
 
   /// Validates non-empty string.
-  static bool isNotEmpty(String? value) {
-    return value != null && value.trim().isNotEmpty;
-  }
+  static bool isNotEmpty(String? value) => value != null && value.trim().isNotEmpty;
 
   /// Validates minimum length.
-  static bool hasMinLength(String value, int minLength) {
-    return value.length >= minLength;
-  }
+  static bool hasMinLength(String value, int minLength) => value.length >= minLength;
 
   /// Validates maximum length.
-  static bool hasMaxLength(String value, int maxLength) {
-    return value.length <= maxLength;
-  }
+  static bool hasMaxLength(String value, int maxLength) => value.length <= maxLength;
 
   /// Validates phone number format.
   static bool isValidPhone(String phone) {
@@ -95,23 +85,19 @@ abstract final class FormValidators {
     return null;
   }
 
-  static String? Function(String?) minLength(int min) {
-    return (String? value) {
+  static String? Function(String?) minLength(int min) => (value) {
       if (value != null && !Validators.hasMinLength(value, min)) {
         return 'Must be at least $min characters';
       }
       return null;
     };
-  }
 
-  static String? Function(String?) maxLength(int max) {
-    return (String? value) {
+  static String? Function(String?) maxLength(int max) => (value) {
       if (value != null && !Validators.hasMaxLength(value, max)) {
         return 'Must be at most $max characters';
       }
       return null;
     };
-  }
 
   static String? phone(String? value) {
     if (!Validators.isNotEmpty(value)) {
@@ -136,13 +122,11 @@ abstract final class FormValidators {
   /// Combines multiple validators.
   static String? Function(String?) combine(
     List<String? Function(String?)> validators,
-  ) {
-    return (String? value) {
+  ) => (value) {
       for (final validator in validators) {
         final error = validator(value);
         if (error != null) return error;
       }
       return null;
     };
-  }
 }

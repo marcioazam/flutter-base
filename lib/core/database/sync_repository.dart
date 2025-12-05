@@ -1,20 +1,19 @@
 import 'package:drift/drift.dart';
-
-import '../errors/failures.dart';
-import '../network/api_client.dart';
-import '../utils/result.dart';
-import 'drift_repository.dart';
+import 'package:flutter_base_2025/core/database/drift_repository.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/network/api_client.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Repository with offline sync support and conflict resolution.
 abstract class SyncRepository<T extends DataClass, ID>
     extends BaseDriftRepository<T, ID> {
-  final ApiClient apiClient;
-  final ConflictResolution conflictResolution;
 
   SyncRepository({
     required this.apiClient,
     this.conflictResolution = ConflictResolution.serverWins,
   });
+  final ApiClient apiClient;
+  final ConflictResolution conflictResolution;
 
   /// Get pending sync items.
   Future<List<T>> getPendingSyncItems();
@@ -58,29 +57,21 @@ abstract class SyncRepository<T extends DataClass, ID>
   }
 
   /// Resolve conflict between local and remote versions.
-  Future<Result<T>> resolveConflict(T local, T remote) async {
-    return switch (conflictResolution) {
+  Future<Result<T>> resolveConflict(T local, T remote) async => switch (conflictResolution) {
       ConflictResolution.serverWins => Success(remote),
       ConflictResolution.clientWins => Success(local),
       ConflictResolution.merge => mergeEntities(local, remote),
       ConflictResolution.keepBoth => Success(local),
     };
-  }
 
   /// Merge two entity versions. Override for custom merge logic.
-  Future<Result<T>> mergeEntities(T local, T remote) async {
-    return Failure(const UnexpectedFailure(
+  Future<Result<T>> mergeEntities(T local, T remote) async => Failure(const UnexpectedFailure(
       'Merge not implemented. Override mergeEntities() for custom merge logic.',
     ));
-  }
 }
 
 /// Result of a sync operation.
 class SyncResult {
-  final int totalItems;
-  final int syncedItems;
-  final int failedItems;
-  final List<String> errors;
 
   const SyncResult({
     required this.totalItems,
@@ -88,6 +79,10 @@ class SyncResult {
     required this.failedItems,
     this.errors = const [],
   });
+  final int totalItems;
+  final int syncedItems;
+  final int failedItems;
+  final List<String> errors;
 
   bool get isFullySuccessful => failedItems == 0;
   bool get hasErrors => errors.isNotEmpty;

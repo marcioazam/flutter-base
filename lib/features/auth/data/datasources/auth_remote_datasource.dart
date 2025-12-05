@@ -1,5 +1,5 @@
-import '../../../../core/network/api_client.dart';
-import '../models/user_dto.dart';
+import 'package:flutter_base_2025/core/network/api_client.dart';
+import 'package:flutter_base_2025/features/auth/data/models/user_dto.dart';
 
 /// Remote data source for authentication.
 abstract interface class AuthRemoteDataSource {
@@ -13,40 +13,34 @@ abstract interface class AuthRemoteDataSource {
 
 /// Implementation of AuthRemoteDataSource.
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
-  final ApiClient _apiClient;
 
   AuthRemoteDataSourceImpl(this._apiClient);
+  final ApiClient _apiClient;
 
   @override
-  Future<AuthResponse> login(String email, String password) async {
-    return _apiClient.post<AuthResponse>(
+  Future<AuthResponse> login(String email, String password) async => _apiClient.post<AuthResponse>(
       '/auth/login',
       data: {'email': email, 'password': password},
       fromJson: AuthResponse.fromJson,
     );
-  }
 
   @override
-  Future<AuthResponse> loginWithOAuth(String provider, String token) async {
-    return _apiClient.post<AuthResponse>(
+  Future<AuthResponse> loginWithOAuth(String provider, String token) async => _apiClient.post<AuthResponse>(
       '/auth/oauth/$provider',
       data: {'token': token},
       fromJson: AuthResponse.fromJson,
     );
-  }
 
   @override
   Future<AuthResponse> register(
     String email,
     String password,
     String name,
-  ) async {
-    return _apiClient.post<AuthResponse>(
+  ) async => _apiClient.post<AuthResponse>(
       '/auth/register',
       data: {'email': email, 'password': password, 'name': name},
       fromJson: AuthResponse.fromJson,
     );
-  }
 
   @override
   Future<void> logout() async {
@@ -54,28 +48,21 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }
 
   @override
-  Future<UserDto> getCurrentUser() async {
-    return _apiClient.get<UserDto>(
+  Future<UserDto> getCurrentUser() async => _apiClient.get<UserDto>(
       '/auth/me',
       fromJson: UserDto.fromJson,
     );
-  }
 
   @override
-  Future<AuthResponse> refreshToken(String refreshToken) async {
-    return _apiClient.post<AuthResponse>(
+  Future<AuthResponse> refreshToken(String refreshToken) async => _apiClient.post<AuthResponse>(
       '/auth/refresh',
       data: {'refresh_token': refreshToken},
       fromJson: AuthResponse.fromJson,
     );
-  }
 }
 
 /// Auth response model.
 class AuthResponse {
-  final UserDto user;
-  final String accessToken;
-  final String refreshToken;
 
   AuthResponse({
     required this.user,
@@ -83,11 +70,12 @@ class AuthResponse {
     required this.refreshToken,
   });
 
-  factory AuthResponse.fromJson(Map<String, dynamic> json) {
-    return AuthResponse(
+  factory AuthResponse.fromJson(Map<String, dynamic> json) => AuthResponse(
       user: UserDto.fromJson(json['user'] as Map<String, dynamic>),
       accessToken: json['access_token'] as String,
       refreshToken: json['refresh_token'] as String,
     );
-  }
+  final UserDto user;
+  final String accessToken;
+  final String refreshToken;
 }

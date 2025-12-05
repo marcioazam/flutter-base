@@ -2,13 +2,12 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_base_2025/core/config/app_config.dart';
+import 'package:flutter_base_2025/core/observability/analytics_service.dart';
+import 'package:flutter_base_2025/core/observability/app_logger.dart';
+import 'package:flutter_base_2025/core/observability/crash_reporter.dart';
+import 'package:flutter_base_2025/core/observability/feature_flags.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-
-import '../config/app_config.dart';
-import '../observability/analytics_service.dart';
-import '../observability/app_logger.dart';
-import '../observability/crash_reporter.dart';
-import '../observability/feature_flags.dart';
 
 /// Initialization step with name and action.
 typedef InitStep = ({String name, Future<void> Function() action});
@@ -20,16 +19,16 @@ sealed class InitResult {
 
 /// Initialization succeeded.
 final class InitSuccess extends InitResult {
-  final Duration duration;
   const InitSuccess(this.duration);
+  final Duration duration;
 }
 
 /// Initialization failed.
 final class InitFailure extends InitResult {
+  const InitFailure(this.step, this.error, this.stackTrace);
   final String step;
   final Object error;
   final StackTrace stackTrace;
-  const InitFailure(this.step, this.error, this.stackTrace);
 
   /// Returns user-friendly error message for production.
   String get userMessage {
@@ -42,13 +41,13 @@ final class InitFailure extends InitResult {
 
 /// App initializer that handles startup sequence.
 class AppInitializer {
-  final Flavor flavor;
-  final void Function(String step, double progress)? onProgress;
 
   AppInitializer({
     required this.flavor,
     this.onProgress,
   });
+  final Flavor flavor;
+  final void Function(String step, double progress)? onProgress;
 
   /// Initializes the app with all required services.
   Future<InitResult> initialize() async {
@@ -107,7 +106,6 @@ class AppInitializer {
   /// Initializes logger with production-appropriate settings.
   void _initializeLogger() {
     AppLogger.initialize(
-      redactSensitive: true,
       baseContext: {
         'flavor': flavor.name,
         'version': '1.0.0',
@@ -122,11 +120,11 @@ class AppInitializer {
       if (!AppConfig.instance.isProduction) {
         FlutterError.presentError(details);
       }
-      CrashReporterService.instance.recordFlutterError(details);
+      CrashReporterService.recordFlutterError(details);
     };
 
     PlatformDispatcher.instance.onError = (error, stack) {
-      CrashReporterService.instance.recordError(error, stack, fatal: true);
+      CrashReporterService.recordError(error, stack, fatal: true);
       return true;
     };
   }
@@ -155,7 +153,7 @@ Future<void> runAppWithErrorHandling(
     },
     (error, stack) {
       // Report to crash service
-      CrashReporterService.instance.recordError(error, stack);
+      CrashReporterService.recordError(error, stack);
       
       // Only log details in non-production
       if (!AppConfig.instance.isProduction) {

@@ -1,19 +1,15 @@
 import 'dart:typed_data';
 
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Image quality levels.
 enum ImageQuality { low, medium, high, original }
 
 /// Image compression configuration.
 class ImageCompressionConfig {
-  final int quality;
-  final int? maxWidth;
-  final int? maxHeight;
-  final bool keepExif;
 
   const ImageCompressionConfig({
     this.quality = 85,
@@ -22,8 +18,7 @@ class ImageCompressionConfig {
     this.keepExif = false,
   });
 
-  factory ImageCompressionConfig.fromQuality(ImageQuality quality) {
-    return switch (quality) {
+  factory ImageCompressionConfig.fromQuality(ImageQuality quality) => switch (quality) {
       ImageQuality.low => const ImageCompressionConfig(
           quality: 50,
           maxWidth: 800,
@@ -35,7 +30,6 @@ class ImageCompressionConfig {
           maxHeight: 1200,
         ),
       ImageQuality.high => const ImageCompressionConfig(
-          quality: 85,
           maxWidth: 1920,
           maxHeight: 1920,
         ),
@@ -43,20 +37,23 @@ class ImageCompressionConfig {
           quality: 100,
         ),
     };
-  }
+  final int quality;
+  final int? maxWidth;
+  final int? maxHeight;
+  final bool keepExif;
 }
 
 /// Image cache configuration.
 class ImageCacheConfig {
-  final int maxMemoryCacheSize;
-  final int maxDiskCacheSize;
-  final Duration stalePeriod;
 
   const ImageCacheConfig({
     this.maxMemoryCacheSize = 100 * 1024 * 1024, // 100 MB
     this.maxDiskCacheSize = 500 * 1024 * 1024, // 500 MB
     this.stalePeriod = const Duration(days: 7),
   });
+  final int maxMemoryCacheSize;
+  final int maxDiskCacheSize;
+  final Duration stalePeriod;
 }
 
 /// Abstract image service interface.
@@ -89,11 +86,11 @@ abstract interface class ImageService {
 /// Image service implementation.
 /// Note: Requires cached_network_image and flutter_image_compress packages.
 class ImageServiceImpl implements ImageService {
-  final ImageCacheConfig cacheConfig;
 
   ImageServiceImpl({
     this.cacheConfig = const ImageCacheConfig(),
   });
+  final ImageCacheConfig cacheConfig;
 
   @override
   Widget loadNetworkImage({
@@ -129,9 +126,7 @@ class ImageServiceImpl implements ImageService {
         if (loadingProgress == null) return child;
         return placeholder ?? const Center(child: CircularProgressIndicator());
       },
-      errorBuilder: (context, error, stackTrace) {
-        return errorWidget ?? const Icon(Icons.error);
-      },
+      errorBuilder: (context, error, stackTrace) => errorWidget ?? const Icon(Icons.error),
     );
   }
 
@@ -180,6 +175,4 @@ class ImageServiceImpl implements ImageService {
 /// Image service factory.
 ImageService createImageService({
   ImageCacheConfig config = const ImageCacheConfig(),
-}) {
-  return ImageServiceImpl(cacheConfig: config);
-}
+}) => ImageServiceImpl(cacheConfig: config);

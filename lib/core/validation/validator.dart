@@ -1,16 +1,17 @@
 /// Generic validation infrastructure.
 /// Provides composable validators following SOLID principles.
+library;
 
 /// Result of a validation operation.
 class ValidationResult {
-  final bool isValid;
-  final Map<String, List<String>> errors;
 
   const ValidationResult.valid()
       : isValid = true,
         errors = const {};
 
   const ValidationResult.invalid(this.errors) : isValid = false;
+  final bool isValid;
+  final Map<String, List<String>> errors;
 
   /// Combines two validation results.
   ValidationResult merge(ValidationResult other) {
@@ -62,12 +63,12 @@ abstract interface class AsyncValidator<T> {
 
 /// Composite validator that chains multiple validators.
 class CompositeValidator<T> implements Validator<T> {
+
+  const CompositeValidator(this.validators, {this.fieldName = 'value'});
   final List<Validator<T>> validators;
 
   @override
   final String fieldName;
-
-  const CompositeValidator(this.validators, {this.fieldName = 'value'});
 
   @override
   ValidationResult validate(T value) {
@@ -79,21 +80,19 @@ class CompositeValidator<T> implements Validator<T> {
   }
 
   /// Creates a new composite with an additional validator.
-  CompositeValidator<T> and(Validator<T> validator) {
-    return CompositeValidator([...validators, validator], fieldName: fieldName);
-  }
+  CompositeValidator<T> and(Validator<T> validator) => CompositeValidator([...validators, validator], fieldName: fieldName);
 }
 
 /// Required field validator.
 class RequiredValidator<T> implements Validator<T> {
-  @override
-  final String fieldName;
-  final String message;
 
   const RequiredValidator({
     required this.fieldName,
     this.message = 'This field is required',
   });
+  @override
+  final String fieldName;
+  final String message;
 
   @override
   ValidationResult validate(T value) {
@@ -113,6 +112,11 @@ class RequiredValidator<T> implements Validator<T> {
 
 /// Email format validator.
 class EmailValidator implements Validator<String> {
+
+  const EmailValidator({
+    this.fieldName = 'email',
+    this.message = 'Invalid email format',
+  });
   @override
   final String fieldName;
   final String message;
@@ -120,11 +124,6 @@ class EmailValidator implements Validator<String> {
   static final _emailRegex = RegExp(
     r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
   );
-
-  const EmailValidator({
-    this.fieldName = 'email',
-    this.message = 'Invalid email format',
-  });
 
   @override
   ValidationResult validate(String value) {
@@ -139,16 +138,16 @@ class EmailValidator implements Validator<String> {
 
 /// Minimum length validator for strings.
 class MinLengthValidator implements Validator<String> {
-  @override
-  final String fieldName;
-  final int minLength;
-  final String? customMessage;
 
   const MinLengthValidator({
     required this.fieldName,
     required this.minLength,
     this.customMessage,
   });
+  @override
+  final String fieldName;
+  final int minLength;
+  final String? customMessage;
 
   @override
   ValidationResult validate(String value) {
@@ -163,16 +162,16 @@ class MinLengthValidator implements Validator<String> {
 
 /// Maximum length validator for strings.
 class MaxLengthValidator implements Validator<String> {
-  @override
-  final String fieldName;
-  final int maxLength;
-  final String? customMessage;
 
   const MaxLengthValidator({
     required this.fieldName,
     required this.maxLength,
     this.customMessage,
   });
+  @override
+  final String fieldName;
+  final int maxLength;
+  final String? customMessage;
 
   @override
   ValidationResult validate(String value) {
@@ -187,16 +186,16 @@ class MaxLengthValidator implements Validator<String> {
 
 /// Pattern validator using regex.
 class PatternValidator implements Validator<String> {
-  @override
-  final String fieldName;
-  final RegExp pattern;
-  final String message;
 
   const PatternValidator({
     required this.fieldName,
     required this.pattern,
     required this.message,
   });
+  @override
+  final String fieldName;
+  final RegExp pattern;
+  final String message;
 
   @override
   ValidationResult validate(String value) {
@@ -211,11 +210,6 @@ class PatternValidator implements Validator<String> {
 
 /// Range validator for numbers.
 class RangeValidator<T extends num> implements Validator<T> {
-  @override
-  final String fieldName;
-  final T? min;
-  final T? max;
-  final String? customMessage;
 
   const RangeValidator({
     required this.fieldName,
@@ -223,6 +217,11 @@ class RangeValidator<T extends num> implements Validator<T> {
     this.max,
     this.customMessage,
   });
+  @override
+  final String fieldName;
+  final T? min;
+  final T? max;
+  final String? customMessage;
 
   @override
   ValidationResult validate(T value) {
@@ -242,16 +241,16 @@ class RangeValidator<T extends num> implements Validator<T> {
 
 /// Custom validator with predicate function.
 class PredicateValidator<T> implements Validator<T> {
-  @override
-  final String fieldName;
-  final bool Function(T value) predicate;
-  final String message;
 
   const PredicateValidator({
     required this.fieldName,
     required this.predicate,
     required this.message,
   });
+  @override
+  final String fieldName;
+  final bool Function(T value) predicate;
+  final String message;
 
   @override
   ValidationResult validate(T value) {
@@ -264,10 +263,106 @@ class PredicateValidator<T> implements Validator<T> {
   }
 }
 
+/// Phone number validator.
+class PhoneValidator implements Validator<String> {
+  const PhoneValidator({
+    this.fieldName = 'phone',
+    this.message = 'Invalid phone number',
+  });
+
+  @override
+  final String fieldName;
+  final String message;
+
+  static final _phoneRegex = RegExp(r'^\+?[\d\s\-\(\)]{10,}$');
+
+  @override
+  ValidationResult validate(String value) {
+    if (value.isEmpty || _phoneRegex.hasMatch(value)) {
+      return const ValidationResult.valid();
+    }
+    return ValidationResult.invalid({
+      fieldName: [message]
+    });
+  }
+}
+
+/// Password strength validator.
+class PasswordValidator implements Validator<String> {
+  const PasswordValidator({
+    this.fieldName = 'password',
+    this.minLength = 8,
+    this.requireUppercase = true,
+    this.requireLowercase = true,
+    this.requireDigit = true,
+    this.requireSpecialChar = false,
+  });
+
+  @override
+  final String fieldName;
+  final int minLength;
+  final bool requireUppercase;
+  final bool requireLowercase;
+  final bool requireDigit;
+  final bool requireSpecialChar;
+
+  @override
+  ValidationResult validate(String value) {
+    final errors = <String>[];
+
+    if (value.length < minLength) {
+      errors.add('Must be at least $minLength characters');
+    }
+    if (requireUppercase && !value.contains(RegExp('[A-Z]'))) {
+      errors.add('Must contain uppercase letter');
+    }
+    if (requireLowercase && !value.contains(RegExp('[a-z]'))) {
+      errors.add('Must contain lowercase letter');
+    }
+    if (requireDigit && !value.contains(RegExp('[0-9]'))) {
+      errors.add('Must contain digit');
+    }
+    if (requireSpecialChar && !value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+      errors.add('Must contain special character');
+    }
+
+    if (errors.isEmpty) {
+      return const ValidationResult.valid();
+    }
+    return ValidationResult.invalid({fieldName: errors});
+  }
+}
+
+/// Or validator that passes if any validator passes.
+class OrValidator<T> implements Validator<T> {
+  const OrValidator(this.validators, {this.fieldName = 'value'});
+  final List<Validator<T>> validators;
+
+  @override
+  final String fieldName;
+
+  @override
+  ValidationResult validate(T value) {
+    for (final validator in validators) {
+      final result = validator.validate(value);
+      if (result.isValid) {
+        return const ValidationResult.valid();
+      }
+    }
+    // Return errors from all validators if none passed
+    var result = const ValidationResult.valid();
+    for (final validator in validators) {
+      result = result.merge(validator.validate(value));
+    }
+    return result;
+  }
+}
+
 /// Extension for easy validator chaining.
 extension ValidatorExtensions<T> on Validator<T> {
-  /// Chains this validator with another.
-  CompositeValidator<T> and(Validator<T> other) {
-    return CompositeValidator([this, other], fieldName: fieldName);
-  }
+  /// Chains this validator with another (AND logic).
+  CompositeValidator<T> and(Validator<T> other) => CompositeValidator([this, other], fieldName: fieldName);
+
+  /// Chains this validator with another (OR logic).
+  OrValidator<T> or(Validator<T> other) => OrValidator([this, other], fieldName: fieldName);
 }

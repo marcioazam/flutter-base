@@ -1,20 +1,20 @@
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Payment result status.
 enum PaymentStatus { success, cancelled, failed }
 
 /// Payment result.
 class PaymentResult {
-  final PaymentStatus status;
-  final String? paymentIntentId;
-  final String? errorMessage;
 
   const PaymentResult({
     required this.status,
     this.paymentIntentId,
     this.errorMessage,
   });
+  final PaymentStatus status;
+  final String? paymentIntentId;
+  final String? errorMessage;
 
   bool get isSuccess => status == PaymentStatus.success;
   bool get isCancelled => status == PaymentStatus.cancelled;
@@ -23,6 +23,16 @@ class PaymentResult {
 
 /// Payment sheet configuration.
 class PaymentSheetConfig {
+
+  const PaymentSheetConfig({
+    required this.paymentIntentClientSecret,
+    required this.merchantDisplayName, this.customerId,
+    this.customerEphemeralKeySecret,
+    this.merchantCountryCode = 'US',
+    this.googlePayEnabled = true,
+    this.applePayEnabled = true,
+    this.testMode = false,
+  });
   final String paymentIntentClientSecret;
   final String? customerId;
   final String? customerEphemeralKeySecret;
@@ -31,25 +41,10 @@ class PaymentSheetConfig {
   final bool googlePayEnabled;
   final bool applePayEnabled;
   final bool testMode;
-
-  const PaymentSheetConfig({
-    required this.paymentIntentClientSecret,
-    this.customerId,
-    this.customerEphemeralKeySecret,
-    required this.merchantDisplayName,
-    this.merchantCountryCode = 'US',
-    this.googlePayEnabled = true,
-    this.applePayEnabled = true,
-    this.testMode = false,
-  });
 }
 
 /// Card details for manual payment.
 class CardDetails {
-  final String number;
-  final int expiryMonth;
-  final int expiryYear;
-  final String cvc;
 
   const CardDetails({
     required this.number,
@@ -57,6 +52,10 @@ class CardDetails {
     required this.expiryYear,
     required this.cvc,
   });
+  final String number;
+  final int expiryMonth;
+  final int expiryYear;
+  final String cvc;
 
   bool get isValid {
     if (number.replaceAll(' ', '').length < 13) return false;

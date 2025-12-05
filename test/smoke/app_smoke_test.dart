@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/core/config/app_config.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/init/app_initializer.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-state-of-art-2025-final, Smoke Tests**
 /// **Validates: Requirements 20.2**

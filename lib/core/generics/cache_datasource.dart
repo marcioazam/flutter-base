@@ -2,11 +2,11 @@ import 'dart:async';
 
 /// Cache entry with value and expiration time.
 class CacheEntry<T> {
-  final T value;
-  final DateTime? expiresAt;
 
   CacheEntry(this.value, {Duration? ttl})
       : expiresAt = ttl != null ? DateTime.now().add(ttl) : null;
+  final T value;
+  final DateTime? expiresAt;
 
   bool get isExpired =>
       expiresAt != null && DateTime.now().isAfter(expiresAt!);
@@ -35,9 +35,6 @@ abstract interface class CacheDataSource<T> {
 
 /// In-memory cache implementation with TTL support.
 class MemoryCacheDataSource<T> implements CacheDataSource<T> {
-  final Map<String, CacheEntry<T>> _cache = {};
-  final Duration? _defaultTtl;
-  Timer? _cleanupTimer;
 
   MemoryCacheDataSource({
     Duration? defaultTtl,
@@ -45,6 +42,9 @@ class MemoryCacheDataSource<T> implements CacheDataSource<T> {
   }) : _defaultTtl = defaultTtl {
     _startCleanupTimer(cleanupInterval);
   }
+  final Map<String, CacheEntry<T>> _cache = {};
+  final Duration? _defaultTtl;
+  Timer? _cleanupTimer;
 
   void _startCleanupTimer(Duration interval) {
     _cleanupTimer?.cancel();
@@ -117,11 +117,6 @@ class MemoryCacheDataSource<T> implements CacheDataSource<T> {
 
 /// LRU cache implementation with TTL and max size.
 class LruCacheDataSource<T> implements CacheDataSource<T> {
-  final int maxSize;
-  final Duration? _defaultTtl;
-  final Map<String, CacheEntry<T>> _cache = {};
-  final List<String> _accessOrder = [];
-  Timer? _cleanupTimer;
 
   LruCacheDataSource({
     this.maxSize = 100,
@@ -130,6 +125,11 @@ class LruCacheDataSource<T> implements CacheDataSource<T> {
   }) : _defaultTtl = defaultTtl {
     _startCleanupTimer(cleanupInterval);
   }
+  final int maxSize;
+  final Duration? _defaultTtl;
+  final Map<String, CacheEntry<T>> _cache = {};
+  final List<String> _accessOrder = [];
+  Timer? _cleanupTimer;
 
   void _startCleanupTimer(Duration interval) {
     _cleanupTimer?.cancel();

@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_base_2025/core/observability/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'app_logger.dart';
 
 /// Remote configuration service.
 /// 
@@ -59,6 +58,12 @@ enum RemoteConfigStatus {
 
 /// Local remote config service implementation.
 class LocalRemoteConfigService implements RemoteConfigService {
+
+  LocalRemoteConfigService({
+    Duration minFetchInterval = const Duration(hours: 1),
+    Duration cacheTtl = const Duration(hours: 12),
+  })  : _minFetchInterval = minFetchInterval,
+        _cacheTtl = cacheTtl;
   final Map<String, dynamic> _defaults = {};
   final Map<String, dynamic> _fetched = {};
   final Map<String, dynamic> _active = {};
@@ -73,12 +78,6 @@ class LocalRemoteConfigService implements RemoteConfigService {
   final Duration _minFetchInterval;
   final Duration _cacheTtl;
 
-  LocalRemoteConfigService({
-    Duration minFetchInterval = const Duration(hours: 1),
-    Duration cacheTtl = const Duration(hours: 12),
-  })  : _minFetchInterval = minFetchInterval,
-        _cacheTtl = cacheTtl;
-
   @override
   Future<void> initialize(Map<String, dynamic> defaults) async {
     _prefs = await SharedPreferences.getInstance();
@@ -86,7 +85,7 @@ class LocalRemoteConfigService implements RemoteConfigService {
     _active.addAll(defaults);
 
     _loadCache();
-    AppLogger.info('RemoteConfigService initialized');
+    AppLogger.instance.info('RemoteConfigService initialized');
   }
 
   void _loadCache() {
@@ -95,9 +94,9 @@ class LocalRemoteConfigService implements RemoteConfigService {
       try {
         final decoded = jsonDecode(cached) as Map<String, dynamic>;
         _active.addAll(decoded);
-        AppLogger.debug('Loaded cached remote config');
+        AppLogger.instance.debug('Loaded cached remote config');
       } catch (e) {
-        AppLogger.warning('Failed to load cached config: $e');
+        AppLogger.instance.warning('Failed to load cached config: $e');
       }
     }
 
@@ -123,7 +122,7 @@ class LocalRemoteConfigService implements RemoteConfigService {
       final elapsed = DateTime.now().difference(_lastFetchTime!);
       if (elapsed < _minFetchInterval) {
         _status = RemoteConfigStatus.throttled;
-        AppLogger.debug('Remote config fetch throttled');
+        AppLogger.instance.debug('Remote config fetch throttled');
         return false;
       }
     }
@@ -139,11 +138,11 @@ class LocalRemoteConfigService implements RemoteConfigService {
       _lastFetchTime = DateTime.now();
       _status = RemoteConfigStatus.success;
 
-      AppLogger.info('Remote config fetched successfully');
+      AppLogger.instance.info('Remote config fetched successfully');
       return true;
     } catch (e) {
       _status = RemoteConfigStatus.failure;
-      AppLogger.error('Remote config fetch failed', error: e);
+      AppLogger.instance.error('Remote config fetch failed', error: e);
       return false;
     }
   }
@@ -153,7 +152,7 @@ class LocalRemoteConfigService implements RemoteConfigService {
     if (_fetched.isNotEmpty) {
       _active.addAll(_fetched);
       await _saveCache();
-      AppLogger.debug('Remote config activated');
+      AppLogger.instance.debug('Remote config activated');
     }
   }
 
@@ -197,7 +196,7 @@ class LocalRemoteConfigService implements RemoteConfigService {
     if (value is double) return value;
     if (value is num) return value.toDouble();
     if (value is String) return double.tryParse(value) ?? 0.0;
-    return 0.0;
+    return 0;
   }
 
   @override

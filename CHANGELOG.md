@@ -23,10 +23,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added complexity metrics (cyclomatic: 10, nesting: 4, params: 4)
 - Improved `.env` files with proper documentation headers
 - Added more generated file patterns to `.gitignore`
+- Refactored integration tests with Patrol best practices
+- Added centralized Keys class for widget test targeting
+- Added TestConfig for test constants and timeouts
 
 ### Documentation
 - Updated environment files with security warnings
 - Added proper headers to configuration files
+- Created ADR-013 for environment security decisions
+- Completely rewritten README.md with C4 architecture diagrams
+- Added System Context and Container diagrams
+- Added Data Flow diagram with CompositeRepository strategy
+- Improved project structure documentation
+- Added detailed tables for features, testing, and CI/CD
+
+### CI/CD
+- Updated Flutter version to 3.38.0 across all workflows
+- Added Patrol integration tests workflow for Android/iOS
+- Fixed setup-flutter action default version
 
 ---
 

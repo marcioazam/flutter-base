@@ -1,13 +1,14 @@
-import '../../../../core/utils/result.dart';
-import '../entities/user.dart';
-import '../repositories/auth_repository.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
+import 'package:flutter_base_2025/features/auth/domain/repositories/auth_repository.dart';
 
 /// Use case for user login.
 /// Pure Dart - no external dependencies.
 class LoginUseCase {
-  final AuthRepository _repository;
 
   LoginUseCase(this._repository);
+  final AuthRepository _repository;
 
   /// Execute login with email and password.
   Future<Result<User>> call({
@@ -55,10 +56,5 @@ class LoginUseCase {
     return null;
   }
 
-  bool _isValidEmail(String email) {
-    return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
-  }
+  bool _isValidEmail(String email) => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
 }
-
-// Import for ValidationFailure
-import '../../../../core/errors/failures.dart';

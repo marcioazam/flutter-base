@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Biometric authentication types.
 enum BiometricType { fingerprint, face, iris, none }

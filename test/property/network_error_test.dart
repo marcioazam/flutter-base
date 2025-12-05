@@ -1,8 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/network/network_error_handler.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-base-2025, Property 9: Network Error Typing**
 /// **Validates: Requirements 4.3**

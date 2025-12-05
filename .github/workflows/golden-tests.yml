@@ -8,7 +8,7 @@ on:
       - 'pubspec.yaml'
 
 env:
-  FLUTTER_VERSION: '3.27.0'
+  FLUTTER_VERSION: '3.38.0'
 
 concurrency:
   group: golden-${{ github.workflow }}-${{ github.ref }}

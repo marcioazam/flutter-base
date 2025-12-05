@@ -1,7 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-state-of-art-2025-final, Property 7: PaginatedList hasMore Calculation**
 /// **Validates: Requirements 5.1, 5.3**
@@ -11,13 +13,13 @@ void main() {
     /// *For any* PaginatedList with page, pageSize, and totalItems,
     /// hasMore should be true if and only if page < totalPages.
     Glados(
-      combine3(
-        any.int.where((i) => i > 0 && i <= 100),
-        any.int.where((i) => i > 0 && i <= 50),
-        any.int.where((i) => i >= 0 && i <= 1000),
+      any.combine3(
+        any.positiveIntOrZero.map((i) => (i % 100) + 1),
+        any.positiveIntOrZero.map((i) => (i % 50) + 1),
+        any.positiveIntOrZero.map((i) => i % 1001),
         (page, pageSize, totalItems) => (page, pageSize, totalItems),
       ),
-      iterations: 100,
+      _explore,
     ).test(
       'hasMore is true iff page < totalPages',
       (params) {
@@ -69,7 +71,7 @@ void main() {
   });
 
   group('PaginatedList map Properties', () {
-    Glados<List<int>>(iterations: 100).test(
+    Glados<List<int>>(any.list(any.int), _explore).test(
       'map preserves pagination metadata',
       (items) {
         final list = PaginatedList.fromItems(
@@ -90,7 +92,7 @@ void main() {
       },
     );
 
-    Glados<List<int>>(iterations: 100).test(
+    Glados<List<int>>(any.list(any.int), _explore).test(
       'map transforms all items',
       (items) {
         final list = PaginatedList.fromItems(

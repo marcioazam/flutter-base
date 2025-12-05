@@ -1,22 +1,20 @@
 import 'dart:ui';
 
+import 'package:flutter_base_2025/core/constants/app_constants.dart';
+import 'package:flutter_base_2025/shared/providers/theme_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../../core/constants/app_constants.dart';
-import 'theme_provider.dart';
+/// Provider for current locale using Riverpod 3.0 Notifier pattern.
+final localeProvider = NotifierProvider<LocaleNotifier, Locale>(LocaleNotifier.new);
 
-/// Provider for current locale.
-final localeProvider = StateNotifierProvider<LocaleNotifier, Locale>((ref) {
-  final prefs = ref.watch(sharedPreferencesProvider);
-  return LocaleNotifier(prefs);
-});
-
-/// Notifier for locale state.
-class LocaleNotifier extends StateNotifier<Locale> {
-  final SharedPreferences _prefs;
-
-  LocaleNotifier(this._prefs) : super(_loadLocale(_prefs));
+/// Notifier for locale state using Riverpod 3.0 pattern.
+class LocaleNotifier extends Notifier<Locale> {
+  @override
+  Locale build() {
+    final prefs = ref.watch(sharedPreferencesProvider);
+    return _loadLocale(prefs);
+  }
 
   static Locale _loadLocale(SharedPreferences prefs) {
     final value = prefs.getString(StorageKeys.locale);
@@ -29,7 +27,8 @@ class LocaleNotifier extends StateNotifier<Locale> {
   Future<void> setLocale(Locale locale) async {
     if (AppConstants.supportedLocales.contains(locale.languageCode)) {
       state = locale;
-      await _prefs.setString(StorageKeys.locale, locale.languageCode);
+      final prefs = ref.read(sharedPreferencesProvider);
+      await prefs.setString(StorageKeys.locale, locale.languageCode);
     }
   }
 

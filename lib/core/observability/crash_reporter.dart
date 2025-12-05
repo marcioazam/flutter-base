@@ -1,9 +1,5 @@
 /// Breadcrumb for crash reporting.
 class Breadcrumb {
-  final String message;
-  final String category;
-  final DateTime timestamp;
-  final Map<String, dynamic>? data;
 
   Breadcrumb({
     required this.message,
@@ -11,6 +7,10 @@ class Breadcrumb {
     DateTime? timestamp,
     this.data,
   }) : timestamp = timestamp ?? DateTime.now();
+  final String message;
+  final String category;
+  final DateTime timestamp;
+  final Map<String, dynamic>? data;
 }
 
 /// Abstract crash reporter interface.
@@ -45,6 +45,11 @@ abstract interface class CrashReporter {
 /// Stub implementation for Sentry crash reporter.
 /// Uncomment sentry_flutter in pubspec.yaml to use.
 class SentryCrashReporter implements CrashReporter {
+
+  SentryCrashReporter({
+    required this.dsn,
+    this.environment = 'development',
+  });
   final String dsn;
   final String environment;
   final List<Breadcrumb> _breadcrumbs = [];
@@ -54,11 +59,6 @@ class SentryCrashReporter implements CrashReporter {
   String? _userId;
   String? _userEmail;
   String? _userName;
-
-  SentryCrashReporter({
-    required this.dsn,
-    this.environment = 'development',
-  });
 
   @override
   Future<void> initialize() async {
@@ -170,4 +170,40 @@ class NoOpCrashReporter implements CrashReporter {
 
   @override
   void setExtra(String key, dynamic value) {}
+}
+
+/// Singleton wrapper for CrashReporter with Flutter error support.
+class CrashReporterService {
+  static CrashReporter? _instance;
+
+  static CrashReporter get instance {
+    _instance ??= NoOpCrashReporter();
+    return _instance!;
+  }
+
+  static void setInstance(CrashReporter reporter) {
+    _instance = reporter;
+  }
+
+  /// Records a Flutter error.
+  static Future<void> recordFlutterError(dynamic details) async {
+    if (details is Error) {
+      await instance.reportError(details, StackTrace.current);
+    } else {
+      final dynamic rawException = details.exception;
+      final Object exception = rawException is Object ? rawException : details as Object;
+      final dynamic rawStack = details.stack;
+      final StackTrace stack = rawStack is StackTrace ? rawStack : StackTrace.current;
+      await instance.reportError(exception, stack);
+    }
+  }
+
+  /// Records an error with optional fatal flag.
+  static Future<void> recordError(
+    Object error,
+    StackTrace stackTrace, {
+    bool fatal = false,
+  }) async {
+    await instance.reportError(error, stackTrace, fatal: fatal);
+  }
 }

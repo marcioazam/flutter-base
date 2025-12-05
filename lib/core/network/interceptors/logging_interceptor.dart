@@ -8,8 +8,6 @@ class LoggingInterceptor extends Interceptor {
       methodCount: 0,
       errorMethodCount: 5,
       lineLength: 80,
-      colors: true,
-      printEmojis: true,
     ),
   );
 

@@ -14,7 +14,7 @@ permissions:
   checks: write
 
 env:
-  FLUTTER_VERSION: '3.27.0'
+  FLUTTER_VERSION: '3.38.0'
 
 jobs:
   reviewdog:

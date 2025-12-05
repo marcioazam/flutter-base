@@ -1,10 +1,10 @@
 /// Base exception for all app exceptions.
 sealed class AppException implements Exception {
+
+  const AppException(this.message, {this.statusCode, this.stackTrace});
   final String message;
   final int? statusCode;
   final StackTrace? stackTrace;
-
-  const AppException(this.message, {this.statusCode, this.stackTrace});
 
   @override
   String toString() => '$runtimeType: $message';
@@ -22,7 +22,6 @@ final class ServerException extends AppException {
 
 /// Validation error exceptions (400, 422).
 final class ValidationException extends AppException {
-  final Map<String, List<String>>? fieldErrors;
 
   const ValidationException(
     super.message, {
@@ -30,6 +29,7 @@ final class ValidationException extends AppException {
     super.statusCode = 422,
     super.stackTrace,
   });
+  final Map<String, List<String>>? fieldErrors;
 }
 
 /// Unauthorized exceptions (401).

@@ -1,10 +1,13 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-import 'package:logger/logger.dart';
-import 'package:mocktail/mocktail.dart';
-
 import 'package:flutter_base_2025/core/observability/app_logger.dart';
 import 'package:flutter_base_2025/core/observability/performance_monitor.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:logger/logger.dart';
+import 'package:mocktail/mocktail.dart' hide any;
+import 'package:mocktail/mocktail.dart' as mocktail;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-state-of-art-2025-final, Logging and Monitoring Tests**
 /// **Validates: Requirements 14.1, 15.5**
@@ -13,9 +16,7 @@ class MockLogger extends Mock implements Logger {}
 
 void main() {
   group('AppLogger Properties', () {
-    setUp(() {
-      AppLogger.initialize(redactSensitive: true);
-    });
+    setUp(AppLogger.initialize);
 
     test('Logger singleton returns same instance', () {
       final logger1 = AppLogger.instance;
@@ -40,7 +41,7 @@ void main() {
 
     group('Sensitive Data Redaction', () {
       test('redacts password field', () {
-        AppLogger.initialize(redactSensitive: true);
+        AppLogger.initialize();
         // The redaction happens internally, we verify the pattern
         final testData = {'password': 'secret123', 'username': 'john'};
         
@@ -94,7 +95,7 @@ void main() {
         expect(redacted['header'], equals('[REDACTED]'));
       });
 
-      Glados<String>(iterations: 50).test(
+      Glados<String>(any.nonEmptyLetters, _explore).test(
         'non-sensitive fields are not redacted',
         (value) {
           final testData = {'normalField': value};
@@ -279,15 +280,15 @@ Map<String, dynamic> _redactSensitiveData(Map<String, dynamic> data) {
   const sensitiveFields = {
     'password',
     'token',
-    'accessToken',
-    'refreshToken',
-    'apiKey',
+    'accesstoken',
+    'refreshtoken',
+    'apikey',
     'secret',
     'authorization',
     'bearer',
     'credential',
     'ssn',
-    'creditCard',
+    'creditcard',
   };
 
   bool isSensitiveKey(String key) {

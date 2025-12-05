@@ -3,10 +3,6 @@ import 'package:equatable/equatable.dart';
 /// Base class para todas as falhas da aplicação.
 /// Usa sealed class para pattern matching exaustivo.
 sealed class AppFailure extends Equatable {
-  final String message;
-  final String? code;
-  final StackTrace? stackTrace;
-  final Map<String, dynamic>? context;
 
   const AppFailure(
     this.message, {
@@ -14,6 +10,10 @@ sealed class AppFailure extends Equatable {
     this.stackTrace,
     this.context,
   });
+  final String message;
+  final String? code;
+  final StackTrace? stackTrace;
+  final Map<String, dynamic>? context;
 
   @override
   List<Object?> get props => [message, code];
@@ -50,7 +50,6 @@ final class CacheFailure extends AppFailure {
 
 /// Falha de validação com erros por campo.
 final class ValidationFailure extends AppFailure {
-  final Map<String, List<String>> fieldErrors;
 
   const ValidationFailure(
     super.message, {
@@ -59,6 +58,7 @@ final class ValidationFailure extends AppFailure {
     super.stackTrace,
     super.context,
   });
+  final Map<String, List<String>> fieldErrors;
 
   @override
   List<Object?> get props => [message, code, fieldErrors];
@@ -91,7 +91,6 @@ final class AuthFailure extends AppFailure {
 
 /// Falha do servidor (5xx, erro interno, etc).
 final class ServerFailure extends AppFailure {
-  final int? statusCode;
 
   const ServerFailure(
     super.message, {
@@ -100,6 +99,7 @@ final class ServerFailure extends AppFailure {
     super.stackTrace,
     super.context,
   });
+  final int? statusCode;
 
   @override
   List<Object?> get props => [message, code, statusCode];
@@ -110,8 +110,6 @@ final class ServerFailure extends AppFailure {
 
 /// Falha de recurso não encontrado (404).
 final class NotFoundFailure extends AppFailure {
-  final String? resourceType;
-  final String? resourceId;
 
   const NotFoundFailure(
     super.message, {
@@ -121,6 +119,8 @@ final class NotFoundFailure extends AppFailure {
     super.stackTrace,
     super.context,
   });
+  final String? resourceType;
+  final String? resourceId;
 
   @override
   List<Object?> get props => [message, code, resourceType, resourceId];
@@ -157,7 +157,6 @@ final class ConflictFailure extends AppFailure {
 
 /// Falha de rate limit (429).
 final class RateLimitFailure extends AppFailure {
-  final Duration? retryAfter;
 
   const RateLimitFailure(
     super.message, {
@@ -166,6 +165,7 @@ final class RateLimitFailure extends AppFailure {
     super.stackTrace,
     super.context,
   });
+  final Duration? retryAfter;
 
   @override
   List<Object?> get props => [message, code, retryAfter];
@@ -185,4 +185,56 @@ final class UnexpectedFailure extends AppFailure {
 
   @override
   String get userMessage => 'Erro inesperado. Tente novamente.';
+}
+
+/// Falha de não autorizado (401).
+final class UnauthorizedFailure extends AppFailure {
+  const UnauthorizedFailure(
+    super.message, {
+    super.code,
+    super.stackTrace,
+    super.context,
+  });
+
+  @override
+  String get userMessage => 'Não autorizado. Faça login novamente.';
+}
+
+/// Falha de sessão expirada.
+final class SessionExpiredFailure extends AppFailure {
+  const SessionExpiredFailure(
+    super.message, {
+    super.code,
+    super.stackTrace,
+    super.context,
+  });
+
+  @override
+  String get userMessage => 'Sessão expirada. Faça login novamente.';
+}
+
+/// Falha de timeout.
+final class TimeoutFailure extends AppFailure {
+  const TimeoutFailure(
+    super.message, {
+    super.code,
+    super.stackTrace,
+    super.context,
+  });
+
+  @override
+  String get userMessage => 'Tempo limite excedido. Tente novamente.';
+}
+
+/// Falha de cache expirado.
+final class CacheExpiredFailure extends AppFailure {
+  const CacheExpiredFailure(
+    super.message, {
+    super.code,
+    super.stackTrace,
+    super.context,
+  });
+
+  @override
+  String get userMessage => 'Dados em cache expiraram.';
 }

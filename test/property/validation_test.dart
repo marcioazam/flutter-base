@@ -1,7 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/validation/validator.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-state-of-art-2025-final, Property 14: Validator Composition**
 /// **Validates: Requirements 13.2**
@@ -10,7 +12,7 @@ void main() {
     /// **Property 14: Validator Composition**
     /// *For any* list of validators, CompositeValidator should return invalid
     /// if any validator returns invalid.
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'CompositeValidator returns invalid if any validator fails',
       (value) {
         // Create a validator that always fails
@@ -35,7 +37,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'CompositeValidator returns valid only if all validators pass',
       (value) {
         final validator1 = PredicateValidator<String>(
@@ -57,7 +59,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'CompositeValidator collects all errors from failing validators',
       (value) {
         final validator1 = PredicateValidator<String>(
@@ -90,7 +92,7 @@ void main() {
       expect(validator.validate('   ').isValid, isFalse);
     });
 
-    Glados(any.letterOrDigits.where((s) => s.isNotEmpty), iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'RequiredValidator passes for non-empty strings',
       (value) {
         final validator = RequiredValidator<String>(fieldName: 'name');
@@ -139,7 +141,7 @@ void main() {
   });
 
   group('MinLengthValidator Properties', () {
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'MinLengthValidator passes for strings >= minLength',
       (minLength) {
         final adjustedMin = (minLength.abs() % 20) + 1;
@@ -156,7 +158,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'MinLengthValidator fails for strings < minLength',
       (minLength) {
         final adjustedMin = (minLength.abs() % 20) + 2;
@@ -172,7 +174,7 @@ void main() {
   });
 
   group('RangeValidator Properties', () {
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'RangeValidator passes for values within range',
       (value) {
         final min = value - 10;

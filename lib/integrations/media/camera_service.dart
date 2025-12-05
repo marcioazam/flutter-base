@@ -1,25 +1,25 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 
-import '../../core/observability/app_logger.dart';
+import 'package:flutter_base_2025/core/observability/app_logger.dart';
 
 /// Result of a scan operation.
 /// 
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 29.2, 29.3**
 class ScanResult {
-  final String data;
-  final BarcodeFormat format;
-  final Uint8List? rawBytes;
-  final DateTime scannedAt;
 
   const ScanResult({
     required this.data,
     required this.format,
-    this.rawBytes,
-    required this.scannedAt,
+    required this.scannedAt, this.rawBytes,
   });
+  final String data;
+  final BarcodeFormat format;
+  final Uint8List? rawBytes;
+  final DateTime scannedAt;
 
   Map<String, dynamic> toMap() => {
         'data': data,
@@ -68,6 +68,14 @@ enum FlashMode {
 
 /// Camera capture result.
 class CaptureResult {
+
+  const CaptureResult({
+    required this.path,
+    required this.mode,
+    required this.capturedAt, this.width,
+    this.height,
+    this.durationMs,
+  });
   final String path;
   final CaptureMode mode;
   final int? width;
@@ -75,26 +83,12 @@ class CaptureResult {
   final int? durationMs;
   final DateTime capturedAt;
 
-  const CaptureResult({
-    required this.path,
-    required this.mode,
-    this.width,
-    this.height,
-    this.durationMs,
-    required this.capturedAt,
-  });
-
   bool get isPhoto => mode == CaptureMode.photo;
   bool get isVideo => mode == CaptureMode.video;
 }
 
 /// Camera configuration.
 class CameraConfig {
-  final CameraFacing facing;
-  final FlashMode flashMode;
-  final double zoom;
-  final bool enableAudio;
-  final int? maxDurationSeconds;
 
   const CameraConfig({
     this.facing = CameraFacing.back,
@@ -103,6 +97,11 @@ class CameraConfig {
     this.enableAudio = true,
     this.maxDurationSeconds,
   });
+  final CameraFacing facing;
+  final FlashMode flashMode;
+  final double zoom;
+  final bool enableAudio;
+  final int? maxDurationSeconds;
 
   CameraConfig copyWith({
     CameraFacing? facing,
@@ -110,24 +109,17 @@ class CameraConfig {
     double? zoom,
     bool? enableAudio,
     int? maxDurationSeconds,
-  }) {
-    return CameraConfig(
+  }) => CameraConfig(
       facing: facing ?? this.facing,
       flashMode: flashMode ?? this.flashMode,
       zoom: zoom ?? this.zoom,
       enableAudio: enableAudio ?? this.enableAudio,
       maxDurationSeconds: maxDurationSeconds ?? this.maxDurationSeconds,
     );
-  }
 }
 
 /// Scanner configuration.
 class ScannerConfig {
-  final List<BarcodeFormat> formats;
-  final bool beepOnScan;
-  final bool vibrateOnScan;
-  final bool autoFocus;
-  final bool continuousScan;
 
   const ScannerConfig({
     this.formats = const [BarcodeFormat.qrCode],
@@ -136,19 +128,24 @@ class ScannerConfig {
     this.autoFocus = true,
     this.continuousScan = false,
   });
+  final List<BarcodeFormat> formats;
+  final bool beepOnScan;
+  final bool vibrateOnScan;
+  final bool autoFocus;
+  final bool continuousScan;
 }
 
 /// Camera service error.
 class CameraError implements Exception {
-  final String message;
-  final CameraErrorType type;
-  final Object? originalError;
 
   const CameraError({
     required this.message,
     required this.type,
     this.originalError,
   });
+  final String message;
+  final CameraErrorType type;
+  final Object? originalError;
 
   @override
   String toString() => 'CameraError($type): $message';
@@ -266,7 +263,7 @@ class MockCameraService implements CameraService {
     _state = CameraState.ready;
     _stateController.add(_state);
 
-    AppLogger.info('MockCameraService initialized');
+    AppLogger.instance.info('MockCameraService initialized');
   }
 
   @override
@@ -350,7 +347,7 @@ class MockCameraService implements CameraService {
   }
 
   @override
-  double get maxZoom => 5.0;
+  double get maxZoom => 5;
 
   @override
   Stream<CameraState> get stateStream => _stateController.stream;
@@ -365,7 +362,7 @@ class MockScannerService implements ScannerService {
   @override
   Future<void> initialize([ScannerConfig? config]) async {
     _config = config ?? const ScannerConfig();
-    AppLogger.info('MockScannerService initialized');
+    AppLogger.instance.info('MockScannerService initialized');
   }
 
   @override
@@ -439,9 +436,9 @@ class _MockStreamController<T> {
 }
 
 class _MockStream<T> extends Stream<T> {
-  final _MockStreamController<T> _controller;
 
   _MockStream(this._controller);
+  final _MockStreamController<T> _controller;
 
   @override
   StreamSubscription<T> listen(

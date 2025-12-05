@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/shared/widgets/error_view.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-modernization-2025, Property 12: Error State Retry Action**
 /// **Validates: Requirements 17.2**

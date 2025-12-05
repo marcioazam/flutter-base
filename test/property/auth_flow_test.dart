@@ -1,11 +1,11 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-import 'package:mocktail/mocktail.dart';
-
 import 'package:flutter_base_2025/core/constants/app_constants.dart';
 import 'package:flutter_base_2025/core/router/route_guards.dart';
 import 'package:flutter_base_2025/core/storage/token_storage.dart';
 import 'package:flutter_base_2025/features/auth/domain/repositories/auth_repository.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:mocktail/mocktail.dart' hide any;
+import 'package:mocktail/mocktail.dart' as mocktail;
 
 import '../helpers/generators.dart';
 import '../helpers/mocks.dart';
@@ -14,9 +14,7 @@ void main() {
   late MockAuthRepository mockAuthRepository;
   late MockTokenStorage mockTokenStorage;
 
-  setUpAll(() {
-    setupMocktailFallbacks();
-  });
+  setUpAll(setupMocktailFallbacks);
 
   setUp(() {
     mockAuthRepository = MockAuthRepository();
@@ -60,8 +58,8 @@ void main() {
         var refreshTokenStored = false;
 
         when(() => mockTokenStorage.saveTokens(
-              accessToken: any(named: 'accessToken'),
-              refreshToken: any(named: 'refreshToken'),
+              accessToken: mocktail.any(named: 'accessToken'),
+              refreshToken: mocktail.any(named: 'refreshToken'),
             )).thenAnswer((_) async {
           accessTokenStored = true;
           refreshTokenStored = true;

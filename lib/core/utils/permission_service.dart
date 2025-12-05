@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-import '../observability/app_logger.dart';
+import 'package:flutter_base_2025/core/observability/app_logger.dart';
 
 /// Permission types supported by the app.
 /// 
@@ -43,15 +43,15 @@ enum PermissionStatus {
 
 /// Result of a permission request.
 class PermissionResult {
-  final Permission permission;
-  final PermissionStatus status;
-  final String? message;
 
   const PermissionResult({
     required this.permission,
     required this.status,
     this.message,
   });
+  final Permission permission;
+  final PermissionStatus status;
+  final String? message;
 
   bool get isGranted => status == PermissionStatus.granted;
   bool get isDenied => status == PermissionStatus.denied;
@@ -61,11 +61,6 @@ class PermissionResult {
 
 /// Permission rationale configuration.
 class PermissionRationale {
-  final String title;
-  final String message;
-  final String? iconAsset;
-  final String positiveButton;
-  final String negativeButton;
 
   const PermissionRationale({
     required this.title,
@@ -74,6 +69,11 @@ class PermissionRationale {
     this.positiveButton = 'Continue',
     this.negativeButton = 'Not Now',
   });
+  final String title;
+  final String message;
+  final String? iconAsset;
+  final String positiveButton;
+  final String negativeButton;
 }
 
 /// Default rationales for common permissions.
@@ -105,7 +105,7 @@ abstract final class DefaultRationales {
   static const notification = PermissionRationale(
     title: 'Notification Access',
     message:
-        'We\'d like to send you notifications about important updates and messages.',
+        "We'd like to send you notifications about important updates and messages.",
   );
 
   static const contacts = PermissionRationale(
@@ -165,9 +165,7 @@ class MockPermissionService implements PermissionService {
   final Map<Permission, PermissionStatus> _statuses = {};
 
   @override
-  Future<PermissionStatus> check(Permission permission) async {
-    return _statuses[permission] ?? PermissionStatus.denied;
-  }
+  Future<PermissionStatus> check(Permission permission) async => _statuses[permission] ?? PermissionStatus.denied;
 
   @override
   Future<PermissionResult> request(Permission permission) async {
@@ -183,7 +181,7 @@ class MockPermissionService implements PermissionService {
     }
 
     _statuses[permission] = PermissionStatus.granted;
-    AppLogger.debug('Permission granted: ${permission.name}');
+    AppLogger.instance.debug('Permission granted: ${permission.name}');
 
     return PermissionResult(
       permission: permission,
@@ -210,7 +208,7 @@ class MockPermissionService implements PermissionService {
 
   @override
   Future<bool> openSettings() async {
-    AppLogger.debug('Opening app settings');
+    AppLogger.instance.debug('Opening app settings');
     return true;
   }
 

@@ -1,0 +1,137 @@
+name: Integration Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - 'lib/**'
+      - 'integration_test/**'
+      - 'pubspec.yaml'
+  workflow_dispatch:
+
+env:
+  FLUTTER_VERSION: '3.38.0'
+
+concurrency:
+  group: integration-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  patrol-android:
+    name: Patrol Tests (Android)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Install Patrol CLI
+        run: dart pub global activate patrol_cli
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Setup Android Emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          profile: pixel_6
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            patrol test --target integration_test/app_test.dart --verbose
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: patrol-android-results
+          path: |
+            build/app/reports/
+            build/app/outputs/androidTest-results/
+          retention-days: 7
+
+  patrol-ios:
+    name: Patrol Tests (iOS)
+    runs-on: macos-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Install Patrol CLI
+        run: dart pub global activate patrol_cli
+
+      - name: Setup iOS Simulator
+        uses: futureware-tech/simulator-action@v3
+        with:
+          model: 'iPhone 15'
+
+      - name: Run Patrol Tests
+        run: patrol test --target integration_test/app_test.dart --verbose
+        continue-on-error: true
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: patrol-ios-results
+          path: build/ios_integ/
+          retention-days: 7
+
+  integration-summary:
+    name: Integration Test Summary
+    runs-on: ubuntu-latest
+    needs: [patrol-android]
+    if: always()
+    steps:
+      - name: Check results
+        run: |
+          echo "## Integration Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Platform | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Android | ${{ needs.patrol-android.result }} |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Post PR Comment
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const androidResult = '${{ needs.patrol-android.result }}';
+            const icon = androidResult === 'success' ? '✅' : '❌';
+            
+            const body = `## ${icon} Integration Test Results
+            
+            | Platform | Status |
+            |----------|--------|
+            | Android | ${androidResult === 'success' ? '✅ Passed' : '❌ Failed'} |
+            
+            ${androidResult !== 'success' ? '> Check the workflow logs for details' : ''}
+            `;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

@@ -8,6 +8,9 @@ abstract interface class Dto<E> {
   Map<String, dynamic> toJson();
 }
 
+/// Alias for backward compatibility.
+typedef BaseDto<E> = Dto<E>;
+
 /// Generic mapper interface.
 /// From = Source type, To = Target type
 abstract interface class Mapper<From, To> {
@@ -21,9 +24,7 @@ abstract interface class Mapper<From, To> {
 /// Extension for pretty-printing DTOs for debugging.
 extension DtoPrettyPrint on Map<String, dynamic> {
   /// Returns a formatted JSON string for debugging.
-  String toPrettyString({int indent = 2}) {
-    return _prettyPrint(this, indent, 0);
-  }
+  String toPrettyString({int indent = 2}) => _prettyPrint(this, indent, 0);
 
   static String _prettyPrint(dynamic value, int indent, int level) {
     final spaces = ' ' * (indent * level);

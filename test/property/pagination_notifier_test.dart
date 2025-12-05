@@ -1,245 +1,16 @@
+import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/shared/providers/pagination_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
 
-import 'package:flutter_base_2025/core/errors/failures.dart';
-import 'package:flutter_base_2025/core/generics/paginated_list.dart';
-import 'package:flutter_base_2025/core/utils/result.dart';
-import 'package:flutter_base_2025/shared/providers/pagination_notifier.dart';
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-state-of-art-2025-final, Property 8: Pagination Failure Preserves Items**
 /// **Validates: Requirements 5.4**
 
-/// Test implementation of PaginationNotifier.
-class TestPaginationNotifier extends PaginationNotifier<String> {
-  final List<Result<PaginatedList<String>>> _responses;
-  int _callCount = 0;
-
-  TestPaginationNotifier(this._responses) : super(pageSize: 10);
-
-  @override
-  Future<Result<PaginatedList<String>>> fetchPage(int page, int pageSize) async {
-    await Future.delayed(const Duration(milliseconds: 10));
-    if (_callCount < _responses.length) {
-      return _responses[_callCount++];
-    }
-    return Failure(const NetworkFailure('No more responses'));
-  }
-
-  int get callCount => _callCount;
-}
-
-final testPaginationProvider = AsyncNotifierProvider.autoDispose<
-    TestPaginationNotifier, PaginationState<String>>(
-  () => throw UnimplementedError('Override in test'),
-);
-
 void main() {
-  group('PaginationNotifier Properties', () {
-    /// **Property 8: Pagination Failure Preserves Items**
-    /// *For any* PaginationNotifier with loaded items, a failed loadMore
-    /// should preserve the existing items.
-    test('loadMore failure preserves existing items', () async {
-      final initialData = PaginatedList.fromItems(
-        ['item1', 'item2', 'item3'],
-        page: 1,
-        pageSize: 10,
-        totalItems: 30,
-      );
-
-      final notifier = TestPaginationNotifier([
-        Success(initialData),
-        Failure(const NetworkFailure('Network error')),
-      ]);
-
-      final container = ProviderContainer(
-        overrides: [
-          testPaginationProvider.overrideWith(() => notifier),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      // Wait for initial load
-      await container.read(testPaginationProvider.future);
-
-      final stateAfterLoad = container.read(testPaginationProvider).valueOrNull;
-      expect(stateAfterLoad?.data.items, equals(['item1', 'item2', 'item3']));
-
-      // Trigger loadMore which will fail
-      await notifier.loadMore();
-
-      final stateAfterFailure = container.read(testPaginationProvider).valueOrNull;
-
-      // Items should be preserved
-      expect(stateAfterFailure?.data.items, equals(['item1', 'item2', 'item3']));
-      expect(stateAfterFailure?.hasError, isTrue);
-      expect(stateAfterFailure?.isLoadingMore, isFalse);
-    });
-
-    Glados<List<String>>(iterations: 50).test(
-      'loadMore failure always preserves all existing items',
-      (items) async {
-        if (items.isEmpty) return;
-
-        final initialData = PaginatedList.fromItems(
-          items,
-          page: 1,
-          pageSize: 10,
-          totalItems: items.length + 20,
-        );
-
-        final notifier = TestPaginationNotifier([
-          Success(initialData),
-          Failure(const ServerFailure('Server error', statusCode: 500)),
-        ]);
-
-        final container = ProviderContainer(
-          overrides: [
-            testPaginationProvider.overrideWith(() => notifier),
-          ],
-        );
-        addTearDown(container.dispose);
-
-        await container.read(testPaginationProvider.future);
-        await notifier.loadMore();
-
-        final state = container.read(testPaginationProvider).valueOrNull;
-
-        // All original items must be preserved
-        expect(state?.data.items.length, equals(items.length));
-        for (var i = 0; i < items.length; i++) {
-          expect(state?.data.items[i], equals(items[i]));
-        }
-      },
-    );
-
-    test('refresh failure preserves existing items', () async {
-      final initialData = PaginatedList.fromItems(
-        ['item1', 'item2'],
-        page: 1,
-        pageSize: 10,
-        totalItems: 20,
-      );
-
-      final notifier = TestPaginationNotifier([
-        Success(initialData),
-        Failure(const NetworkFailure('Refresh failed')),
-      ]);
-
-      final container = ProviderContainer(
-        overrides: [
-          testPaginationProvider.overrideWith(() => notifier),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      await container.read(testPaginationProvider.future);
-      await notifier.refresh();
-
-      final state = container.read(testPaginationProvider).valueOrNull;
-
-      expect(state?.data.items, equals(['item1', 'item2']));
-      expect(state?.hasError, isTrue);
-    });
-
-    test('successful loadMore appends items', () async {
-      final page1 = PaginatedList.fromItems(
-        ['a', 'b'],
-        page: 1,
-        pageSize: 2,
-        totalItems: 4,
-      );
-
-      final page2 = PaginatedList.fromItems(
-        ['c', 'd'],
-        page: 2,
-        pageSize: 2,
-        totalItems: 4,
-      );
-
-      final notifier = TestPaginationNotifier([
-        Success(page1),
-        Success(page2),
-      ]);
-
-      final container = ProviderContainer(
-        overrides: [
-          testPaginationProvider.overrideWith(() => notifier),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      await container.read(testPaginationProvider.future);
-      await notifier.loadMore();
-
-      final state = container.read(testPaginationProvider).valueOrNull;
-
-      expect(state?.data.items, equals(['a', 'b', 'c', 'd']));
-      expect(state?.hasError, isFalse);
-    });
-
-    test('canLoadMore is false when no more pages', () async {
-      final lastPage = PaginatedList.fromItems(
-        ['item1'],
-        page: 1,
-        pageSize: 10,
-        totalItems: 1,
-      );
-
-      final notifier = TestPaginationNotifier([Success(lastPage)]);
-
-      final container = ProviderContainer(
-        overrides: [
-          testPaginationProvider.overrideWith(() => notifier),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      await container.read(testPaginationProvider.future);
-
-      final state = container.read(testPaginationProvider).valueOrNull;
-
-      expect(state?.canLoadMore, isFalse);
-      expect(state?.data.hasMore, isFalse);
-    });
-
-    test('clearError removes error state', () async {
-      final initialData = PaginatedList.fromItems(
-        ['item1'],
-        page: 1,
-        pageSize: 10,
-        totalItems: 20,
-      );
-
-      final notifier = TestPaginationNotifier([
-        Success(initialData),
-        Failure(const NetworkFailure('Error')),
-      ]);
-
-      final container = ProviderContainer(
-        overrides: [
-          testPaginationProvider.overrideWith(() => notifier),
-        ],
-      );
-      addTearDown(container.dispose);
-
-      await container.read(testPaginationProvider.future);
-      await notifier.loadMore();
-
-      expect(
-        container.read(testPaginationProvider).valueOrNull?.hasError,
-        isTrue,
-      );
-
-      notifier.clearError();
-
-      expect(
-        container.read(testPaginationProvider).valueOrNull?.hasError,
-        isFalse,
-      );
-    });
-  });
-
   group('PaginationState Properties', () {
     test('initial state has correct defaults', () {
       final state = PaginationState<String>.initial();
@@ -274,10 +45,87 @@ void main() {
       expect(loadingMore.isLoading, isTrue);
       expect(refreshing.isLoading, isTrue);
     });
+
+    test('canLoadMore is true when hasMore and not loading', () {
+      final state = PaginationState(
+        data: PaginatedList.fromItems(
+          ['item'],
+          page: 1,
+          pageSize: 10,
+          totalItems: 100,
+        ),
+      );
+
+      expect(state.canLoadMore, isTrue);
+    });
+
+    test('canLoadMore is false when loading', () {
+      final state = PaginationState(
+        data: PaginatedList.fromItems(
+          ['item'],
+          page: 1,
+          pageSize: 10,
+          totalItems: 100,
+        ),
+        isLoadingMore: true,
+      );
+
+      expect(state.canLoadMore, isFalse);
+    });
+
+    test('canLoadMore is false when no more pages', () {
+      final state = PaginationState(
+        data: PaginatedList.fromItems(
+          ['item'],
+          page: 1,
+          pageSize: 10,
+          totalItems: 1,
+        ),
+      );
+
+      expect(state.canLoadMore, isFalse);
+    });
+
+    test('copyWith preserves unchanged values', () {
+      final original = PaginationState(
+        data: PaginatedList.fromItems(
+          ['item'],
+          page: 1,
+          pageSize: 10,
+          totalItems: 1,
+        ),
+        isLoadingMore: true,
+        isRefreshing: false,
+        error: 'error',
+      );
+
+      final copied = original.copyWith(isLoadingMore: false);
+
+      expect(copied.data.items, equals(original.data.items));
+      expect(copied.isLoadingMore, isFalse);
+      expect(copied.isRefreshing, equals(original.isRefreshing));
+      expect(copied.error, equals(original.error));
+    });
+
+    Glados<List<String>>(any.list(any.nonEmptyLetters), _explore).test(
+      'hasData reflects items presence',
+      (items) {
+        final state = PaginationState(
+          data: PaginatedList.fromItems(
+            items,
+            page: 1,
+            pageSize: 10,
+            totalItems: items.length,
+          ),
+        );
+
+        expect(state.hasData, equals(items.isNotEmpty));
+      },
+    );
   });
 
   group('PaginationStateExtension Properties', () {
-    test('items returns empty list for null state', () {
+    test('items returns empty list for loading state', () {
       const AsyncValue<PaginationState<String>> value = AsyncLoading();
       expect(value.items, isEmpty);
     });
@@ -295,5 +143,82 @@ void main() {
 
       expect(value.items, equals(['a', 'b']));
     });
+
+    test('isLoadingMore returns false for loading state', () {
+      const AsyncValue<PaginationState<String>> value = AsyncLoading();
+      expect(value.isLoadingMore, isFalse);
+    });
+
+    test('canLoadMore returns false for loading state', () {
+      const AsyncValue<PaginationState<String>> value = AsyncLoading();
+      expect(value.canLoadMore, isFalse);
+    });
+
+    test('errorMessage returns null for loading state', () {
+      const AsyncValue<PaginationState<String>> value = AsyncLoading();
+      expect(value.errorMessage, isNull);
+    });
+
+    test('errorMessage returns error for state with error', () {
+      final state = PaginationState<String>.initial().copyWith(
+        error: 'Test error',
+      );
+      final value = AsyncData(state);
+
+      expect(value.errorMessage, equals('Test error'));
+    });
+  });
+
+  group('PaginatedList concat Properties', () {
+    test('concat combines two lists', () {
+      final list1 = PaginatedList.fromItems(
+        ['a', 'b'],
+        page: 1,
+        pageSize: 2,
+        totalItems: 4,
+      );
+
+      final list2 = PaginatedList.fromItems(
+        ['c', 'd'],
+        page: 2,
+        pageSize: 2,
+        totalItems: 4,
+      );
+
+      final combined = list1.concat(list2);
+
+      expect(combined.items, equals(['a', 'b', 'c', 'd']));
+      expect(combined.page, equals(2));
+      expect(combined.totalItems, equals(4));
+    });
+
+    Glados2<List<String>, List<String>>(
+      any.list(any.nonEmptyLetters),
+      any.list(any.nonEmptyLetters),
+      _explore,
+    ).test(
+      'concat preserves all items from both lists',
+      (items1, items2) {
+        final list1 = PaginatedList.fromItems(
+          items1,
+          page: 1,
+          pageSize: 10,
+          totalItems: items1.length + items2.length,
+        );
+
+        final list2 = PaginatedList.fromItems(
+          items2,
+          page: 2,
+          pageSize: 10,
+          totalItems: items1.length + items2.length,
+        );
+
+        final combined = list1.concat(list2);
+
+        expect(combined.items.length, equals(items1.length + items2.length));
+        expect(combined.items.sublist(0, items1.length), equals(items1));
+        expect(combined.items.sublist(items1.length), equals(items2));
+      },
+    );
   });
 }

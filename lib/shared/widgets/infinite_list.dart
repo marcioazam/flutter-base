@@ -7,6 +7,12 @@ enum InfiniteScrollState { idle, loading, error, noMoreData }
 
 /// Infinite scroll controller.
 class InfiniteScrollController<T> extends ChangeNotifier {
+
+  InfiniteScrollController({
+    required this.fetchPage,
+    this.pageSize = 20,
+    this.loadThreshold = 0.8,
+  });
   final Future<List<T>> Function(int page, int pageSize) fetchPage;
   final int pageSize;
   final double loadThreshold;
@@ -16,12 +22,6 @@ class InfiniteScrollController<T> extends ChangeNotifier {
   InfiniteScrollState _state = InfiniteScrollState.idle;
   String? _errorMessage;
   bool _hasMoreData = true;
-
-  InfiniteScrollController({
-    required this.fetchPage,
-    this.pageSize = 20,
-    this.loadThreshold = 0.8,
-  });
 
   List<T> get items => List.unmodifiable(_items);
   InfiniteScrollState get state => _state;
@@ -125,6 +125,18 @@ class InfiniteScrollController<T> extends ChangeNotifier {
 
 /// Infinite list view widget.
 class InfiniteListView<T> extends StatefulWidget {
+
+  const InfiniteListView({
+    required this.controller, required this.itemBuilder, super.key,
+    this.loadingWidget,
+    this.errorWidget,
+    this.emptyWidget,
+    this.endOfListWidget,
+    this.separatorWidget,
+    this.padding,
+    this.physics,
+    this.shrinkWrap = false,
+  });
   final InfiniteScrollController<T> controller;
   final Widget Function(BuildContext context, T item, int index) itemBuilder;
   final Widget? loadingWidget;
@@ -135,20 +147,6 @@ class InfiniteListView<T> extends StatefulWidget {
   final EdgeInsets? padding;
   final ScrollPhysics? physics;
   final bool shrinkWrap;
-
-  const InfiniteListView({
-    super.key,
-    required this.controller,
-    required this.itemBuilder,
-    this.loadingWidget,
-    this.errorWidget,
-    this.emptyWidget,
-    this.endOfListWidget,
-    this.separatorWidget,
-    this.padding,
-    this.physics,
-    this.shrinkWrap = false,
-  });
 
   @override
   State<InfiniteListView<T>> createState() => _InfiniteListViewState<T>();

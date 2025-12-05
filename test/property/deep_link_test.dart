@@ -1,7 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/router/app_router.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-modernization-2025, Property 10: Deep Link Navigation Resolution**
 /// **Validates: Requirements 23.1**
@@ -16,7 +18,7 @@ void main() {
       expect(uri.path, equals('/home'));
     });
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'buildUri preserves path',
       (path) {
         final validPath = '/${path.replaceAll(RegExp(r'[^\w/]'), '_')}';
@@ -70,7 +72,7 @@ void main() {
       expect(parsedPath, equals(originalPath));
     });
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'round-trip preserves any valid path',
       (path) {
         final validPath = '/${path.replaceAll(RegExp(r'[^\w/]'), '_')}';

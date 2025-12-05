@@ -2,22 +2,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Provider for token storage.
-final tokenStorageProvider = Provider<TokenStorage>((ref) {
-  return TokenStorage();
-});
+final tokenStorageProvider = Provider<TokenStorage>((ref) => TokenStorage());
 
 /// Secure storage for auth tokens only.
 /// All data persistence is handled by Python API.
 class TokenStorage {
-  static const _accessTokenKey = 'access_token';
-  static const _refreshTokenKey = 'refresh_token';
-
-  final FlutterSecureStorage _storage;
 
   TokenStorage() : _storage = const FlutterSecureStorage(
     aOptions: AndroidOptions(encryptedSharedPreferences: true),
     iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
   );
+  static const _accessTokenKey = 'access_token';
+  static const _refreshTokenKey = 'refresh_token';
+
+  final FlutterSecureStorage _storage;
 
   /// Gets access token.
   Future<String?> getAccessToken() => _storage.read(key: _accessTokenKey);

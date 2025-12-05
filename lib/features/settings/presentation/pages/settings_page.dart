@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_base_2025/shared/providers/locale_provider.dart';
+import 'package:flutter_base_2025/shared/providers/theme_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../shared/providers/locale_provider.dart';
-import '../../../../shared/providers/theme_provider.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -44,21 +43,17 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  String _themeModeLabel(ThemeMode mode) {
-    return switch (mode) {
+  String _themeModeLabel(ThemeMode mode) => switch (mode) {
       ThemeMode.system => 'System',
       ThemeMode.light => 'Light',
       ThemeMode.dark => 'Dark',
     };
-  }
 
-  String _localeLabel(Locale locale) {
-    return switch (locale.languageCode) {
+  String _localeLabel(Locale locale) => switch (locale.languageCode) {
       'en' => 'English',
       'pt' => 'Português',
       _ => locale.languageCode,
     };
-  }
 
   void _showThemeDialog(BuildContext context, WidgetRef ref, ThemeMode current) {
     showDialog<void>(
@@ -67,8 +62,7 @@ class SettingsPage extends ConsumerWidget {
         title: const Text('Select Theme'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: ThemeMode.values.map((mode) {
-            return RadioListTile<ThemeMode>(
+          children: ThemeMode.values.map((mode) => RadioListTile<ThemeMode>(
               title: Text(_themeModeLabel(mode)),
               value: mode,
               groupValue: current,
@@ -78,8 +72,7 @@ class SettingsPage extends ConsumerWidget {
                   Navigator.pop(context);
                 }
               },
-            );
-          }).toList(),
+            )).toList(),
         ),
       ),
     );
@@ -97,8 +90,7 @@ class SettingsPage extends ConsumerWidget {
         title: const Text('Select Language'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
-          children: locales.map((locale) {
-            return RadioListTile<Locale>(
+          children: locales.map((locale) => RadioListTile<Locale>(
               title: Text(_localeLabel(locale)),
               value: locale,
               groupValue: current,
@@ -108,8 +100,7 @@ class SettingsPage extends ConsumerWidget {
                   Navigator.pop(context);
                 }
               },
-            );
-          }).toList(),
+            )).toList(),
         ),
       ),
     );

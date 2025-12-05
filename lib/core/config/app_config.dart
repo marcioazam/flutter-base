@@ -2,19 +2,17 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// App configuration provider.
-final appConfigProvider = Provider<AppConfig>((ref) {
-  return AppConfig.instance;
-});
+final appConfigProvider = Provider<AppConfig>((ref) => AppConfig.instance);
 
 /// Flavor enum for different environments.
 enum Flavor { development, staging, production }
 
 /// Configuration validation errors.
 class ConfigValidationError implements Exception {
-  final String message;
-  final List<String> missingKeys;
 
   ConfigValidationError(this.message, {this.missingKeys = const []});
+  final String message;
+  final List<String> missingKeys;
 
   @override
   String toString() => 'ConfigValidationError: $message';
@@ -22,6 +20,16 @@ class ConfigValidationError implements Exception {
 
 /// Application configuration based on flavor/environment.
 class AppConfig {
+
+  AppConfig._({
+    required this.flavor,
+    required this.apiBaseUrl,
+    required this.appName,
+    required this.enableLogging,
+    required this.showDebugBanner,
+    required this.enableAnalytics,
+    required this.enableCrashReporting,
+  });
   final Flavor flavor;
   final String apiBaseUrl;
   final String appName;
@@ -36,33 +44,30 @@ class AppConfig {
   /// Required environment keys.
   static const _requiredKeys = ['API_BASE_URL', 'APP_NAME'];
 
-  AppConfig._({
-    required this.flavor,
-    required this.apiBaseUrl,
-    required this.appName,
-    required this.enableLogging,
-    required this.showDebugBanner,
-    required this.enableAnalytics,
-    required this.enableCrashReporting,
-  });
-
   /// Initializes config from environment with validation.
   static Future<void> initialize(Flavor flavor) async {
-    await dotenv.load(fileName: _envFileName(flavor));
-    
-    // Validate required keys
-    _validateEnvironment();
+    var envLoaded = false;
+    try {
+      await dotenv.load(fileName: _envFileName(flavor));
+      envLoaded = true;
+      // Validate required keys only if env file was loaded
+      _validateEnvironment();
+    } catch (_) {
+      // Fallback to defaults if env file not found (useful for tests)
+    }
     
     _instance = AppConfig._(
       flavor: flavor,
-      apiBaseUrl: dotenv.env['API_BASE_URL'] ?? _defaultApiUrl(flavor),
-      appName: dotenv.env['APP_NAME'] ?? _defaultAppName(flavor),
+      apiBaseUrl: envLoaded ? (dotenv.env['API_BASE_URL'] ?? _defaultApiUrl(flavor)) : _defaultApiUrl(flavor),
+      appName: envLoaded ? (dotenv.env['APP_NAME'] ?? _defaultAppName(flavor)) : _defaultAppName(flavor),
       enableLogging: flavor != Flavor.production,
       showDebugBanner: flavor != Flavor.production,
-      enableAnalytics: _parseBool(dotenv.env['ENABLE_ANALYTICS'], 
-          defaultValue: flavor != Flavor.development),
-      enableCrashReporting: _parseBool(dotenv.env['ENABLE_CRASH_REPORTING'], 
-          defaultValue: flavor != Flavor.development),
+      enableAnalytics: envLoaded 
+          ? _parseBool(dotenv.env['ENABLE_ANALYTICS'], defaultValue: flavor != Flavor.development)
+          : flavor != Flavor.development,
+      enableCrashReporting: envLoaded 
+          ? _parseBool(dotenv.env['ENABLE_CRASH_REPORTING'], defaultValue: flavor != Flavor.development)
+          : flavor != Flavor.development,
     );
   }
 

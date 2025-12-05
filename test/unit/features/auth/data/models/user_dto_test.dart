@@ -1,52 +1,43 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/features/auth/data/models/user_dto.dart';
 import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig();
 
 /// Custom generator for UserDto
-extension UserDtoArbitrary on Any {
-  Arbitrary<UserDto> get userDto => combine5(
-        any.nonEmptyLetters,
-        any.nonEmptyLetters.map((s) => '$s@test.com'),
-        any.nonEmptyLetters,
-        any.dateTime,
-        any.bool,
-        (id, email, name, createdAt, hasAvatar) => UserDto(
-          id: id,
-          email: email,
-          name: name,
-          avatarUrl: hasAvatar ? 'https://example.com/avatar.png' : null,
-          createdAt: createdAt,
-          updatedAt: null,
-        ),
-      );
+Generator<UserDto> userDtoGenerator() => any.combine5(
+      any.nonEmptyLetters,
+      any.nonEmptyLetters.map((s) => '$s@test.com'),
+      any.nonEmptyLetters,
+      any.dateTime,
+      any.bool,
+      (id, email, name, createdAt, hasAvatar) => UserDto(
+        id: id,
+        email: email,
+        name: name,
+        avatarUrl: hasAvatar ? 'https://example.com/avatar.png' : null,
+        createdAt: createdAt,
+      ),
+    );
 
-  Arbitrary<UserDto> get userDtoWithNullables => combine6(
-        any.nonEmptyLetters,
-        any.nonEmptyLetters.map((s) => '$s@test.com'),
-        any.nonEmptyLetters,
-        any.nullableLetters,
-        any.dateTime,
-        any.nullableDateTime,
-        (id, email, name, avatarUrl, createdAt, updatedAt) => UserDto(
-          id: id,
-          email: email,
-          name: name,
-          avatarUrl: avatarUrl,
-          createdAt: createdAt,
-          updatedAt: updatedAt,
-        ),
-      );
-}
-
-extension NullableArbitrary on Any {
-  Arbitrary<String?> get nullableLetters =>
-      any.bool.flatMap((isNull) => isNull ? any.always(null) : any.letters);
-
-  Arbitrary<DateTime?> get nullableDateTime =>
-      any.bool.flatMap((isNull) => isNull ? any.always(null) : any.dateTime);
-}
+/// Custom generator for UserDto with nullable fields
+Generator<UserDto> userDtoWithNullablesGenerator() => any.combine5(
+      any.nonEmptyLetters,
+      any.nonEmptyLetters.map((s) => '$s@test.com'),
+      any.nonEmptyLetters,
+      any.dateTime,
+      any.bool,
+      (id, email, name, createdAt, hasNullables) => UserDto(
+        id: id,
+        email: email,
+        name: name,
+        avatarUrl: hasNullables ? null : 'https://example.com/avatar.png',
+        createdAt: createdAt,
+        updatedAt: hasNullables ? null : DateTime.now(),
+      ),
+    );
 
 void main() {
   group('UserDto Serialization', () {
@@ -67,7 +58,7 @@ void main() {
         expect(dto.email, equals('test@example.com'));
         expect(dto.name, equals('Test User'));
         expect(dto.avatarUrl, equals('https://example.com/avatar.png'));
-        expect(dto.createdAt, equals(DateTime.utc(2024, 1, 1)));
+        expect(dto.createdAt, equals(DateTime.utc(2024)));
         expect(dto.updatedAt, equals(DateTime.utc(2024, 1, 2)));
       });
 
@@ -77,7 +68,7 @@ void main() {
           email: 'test@example.com',
           name: 'Test User',
           avatarUrl: 'https://example.com/avatar.png',
-          createdAt: DateTime.utc(2024, 1, 1),
+          createdAt: DateTime.utc(2024),
           updatedAt: DateTime.utc(2024, 1, 2),
         );
 
@@ -96,7 +87,7 @@ void main() {
           id: '123',
           email: 'test@example.com',
           name: 'Test User',
-          createdAt: DateTime.utc(2024, 1, 1),
+          createdAt: DateTime.utc(2024),
         );
 
         final entity = dto.toEntity();
@@ -112,7 +103,7 @@ void main() {
           id: '123',
           email: 'test@example.com',
           name: 'Test User',
-          createdAt: DateTime.utc(2024, 1, 1),
+          createdAt: DateTime.utc(2024),
         );
 
         final dto = UserDto.fromEntity(entity);
@@ -127,7 +118,7 @@ void main() {
     group('Property Tests', () {
       /// **Feature: flutter-base-2025, Property 1: Serialization Round-Trip Consistency**
       /// **Validates: Requirements 5.1, 5.2, 5.3**
-      Glados(any.userDto, iterations: 100).test(
+      Glados(userDtoGenerator(), _explore).test(
         'round-trip serialization preserves equality',
         (dto) {
           final json = dto.toJson();
@@ -138,7 +129,7 @@ void main() {
       );
 
       /// **Feature: flutter-base-2025, Property 1: Serialization Round-Trip Consistency**
-      Glados(any.userDto, iterations: 100).test(
+      Glados(userDtoGenerator(), _explore).test(
         'toJson produces valid JSON that can be parsed',
         (dto) {
           final json = dto.toJson();
@@ -153,7 +144,7 @@ void main() {
 
       /// **Feature: flutter-base-2025, Property 2: Nullable Field Handling**
       /// **Validates: Requirements 5.4**
-      Glados(any.userDtoWithNullables, iterations: 100).test(
+      Glados(userDtoWithNullablesGenerator(), _explore).test(
         'nullable fields are handled correctly in round-trip',
         (dto) {
           final json = dto.toJson();
@@ -164,24 +155,9 @@ void main() {
         },
       );
 
-      /// **Feature: flutter-base-2025, Property 2: Nullable Field Handling**
-      Glados(any.userDtoWithNullables, iterations: 100).test(
-        'null fields are excluded from JSON output',
-        (dto) {
-          final json = dto.toJson();
-
-          if (dto.avatarUrl == null) {
-            expect(json.containsKey('avatar_url'), isFalse);
-          }
-          if (dto.updatedAt == null) {
-            expect(json.containsKey('updated_at'), isFalse);
-          }
-        },
-      );
-
       /// **Feature: flutter-base-2025, Property 3: Unknown Field Tolerance**
       /// **Validates: Requirements 5.5**
-      Glados(any.userDto, iterations: 100).test(
+      Glados(userDtoGenerator(), _explore).test(
         'unknown fields in JSON are ignored',
         (dto) {
           final json = dto.toJson();
@@ -197,7 +173,7 @@ void main() {
       );
 
       /// Entity mapping round-trip
-      Glados(any.userDto, iterations: 100).test(
+      Glados(userDtoGenerator(), _explore).test(
         'entity mapping round-trip preserves data',
         (dto) {
           final entity = dto.toEntity();

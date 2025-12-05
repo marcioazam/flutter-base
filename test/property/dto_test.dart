@@ -1,16 +1,19 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/features/auth/data/models/user_dto.dart';
 import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
 import '../helpers/generators.dart';
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-modernization-2025, Property 3: DTO Round-Trip Consistency**
 /// **Feature: flutter-modernization-2025, Property 4: Entity-DTO Mapping Consistency**
 /// **Validates: Requirements 6.3, 6.4**
 void main() {
   group('DTO Round-Trip Properties', () {
-    Glados(any.userDto, iterations: 100).test(
+    Glados(any.userDto, _explore).test(
       'UserDto JSON round-trip preserves equality',
       (dto) {
         final json = dto.toJson();
@@ -26,7 +29,7 @@ void main() {
   });
 
   group('Entity-DTO Mapping Properties', () {
-    Glados(any.user, iterations: 100).test(
+    Glados(any.user, _explore).test(
       'User to UserDto to User preserves data',
       (user) {
         final dto = UserDto.fromEntity(user);
@@ -40,7 +43,7 @@ void main() {
       },
     );
 
-    Glados(any.userDto, iterations: 100).test(
+    Glados(any.userDto, _explore).test(
       'UserDto to User to UserDto preserves data',
       (dto) {
         final entity = dto.toEntity();

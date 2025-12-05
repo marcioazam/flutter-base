@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../core/errors/failures.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
 
 /// Generic error view with retry action.
 class ErrorView extends StatelessWidget {

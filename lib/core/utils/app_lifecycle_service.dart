@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
 
@@ -13,15 +14,15 @@ enum AppLifecycleState {
 
 /// App lifecycle configuration.
 class AppLifecycleConfig {
-  final Duration staleDataThreshold;
-  final bool refreshOnResume;
-  final bool pauseOnBackground;
 
   const AppLifecycleConfig({
     this.staleDataThreshold = const Duration(minutes: 5),
     this.refreshOnResume = true,
     this.pauseOnBackground = true,
   });
+  final Duration staleDataThreshold;
+  final bool refreshOnResume;
+  final bool pauseOnBackground;
 }
 
 /// Abstract app lifecycle service interface.
@@ -61,6 +62,12 @@ abstract interface class AppLifecycleService {
 class AppLifecycleServiceImpl
     with WidgetsBindingObserver
     implements AppLifecycleService {
+
+  AppLifecycleServiceImpl({
+    this.config = const AppLifecycleConfig(),
+  }) {
+    WidgetsBinding.instance.addObserver(this);
+  }
   final AppLifecycleConfig config;
 
   final _stateController = StreamController<AppLifecycleState>.broadcast();
@@ -70,12 +77,6 @@ class AppLifecycleServiceImpl
 
   AppLifecycleState _currentState = AppLifecycleState.resumed;
   DateTime? _backgroundTime;
-
-  AppLifecycleServiceImpl({
-    this.config = const AppLifecycleConfig(),
-  }) {
-    WidgetsBinding.instance.addObserver(this);
-  }
 
   @override
   Stream<AppLifecycleState> get stateChanges => _stateController.stream;
@@ -136,15 +137,13 @@ class AppLifecycleServiceImpl
     }
   }
 
-  AppLifecycleState _mapState(ui.AppLifecycleState state) {
-    return switch (state) {
+  AppLifecycleState _mapState(ui.AppLifecycleState state) => switch (state) {
       ui.AppLifecycleState.resumed => AppLifecycleState.resumed,
       ui.AppLifecycleState.inactive => AppLifecycleState.inactive,
       ui.AppLifecycleState.paused => AppLifecycleState.paused,
       ui.AppLifecycleState.detached => AppLifecycleState.detached,
       ui.AppLifecycleState.hidden => AppLifecycleState.hidden,
     };
-  }
 
   @override
   void onResume(VoidCallback callback) {
@@ -184,6 +183,4 @@ class AppLifecycleServiceImpl
 /// App lifecycle service factory.
 AppLifecycleService createAppLifecycleService({
   AppLifecycleConfig config = const AppLifecycleConfig(),
-}) {
-  return AppLifecycleServiceImpl(config: config);
-}
+}) => AppLifecycleServiceImpl(config: config);

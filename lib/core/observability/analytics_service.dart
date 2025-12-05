@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'app_logger.dart';
+import 'package:flutter_base_2025/core/observability/app_logger.dart';
 
 /// Abstract interface for analytics tracking.
 abstract interface class AnalyticsService {
@@ -41,7 +41,7 @@ class ConsoleAnalyticsService implements AnalyticsService {
 
   @override
   Future<void> initialize() async {
-    AppLogger.info('AnalyticsService initialized (console mode)');
+    AppLogger.instance.info('AnalyticsService initialized (console mode)');
   }
 
   @override
@@ -50,7 +50,7 @@ class ConsoleAnalyticsService implements AnalyticsService {
     String? screenClass,
   }) async {
     if (!_enabled) return;
-    AppLogger.debug(
+    AppLogger.instance.debug(
       '[ANALYTICS] Screen View: $screenName${screenClass != null ? ' ($screenClass)' : ''}',
     );
   }
@@ -61,7 +61,7 @@ class ConsoleAnalyticsService implements AnalyticsService {
     Map<String, dynamic>? parameters,
   }) async {
     if (!_enabled) return;
-    AppLogger.debug(
+    AppLogger.instance.debug(
       '[ANALYTICS] Event: $name${parameters != null ? ' $parameters' : ''}',
     );
   }
@@ -69,13 +69,13 @@ class ConsoleAnalyticsService implements AnalyticsService {
   @override
   Future<void> setUserId(String userId) async {
     if (!_enabled) return;
-    AppLogger.debug('[ANALYTICS] User ID: $userId');
+    AppLogger.instance.debug('[ANALYTICS] User ID: $userId');
   }
 
   @override
   Future<void> clearUserId() async {
     if (!_enabled) return;
-    AppLogger.debug('[ANALYTICS] User ID cleared');
+    AppLogger.instance.debug('[ANALYTICS] User ID cleared');
   }
 
   @override
@@ -84,21 +84,21 @@ class ConsoleAnalyticsService implements AnalyticsService {
     required String value,
   }) async {
     if (!_enabled) return;
-    AppLogger.debug('[ANALYTICS] User Property: $name = $value');
+    AppLogger.instance.debug('[ANALYTICS] User Property: $name = $value');
   }
 
   @override
   Future<void> setAnalyticsCollectionEnabled(bool enabled) async {
     _enabled = enabled;
-    AppLogger.debug('[ANALYTICS] Collection enabled: $enabled');
+    AppLogger.instance.debug('[ANALYTICS] Collection enabled: $enabled');
   }
 }
 
 /// Navigator observer for automatic screen tracking.
 class AnalyticsNavigatorObserver extends NavigatorObserver {
-  final AnalyticsService _analytics;
 
   AnalyticsNavigatorObserver(this._analytics);
+  final AnalyticsService _analytics;
 
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {

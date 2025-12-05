@@ -2,6 +2,7 @@
 /// 
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 6.1, 6.2, 6.3, 6.4, 6.5**
+library;
 
 /// Validator function type that returns a ValidationResult.
 typedef Validator<T> = ValidationResult<T> Function(T value);
@@ -31,9 +32,9 @@ sealed class ValidationResult<T> {
 
 /// Represents a successful validation with the validated value.
 final class Valid<T> extends ValidationResult<T> {
-  final T value;
 
   const Valid(this.value);
+  final T value;
 
   @override
   bool get isValid => true;
@@ -65,7 +66,6 @@ final class Valid<T> extends ValidationResult<T> {
 
 /// Represents a failed validation with field-specific errors.
 final class Invalid<T> extends ValidationResult<T> {
-  final Map<String, List<String>> errors;
 
   const Invalid(this.errors);
 
@@ -76,6 +76,7 @@ final class Invalid<T> extends ValidationResult<T> {
   /// Creates Invalid with multiple errors for a single field.
   factory Invalid.field(String field, List<String> messages) =>
       Invalid({field: messages});
+  final Map<String, List<String>> errors;
 
   @override
   bool get isValid => false;
@@ -149,14 +150,12 @@ abstract final class TypedValidators {
   static Validator<String> required({
     String field = 'value',
     String? message,
-  }) {
-    return (value) {
+  }) => (value) {
       if (value.trim().isEmpty) {
         return Invalid.single(field, message ?? 'This field is required');
       }
       return Valid(value);
     };
-  }
 
   /// Validates email format.
   static Validator<String> email({
@@ -177,8 +176,7 @@ abstract final class TypedValidators {
     int length, {
     String field = 'value',
     String? message,
-  }) {
-    return (value) {
+  }) => (value) {
       if (value.length < length) {
         return Invalid.single(
           field,
@@ -187,15 +185,13 @@ abstract final class TypedValidators {
       }
       return Valid(value);
     };
-  }
 
   /// Validates maximum length.
   static Validator<String> maxLength(
     int length, {
     String field = 'value',
     String? message,
-  }) {
-    return (value) {
+  }) => (value) {
       if (value.length > length) {
         return Invalid.single(
           field,
@@ -204,21 +200,18 @@ abstract final class TypedValidators {
       }
       return Valid(value);
     };
-  }
 
   /// Validates against a regex pattern.
   static Validator<String> pattern(
     RegExp regex, {
     String field = 'value',
     String? message,
-  }) {
-    return (value) {
+  }) => (value) {
       if (!regex.hasMatch(value)) {
         return Invalid.single(field, message ?? 'Invalid format');
       }
       return Valid(value);
     };
-  }
 
   /// Validates that a number is within a range.
   static Validator<num> range(
@@ -226,8 +219,7 @@ abstract final class TypedValidators {
     num max, {
     String field = 'value',
     String? message,
-  }) {
-    return (value) {
+  }) => (value) {
       if (value < min || value > max) {
         return Invalid.single(
           field,
@@ -236,24 +228,20 @@ abstract final class TypedValidators {
       }
       return Valid(value);
     };
-  }
 
   /// Validates that a value is not null.
   static Validator<T?> notNull<T>({
     String field = 'value',
     String? message,
-  }) {
-    return (value) {
+  }) => (value) {
       if (value == null) {
         return Invalid.single(field, message ?? 'Value cannot be null');
       }
       return Valid(value);
     };
-  }
 
   /// Composes multiple validators, aggregating all errors.
-  static Validator<T> compose<T>(List<Validator<T>> validators) {
-    return (value) {
+  static Validator<T> compose<T>(List<Validator<T>> validators) => (value) {
       Invalid<T>? accumulated;
 
       for (final validator in validators) {
@@ -265,11 +253,9 @@ abstract final class TypedValidators {
 
       return accumulated ?? Valid(value);
     };
-  }
 
   /// Composes validators, stopping at first failure.
-  static Validator<T> composeFailFast<T>(List<Validator<T>> validators) {
-    return (value) {
+  static Validator<T> composeFailFast<T>(List<Validator<T>> validators) => (value) {
       for (final validator in validators) {
         final result = validator(value);
         if (result.isInvalid) {
@@ -278,24 +264,20 @@ abstract final class TypedValidators {
       }
       return Valid(value);
     };
-  }
 
   /// Creates a conditional validator.
   static Validator<T> when<T>(
     bool Function(T) condition,
     Validator<T> validator,
-  ) {
-    return (value) {
+  ) => (value) {
       if (condition(value)) {
         return validator(value);
       }
       return Valid(value);
     };
-  }
 
   /// Validates a list of items.
-  static Validator<List<T>> listOf<T>(Validator<T> itemValidator) {
-    return (items) {
+  static Validator<List<T>> listOf<T>(Validator<T> itemValidator) => (items) {
       final errors = <String, List<String>>{};
 
       for (var i = 0; i < items.length; i++) {
@@ -313,21 +295,18 @@ abstract final class TypedValidators {
       }
       return Invalid(errors);
     };
-  }
 }
 
 /// Extension for chaining validation results.
 extension ValidationResultExtensions<T> on ValidationResult<T> {
   /// Combines with another validation result.
-  ValidationResult<(T, R)> and<R>(ValidationResult<R> other) {
-    return switch ((this, other)) {
+  ValidationResult<(T, R)> and<R>(ValidationResult<R> other) => switch ((this, other)) {
       (Valid(value: final a), Valid(value: final b)) => Valid((a, b)),
       (Invalid(errors: final e1), Invalid(errors: final e2)) =>
         Invalid(_mergeErrors(e1, e2)),
       (Invalid(errors: final e), _) => Invalid(e),
       (_, Invalid(errors: final e)) => Invalid(e),
     };
-  }
 
   static Map<String, List<String>> _mergeErrors(
     Map<String, List<String>> a,

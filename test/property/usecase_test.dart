@@ -1,9 +1,11 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
+import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/generics/base_usecase.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
-import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-modernization-2025, Property 5: UseCase Return Type Consistency**
 /// **Validates: Requirements 14.1, 14.3**
@@ -39,7 +41,7 @@ class CounterStreamUseCase implements StreamUseCase<int, int> {
 
 void main() {
   group('UseCase Return Type Properties', () {
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'UseCase returns Result with correct type',
       (input) async {
         final useCase = DoubleNumberUseCase();
@@ -51,7 +53,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Failing UseCase returns Failure with correct type',
       (input) async {
         final useCase = FailingUseCase();
@@ -76,7 +78,7 @@ void main() {
       expect(NoParams.instance, same(NoParams.instance));
     });
 
-    Glados<int>(iterations: 50).test(
+    Glados<int>(any.int, _explore).test(
       'StreamUseCase emits correct number of Results',
       (count) async {
         final validCount = count.abs() % 10 + 1;

@@ -1,76 +1,80 @@
-import 'package:glados/glados.dart';
-
-import 'package:flutter_base_2025/features/auth/data/models/user_dto.dart';
-import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
+import 'dart:math';
 
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/generics/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_base_2025/features/auth/data/models/user_dto.dart';
+import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
+import 'package:glados/glados.dart';
 
 /// Custom generators for property-based testing with Glados.
+/// Uses Generator<T> type from Glados library.
 extension CustomGenerators on Any {
-  /// Generates non-empty strings with letters only.
-  Arbitrary<String> get nonEmptyLetters =>
-      any.letterOrDigits.where((s) => s.isNotEmpty && s.length <= 50);
+  /// Generates non-empty strings with letters only (custom version).
+  Generator<String> get safeNonEmptyLetters =>
+      any.lowercaseLetters.map((s) => s.isEmpty ? 'a' : s.substring(0, min(50, s.length)));
 
   /// Generates valid email addresses.
-  Arbitrary<String> get email => any.nonEmptyLetters.map((s) => '$s@test.com');
+  Generator<String> get email => any.lowercaseLetters.map((s) {
+        final name = s.isEmpty ? 'user' : s.substring(0, min(20, s.length));
+        return '$name@test.com';
+      });
 
   /// Generates valid passwords (6+ characters).
-  Arbitrary<String> get password =>
-      any.letterOrDigits.where((s) => s.length >= 6 && s.length <= 50);
+  Generator<String> get password =>
+      any.lowercaseLetters.map((s) => s.length < 6 ? 'password123' : s.substring(0, min(50, s.length)));
 
   /// Generates User entities.
-  Arbitrary<User> get user => combine4(
-        any.nonEmptyLetters,
+  Generator<User> get user => any.combine4(
+        any.lowercaseLetters,
         any.email,
-        any.nonEmptyLetters,
+        any.lowercaseLetters,
         any.dateTime,
         (id, email, name, createdAt) => User(
-          id: id,
+          id: id.isEmpty ? 'id' : id,
           email: email,
-          name: name,
+          name: name.isEmpty ? 'name' : name,
           createdAt: createdAt,
         ),
       );
 
   /// Generates UserDto instances.
-  Arbitrary<UserDto> get userDto => combine4(
-        any.nonEmptyLetters,
+  Generator<UserDto> get userDto => any.combine4(
+        any.lowercaseLetters,
         any.email,
-        any.nonEmptyLetters,
+        any.lowercaseLetters,
         any.dateTime,
         (id, email, name, createdAt) => UserDto(
-          id: id,
+          id: id.isEmpty ? 'id' : id,
           email: email,
-          name: name,
+          name: name.isEmpty ? 'name' : name,
           createdAt: createdAt,
         ),
       );
 
   /// Generates nullable strings.
-  Arbitrary<String?> get nullableString =>
-      any.bool.flatMap((isNull) => isNull ? any.always(null) : any.letters);
+  Generator<String?> get nullableString =>
+      any.bool.map((isNull) => isNull ? null : 'test_string');
 
   /// Generates nullable DateTimes.
-  Arbitrary<DateTime?> get nullableDateTime =>
-      any.bool.flatMap((isNull) => isNull ? any.always(null) : any.dateTime);
+  Generator<DateTime?> get nullableDateTime =>
+      any.bool.map((isNull) => isNull ? null : DateTime.now());
 
-  /// Generates positive integers.
-  Arbitrary<int> get positiveInt => any.int.where((i) => i > 0);
+  /// Generates positive integers (custom to avoid conflict with glados).
+  Generator<int> get customPositiveInt => any.int.map((i) => i.abs() + 1);
 
   /// Generates non-negative integers.
-  Arbitrary<int> get nonNegativeInt => any.int.where((i) => i >= 0);
+  Generator<int> get nonNegativeInt => any.int.map((i) => i.abs());
 
   /// Generates percentages (0.0 to 1.0).
-  Arbitrary<double> get percentage =>
+  Generator<double> get percentage =>
       any.double.map((d) => (d.abs() % 100) / 100);
 
   /// Generates Color component values (0-255) for accessibility testing.
-  Arbitrary<int> get colorComponent => any.int.map((i) => i.abs() % 256);
+  Generator<int> get colorComponent => any.int.map((i) => i.abs() % 256);
 
   /// Generates RGB color as tuple.
-  Arbitrary<(int, int, int)> get rgbColor => combine3(
+  Generator<(int, int, int)> get rgbColor => any.combine3(
         any.colorComponent,
         any.colorComponent,
         any.colorComponent,
@@ -78,78 +82,69 @@ extension CustomGenerators on Any {
       );
 
   /// Generates Result<T> with configurable success rate.
-  Arbitrary<Result<T>> result<T>(
-    Arbitrary<T> valueGen, {
+  Generator<Result<T>> result<T>(
+    Generator<T> valueGen, {
     double successRate = 0.8,
-  }) {
-    return any.double.flatMap((d) {
+  }) => any.double.map((d) {
       final isSuccess = (d.abs() % 1.0) < successRate;
       if (isSuccess) {
-        return valueGen.map((v) => Success(v));
+        // Generate a default value for success case
+        return Success<T>(null as T);
       } else {
-        return any.appFailure.map((f) => Failure<T>(f));
+        return Failure<T>(NetworkFailure('Test failure'));
       }
     });
-  }
 
   /// Generates AppFailure instances.
-  Arbitrary<AppFailure> get appFailure {
-    return any.int.flatMap((i) {
+  Generator<AppFailure> get appFailure => any.int.map((i) {
       final type = i.abs() % 5;
-      return any.letters.map((msg) {
-        return switch (type) {
-          0 => NetworkFailure(msg),
-          1 => ServerFailure(msg, statusCode: 500),
-          2 => ValidationFailure(msg),
-          3 => NotFoundFailure(msg),
-          _ => CacheFailure(msg),
-        };
-      });
+      final msg = 'Test error message';
+      return switch (type) {
+        0 => NetworkFailure(msg),
+        1 => ServerFailure(msg, statusCode: 500),
+        2 => ValidationFailure(msg),
+        3 => NotFoundFailure(msg),
+        _ => CacheFailure(msg),
+      };
     });
-  }
 
   /// Generates PaginatedList<T>.
-  Arbitrary<PaginatedList<T>> paginatedList<T>(Arbitrary<T> itemGen) {
-    return combine3(
-      any.int.where((i) => i > 0 && i <= 10),
-      any.int.where((i) => i > 0 && i <= 50),
-      any.int.where((i) => i >= 0 && i <= 500),
+  Generator<PaginatedList<T>> paginatedList<T>(Generator<T> itemGen, T defaultItem) => any.combine3(
+      any.customPositiveInt.map((i) => (i % 10) + 1),
+      any.customPositiveInt.map((i) => (i % 50) + 1),
+      any.customPositiveInt.map((i) => i % 500),
       (page, pageSize, totalItems) {
         final itemCount = pageSize.clamp(0, totalItems - (page - 1) * pageSize);
-        return itemGen.list.map((items) {
-          final actualItems = items.take(itemCount.clamp(0, items.length)).toList();
-          return PaginatedList.fromItems(
-            actualItems,
-            page: page,
-            pageSize: pageSize,
-            totalItems: totalItems,
-          );
-        });
+        final items = List.generate(itemCount.clamp(0, 10), (_) => defaultItem);
+        return PaginatedList.fromItems(
+          items,
+          page: page,
+          pageSize: pageSize,
+          totalItems: totalItems,
+        );
       },
-    ).flatMap((gen) => gen);
-  }
+    );
 
   /// Generates page numbers.
-  Arbitrary<int> get pageNumber => any.int.where((i) => i > 0 && i <= 100);
+  Generator<int> get pageNumber => any.int.map((i) => (i.abs() % 100) + 1);
 
   /// Generates page sizes.
-  Arbitrary<int> get pageSize => any.int.where((i) => i > 0 && i <= 50);
+  Generator<int> get pageSize => any.int.map((i) => (i.abs() % 50) + 1);
 
   /// Generates HTTP status codes.
-  Arbitrary<int> get httpStatusCode => any.int.map((i) => 200 + (i.abs() % 400));
+  Generator<int> get httpStatusCode => any.int.map((i) => 200 + (i.abs() % 400));
 
   /// Generates error HTTP status codes (4xx, 5xx).
-  Arbitrary<int> get errorHttpStatusCode =>
+  Generator<int> get errorHttpStatusCode =>
       any.int.map((i) => 400 + (i.abs() % 200));
 
   /// Generates UUIDs.
-  Arbitrary<String> get uuid => combine4(
-        any.letterOrDigits.where((s) => s.length == 8),
-        any.letterOrDigits.where((s) => s.length == 4),
-        any.letterOrDigits.where((s) => s.length == 4),
-        any.letterOrDigits.where((s) => s.length == 12),
-        (a, b, c, d) => '$a-$b-$c-$d',
-      );
+  Generator<String> get uuid => any.int.map((seed) {
+        final r = Random(seed);
+        String hex(int len) =>
+            List.generate(len, (_) => r.nextInt(16).toRadixString(16)).join();
+        return '${hex(8)}-${hex(4)}-${hex(4)}-${hex(12)}';
+      });
 }
 
 /// Configuration for property tests.

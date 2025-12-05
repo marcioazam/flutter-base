@@ -1,18 +1,14 @@
 import 'dart:async';
 
-import '../../../../core/errors/failures.dart';
-import '../../../../core/storage/token_storage.dart';
-import '../../../../core/utils/result.dart';
-import '../../domain/entities/user.dart';
-import '../../domain/repositories/auth_repository.dart';
-import '../datasources/auth_remote_datasource.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/storage/token_storage.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_base_2025/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
+import 'package:flutter_base_2025/features/auth/domain/repositories/auth_repository.dart';
 
 /// Implementation of AuthRepository consuming Python API.
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSource _remoteDataSource;
-  final TokenStorage _tokenStorage;
-
-  final _authStateController = StreamController<AuthState>.broadcast();
 
   AuthRepositoryImpl({
     required AuthRemoteDataSource remoteDataSource,
@@ -21,6 +17,10 @@ class AuthRepositoryImpl implements AuthRepository {
         _tokenStorage = tokenStorage {
     _initAuthState();
   }
+  final AuthRemoteDataSource _remoteDataSource;
+  final TokenStorage _tokenStorage;
+
+  final _authStateController = StreamController<AuthState>.broadcast();
 
   Future<void> _initAuthState() async {
     final hasTokens = await _tokenStorage.hasTokens();

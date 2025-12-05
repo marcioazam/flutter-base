@@ -2,24 +2,25 @@ import 'dart:async';
 
 import 'package:dio/dio.dart';
 
-import '../../constants/app_constants.dart';
+import 'package:flutter_base_2025/core/constants/app_constants.dart';
 
 /// Interceptor for retrying failed requests.
 class RetryInterceptor extends Interceptor {
-  final Dio dio;
-  final int maxRetries;
-  final Duration retryDelay;
 
   RetryInterceptor({
     required this.dio,
     this.maxRetries = AppConstants.maxRetryAttempts,
     this.retryDelay = AppConstants.retryDelay,
   });
+  final Dio dio;
+  final int maxRetries;
+  final Duration retryDelay;
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
     if (_shouldRetry(err)) {
-      final retryCount = err.requestOptions.extra['retryCount'] ?? 0;
+      final dynamic rawRetryCount = err.requestOptions.extra['retryCount'];
+      final retryCount = rawRetryCount is int ? rawRetryCount : 0;
 
       if (retryCount < maxRetries) {
         await Future<void>.delayed(retryDelay * (retryCount + 1));

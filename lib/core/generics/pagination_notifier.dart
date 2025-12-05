@@ -1,18 +1,9 @@
+import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../utils/result.dart';
-import 'paginated_list.dart';
 
 /// State for pagination operations.
 class PaginationState<T> {
-  final List<T> items;
-  final int currentPage;
-  final int pageSize;
-  final int totalItems;
-  final bool isLoading;
-  final bool isLoadingMore;
-  final bool hasMore;
-  final Object? error;
 
   const PaginationState({
     this.items = const [],
@@ -24,6 +15,14 @@ class PaginationState<T> {
     this.hasMore = true,
     this.error,
   });
+  final List<T> items;
+  final int currentPage;
+  final int pageSize;
+  final int totalItems;
+  final bool isLoading;
+  final bool isLoadingMore;
+  final bool hasMore;
+  final Object? error;
 
   PaginationState<T> copyWith({
     List<T>? items,
@@ -35,8 +34,7 @@ class PaginationState<T> {
     bool? hasMore,
     Object? error,
     bool clearError = false,
-  }) {
-    return PaginationState(
+  }) => PaginationState(
       items: items ?? this.items,
       currentPage: currentPage ?? this.currentPage,
       pageSize: pageSize ?? this.pageSize,
@@ -46,7 +44,6 @@ class PaginationState<T> {
       hasMore: hasMore ?? this.hasMore,
       error: clearError ? null : (error ?? this.error),
     );
-  }
 
   bool get isEmpty => items.isEmpty && !isLoading;
   bool get hasError => error != null;
@@ -152,9 +149,18 @@ abstract class AsyncPaginationNotifier<T>
   /// Fetches a page of data. Override in subclass.
   Future<Result<PaginatedList<T>>> fetchPage(int page, int pageSize);
 
+  /// Gets current state value or default.
+  PaginationState<T> _getCurrentState() {
+    final asyncValue = state;
+    if (asyncValue is AsyncData<PaginationState<T>>) {
+      return asyncValue.value;
+    }
+    return const PaginationState();
+  }
+
   /// Loads the first page of data.
   Future<void> loadInitial() async {
-    final currentState = state.valueOrNull ?? const PaginationState();
+    final currentState = _getCurrentState();
     if (currentState.isLoading) return;
 
     state = AsyncData(currentState.copyWith(isLoading: true, clearError: true));
@@ -182,7 +188,7 @@ abstract class AsyncPaginationNotifier<T>
 
   /// Loads the next page of data.
   Future<void> loadMore() async {
-    final currentState = state.valueOrNull ?? const PaginationState();
+    final currentState = _getCurrentState();
     if (currentState.isLoading ||
         currentState.isLoadingMore ||
         !currentState.hasMore) {

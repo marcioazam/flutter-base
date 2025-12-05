@@ -7,6 +7,35 @@ import 'package:flutter/material.dart';
 /// Enhanced PopScope for predictive back gesture support (Android 15+).
 /// Provides async confirmation dialogs and custom back handling.
 class PredictivePopScope extends StatelessWidget {
+
+  const PredictivePopScope({
+    required this.child, super.key,
+    this.canPop = true,
+    this.onPopInvoked,
+    this.confirmationDialog,
+  });
+
+  /// Creates a PredictivePopScope with unsaved changes confirmation.
+  factory PredictivePopScope.unsavedChanges({
+    required Widget child, required bool hasUnsavedChanges, Key? key,
+    String title = 'Descartar alterações?',
+    String message = 'Você tem alterações não salvas. Deseja descartá-las?',
+    String confirmText = 'Descartar',
+    String cancelText = 'Continuar editando',
+  }) => PredictivePopScope(
+      key: key,
+      canPop: !hasUnsavedChanges,
+      confirmationDialog: hasUnsavedChanges
+          ? (context) => _showDiscardDialog(
+                context,
+                title: title,
+                message: message,
+                confirmText: confirmText,
+                cancelText: cancelText,
+              )
+          : null,
+      child: child,
+    );
   final Widget child;
 
   /// Whether the route can be popped.
@@ -18,22 +47,13 @@ class PredictivePopScope extends StatelessWidget {
   /// Optional confirmation dialog builder.
   final Future<bool> Function(BuildContext context)? confirmationDialog;
 
-  const PredictivePopScope({
-    super.key,
-    required this.child,
-    this.canPop = true,
-    this.onPopInvoked,
-    this.confirmationDialog,
-  });
-
   @override
-  Widget build(BuildContext context) {
-    return PopScope(
+  Widget build(BuildContext context) => PopScope(
       canPop: canPop && onPopInvoked == null && confirmationDialog == null,
       onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
 
-        bool shouldPop = true;
+        var shouldPop = true;
 
         // Show confirmation dialog if provided
         if (confirmationDialog != null) {
@@ -50,33 +70,6 @@ class PredictivePopScope extends StatelessWidget {
       },
       child: child,
     );
-  }
-
-  /// Creates a PredictivePopScope with unsaved changes confirmation.
-  factory PredictivePopScope.unsavedChanges({
-    Key? key,
-    required Widget child,
-    required bool hasUnsavedChanges,
-    String title = 'Descartar alterações?',
-    String message = 'Você tem alterações não salvas. Deseja descartá-las?',
-    String confirmText = 'Descartar',
-    String cancelText = 'Continuar editando',
-  }) {
-    return PredictivePopScope(
-      key: key,
-      canPop: !hasUnsavedChanges,
-      confirmationDialog: hasUnsavedChanges
-          ? (context) => _showDiscardDialog(
-                context,
-                title: title,
-                message: message,
-                confirmText: confirmText,
-                cancelText: cancelText,
-              )
-          : null,
-      child: child,
-    );
-  }
 
   static Future<bool> _showDiscardDialog(
     BuildContext context, {
@@ -125,10 +118,8 @@ mixin UnsavedChangesMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Wrap your form with this to get automatic unsaved changes protection.
-  Widget buildWithUnsavedChangesProtection({required Widget child}) {
-    return PredictivePopScope.unsavedChanges(
+  Widget buildWithUnsavedChangesProtection({required Widget child}) => PredictivePopScope.unsavedChanges(
       hasUnsavedChanges: _hasUnsavedChanges,
       child: child,
     );
-  }
 }

@@ -1,20 +1,20 @@
 import 'dart:async';
 
-import '../errors/failures.dart';
-import 'result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Share result status.
 enum ShareStatus { success, dismissed, unavailable }
 
 /// Share result.
 class ShareResult {
-  final ShareStatus status;
-  final String? raw;
 
   const ShareResult({
     required this.status,
     this.raw,
   });
+  final ShareStatus status;
+  final String? raw;
 
   bool get isSuccess => status == ShareStatus.success;
   bool get isDismissed => status == ShareStatus.dismissed;

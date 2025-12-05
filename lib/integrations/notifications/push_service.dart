@@ -1,26 +1,19 @@
 import 'dart:async';
 
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Push notification message.
 class PushNotification {
-  final String? title;
-  final String? body;
-  final Map<String, dynamic>? data;
-  final String? imageUrl;
-  final DateTime receivedAt;
 
   const PushNotification({
-    this.title,
+    required this.receivedAt, this.title,
     this.body,
     this.data,
     this.imageUrl,
-    required this.receivedAt,
   });
 
-  factory PushNotification.fromJson(Map<String, dynamic> json) {
-    return PushNotification(
+  factory PushNotification.fromJson(Map<String, dynamic> json) => PushNotification(
       title: json['title'] as String?,
       body: json['body'] as String?,
       data: json['data'] as Map<String, dynamic>?,
@@ -29,7 +22,11 @@ class PushNotification {
           ? DateTime.parse(json['receivedAt'] as String)
           : DateTime.now(),
     );
-  }
+  final String? title;
+  final String? body;
+  final Map<String, dynamic>? data;
+  final String? imageUrl;
+  final DateTime receivedAt;
 
   Map<String, dynamic> toJson() => {
         'title': title,

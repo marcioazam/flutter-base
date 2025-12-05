@@ -1,8 +1,10 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart';
-
 import 'package:flutter_base_2025/core/generics/cache_repository.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+
+// Configure Glados for 100 iterations
+final _explore = ExploreConfig(numRuns: 100);
 
 /// **Feature: flutter-state-of-art-2025-final, Property 13: Cache TTL Expiration**
 /// **Validates: Requirements 1.5**
@@ -41,7 +43,7 @@ void main() {
       expect(fetchCount, equals(2));
     });
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'Cache hit rate increases with repeated access to same key',
       (value) async {
         final cache = InMemoryCacheRepository<int, String>();
@@ -62,7 +64,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'Cache contains returns true for non-expired entries',
       (value) {
         final cache = InMemoryCacheRepository<String, String>();
@@ -73,7 +75,7 @@ void main() {
       },
     );
 
-    Glados<String>(iterations: 100).test(
+    Glados<String>(any.nonEmptyLetters, _explore).test(
       'Invalidate removes entry from cache',
       (value) {
         final cache = InMemoryCacheRepository<String, String>();
@@ -125,7 +127,7 @@ void main() {
       expect(cache.contains('long'), isTrue);
     });
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'getCached returns failure for missing entries',
       (value) {
         final cache = InMemoryCacheRepository<int, String>();
@@ -136,7 +138,7 @@ void main() {
       },
     );
 
-    Glados<int>(iterations: 100).test(
+    Glados<int>(any.int, _explore).test(
       'getCached returns success for cached entries',
       (value) {
         final cache = InMemoryCacheRepository<int, String>();
@@ -155,7 +157,6 @@ void main() {
       final entry = CacheEntry(
         value: 'test',
         cachedAt: DateTime.now(),
-        expiresAt: null,
       );
 
       expect(entry.isExpired, isFalse);

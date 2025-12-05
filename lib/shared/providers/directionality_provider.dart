@@ -1,9 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/widgets.dart';
+import 'package:flutter_base_2025/shared/providers/locale_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'locale_provider.dart';
 
 /// RTL languages list.
 const _rtlLanguages = ['ar', 'he', 'fa', 'ur', 'ps', 'sd', 'yi'];

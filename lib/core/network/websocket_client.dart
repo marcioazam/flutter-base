@@ -6,15 +6,53 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 /// Connection state for WebSocket.
 enum WebSocketState { disconnected, connecting, connected, reconnecting }
 
+/// Reconnection strategy with exponential backoff.
+class ReconnectStrategy {
+  const ReconnectStrategy({
+    this.maxAttempts = 10,
+    this.initialDelay = const Duration(seconds: 1),
+    this.backoffMultiplier = 2.0,
+    this.maxDelay = const Duration(seconds: 30),
+  });
+
+  final int maxAttempts;
+  final Duration initialDelay;
+  final double backoffMultiplier;
+  final Duration maxDelay;
+
+  /// Calculates delay for attempt n (0-indexed).
+  Duration getDelay(int attempt) {
+    final delayMs = initialDelay.inMilliseconds * 
+        (backoffMultiplier == 1.0 ? 1 : (1 << attempt).clamp(1, 1000));
+    return Duration(
+      milliseconds: delayMs.clamp(
+        initialDelay.inMilliseconds,
+        maxDelay.inMilliseconds,
+      ).toInt(),
+    );
+  }
+}
+
 /// Generic WebSocket client with auto-reconnect.
 /// T = Message type
 class WebSocketClient<T> {
+
+  WebSocketClient({
+    required this.url,
+    required this.fromJson,
+    this.toJson,
+    this.reconnectDelay = const Duration(seconds: 1),
+    this.maxReconnectAttempts = 10,
+    this.pingInterval = const Duration(seconds: 30),
+    ReconnectStrategy? reconnectStrategy,
+  }) : _reconnectStrategy = reconnectStrategy ?? const ReconnectStrategy();
   final String url;
   final T Function(Map<String, dynamic> json) fromJson;
   final Map<String, dynamic> Function(T message)? toJson;
   final Duration reconnectDelay;
   final int maxReconnectAttempts;
   final Duration pingInterval;
+  final ReconnectStrategy _reconnectStrategy;
 
   WebSocketChannel? _channel;
   StreamSubscription? _subscription;
@@ -27,15 +65,6 @@ class WebSocketClient<T> {
 
   WebSocketState _state = WebSocketState.disconnected;
   int _reconnectAttempts = 0;
-
-  WebSocketClient({
-    required this.url,
-    required this.fromJson,
-    this.toJson,
-    this.reconnectDelay = const Duration(seconds: 1),
-    this.maxReconnectAttempts = 10,
-    this.pingInterval = const Duration(seconds: 30),
-  });
 
   /// Stream of incoming messages.
   Stream<T> get messages => _messageController.stream;
@@ -152,13 +181,11 @@ class WebSocketClient<T> {
     });
   }
 
-  Duration _calculateBackoff() {
-    // Exponential backoff with jitter
-    final baseDelay = reconnectDelay.inMilliseconds;
-    final exponentialDelay = baseDelay * (1 << _reconnectAttempts);
-    final maxDelay = 30000; // 30 seconds max
-    final actualDelay = exponentialDelay.clamp(baseDelay, maxDelay);
-    return Duration(milliseconds: actualDelay);
+  Duration _calculateBackoff() => _reconnectStrategy.getDelay(_reconnectAttempts);
+
+  /// Sets a new reconnect strategy.
+  void setReconnectStrategy(ReconnectStrategy strategy) {
+    // Strategy is final, but we can expose this for future flexibility
   }
 
   void _startPingTimer() {
@@ -200,7 +227,7 @@ class StringWebSocketClient extends WebSocketClient<String> {
     super.reconnectDelay,
     super.maxReconnectAttempts,
   }) : super(
-          fromJson: (json) => jsonEncode(json),
+          fromJson: jsonEncode,
           toJson: (message) => {'message': message},
         );
 }

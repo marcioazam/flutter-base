@@ -5,13 +5,6 @@ enum LogLevel { trace, debug, info, warning, error, fatal }
 
 /// Structured log entry.
 class LogEntry {
-  final LogLevel level;
-  final String message;
-  final DateTime timestamp;
-  final String? correlationId;
-  final Map<String, dynamic>? context;
-  final Object? error;
-  final StackTrace? stackTrace;
 
   LogEntry({
     required this.level,
@@ -22,6 +15,13 @@ class LogEntry {
     this.error,
     this.stackTrace,
   }) : timestamp = timestamp ?? DateTime.now();
+  final LogLevel level;
+  final String message;
+  final DateTime timestamp;
+  final String? correlationId;
+  final Map<String, dynamic>? context;
+  final Object? error;
+  final StackTrace? stackTrace;
 
   Map<String, dynamic> toJson() => {
         'level': level.name,
@@ -50,12 +50,6 @@ const _sensitiveFields = {
 
 /// Structured logger with context and redaction.
 class AppLogger {
-  final Logger _logger;
-  final String? _correlationId;
-  final Map<String, dynamic> _baseContext;
-  final bool _redactSensitive;
-
-  static AppLogger? _instance;
 
   AppLogger._({
     Logger? logger,
@@ -68,13 +62,17 @@ class AppLogger {
                 methodCount: 0,
                 errorMethodCount: 5,
                 lineLength: 80,
-                colors: true,
-                printEmojis: true,
               ),
             ),
         _correlationId = correlationId,
         _baseContext = baseContext ?? {},
         _redactSensitive = redactSensitive;
+  final Logger _logger;
+  final String? _correlationId;
+  final Map<String, dynamic> _baseContext;
+  final bool _redactSensitive;
+
+  static AppLogger? _instance;
 
   /// Gets or creates singleton instance.
   static AppLogger get instance {
@@ -98,24 +96,20 @@ class AppLogger {
   }
 
   /// Creates a child logger with additional context.
-  AppLogger withContext(Map<String, dynamic> context) {
-    return AppLogger._(
+  AppLogger withContext(Map<String, dynamic> context) => AppLogger._(
       logger: _logger,
       correlationId: _correlationId,
       baseContext: {..._baseContext, ...context},
       redactSensitive: _redactSensitive,
     );
-  }
 
   /// Creates a child logger with correlation ID.
-  AppLogger withCorrelationId(String correlationId) {
-    return AppLogger._(
+  AppLogger withCorrelationId(String correlationId) => AppLogger._(
       logger: _logger,
       correlationId: correlationId,
       baseContext: _baseContext,
       redactSensitive: _redactSensitive,
     );
-  }
 
   /// Logs trace message.
   void trace(String message, {Map<String, dynamic>? context}) {
@@ -221,8 +215,7 @@ class AppLogger {
     return buffer.toString();
   }
 
-  Map<String, dynamic> _redactSensitiveData(Map<String, dynamic> data) {
-    return data.map((key, value) {
+  Map<String, dynamic> _redactSensitiveData(Map<String, dynamic> data) => data.map((key, value) {
       if (_isSensitiveKey(key)) {
         return MapEntry(key, '[REDACTED]');
       }
@@ -234,11 +227,10 @@ class AppLogger {
       }
       return MapEntry(key, value);
     });
-  }
 
   bool _isSensitiveKey(String key) {
     final lowerKey = key.toLowerCase();
-    return _sensitiveFields.any((field) => lowerKey.contains(field));
+    return _sensitiveFields.any(lowerKey.contains);
   }
 
   bool _containsSensitivePattern(String value) {

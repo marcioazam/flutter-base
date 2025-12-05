@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import '../../core/errors/failures.dart';
-import '../../core/utils/result.dart';
-import 'map_service.dart';
+import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:flutter_base_2025/integrations/maps/map_service.dart';
 
 /// Location permission status.
 enum LocationPermission {
@@ -17,6 +17,15 @@ enum LocationAccuracy { lowest, low, medium, high, best }
 
 /// Location data.
 class LocationData {
+
+  const LocationData({
+    required this.latitude,
+    required this.longitude,
+    required this.timestamp, this.altitude,
+    this.accuracy,
+    this.heading,
+    this.speed,
+  });
   final double latitude;
   final double longitude;
   final double? altitude;
@@ -24,16 +33,6 @@ class LocationData {
   final double? heading;
   final double? speed;
   final DateTime timestamp;
-
-  const LocationData({
-    required this.latitude,
-    required this.longitude,
-    this.altitude,
-    this.accuracy,
-    this.heading,
-    this.speed,
-    required this.timestamp,
-  });
 
   LatLng toLatLng() => LatLng(latitude, longitude);
 
@@ -50,15 +49,15 @@ class LocationData {
 
 /// Location service configuration.
 class LocationConfig {
-  final LocationAccuracy accuracy;
-  final int distanceFilter;
-  final Duration? timeLimit;
 
   const LocationConfig({
     this.accuracy = LocationAccuracy.high,
     this.distanceFilter = 10,
     this.timeLimit,
   });
+  final LocationAccuracy accuracy;
+  final int distanceFilter;
+  final Duration? timeLimit;
 }
 
 /// Abstract location service interface.
@@ -154,8 +153,8 @@ class LocationServiceImpl implements LocationService {
       // ));
 
       return Success(LocationData(
-        latitude: 0.0,
-        longitude: 0.0,
+        latitude: 0,
+        longitude: 0,
         timestamp: DateTime.now(),
       ));
     } catch (e) {

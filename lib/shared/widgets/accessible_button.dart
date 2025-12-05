@@ -3,7 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 /// Minimum touch target size per WCAG guidelines.
-const double kMinTouchTargetSize = 48.0;
+const double kMinTouchTargetSize = 48;
 
 // Widget Previewer annotations for IDE preview support (Flutter 3.38+)
 // @Preview(name: 'Default', width: 200, height: 100)
@@ -73,8 +73,7 @@ class AccessibleIconButton extends StatelessWidget {
   final Color? color;
 
   @override
-  Widget build(BuildContext context) {
-    return Semantics(
+  Widget build(BuildContext context) => Semantics(
       label: tooltip,
       button: true,
       enabled: onPressed != null,
@@ -88,7 +87,6 @@ class AccessibleIconButton extends StatelessWidget {
         ),
       ),
     );
-  }
 }
 
 /// Accessible image with semantic label.
@@ -111,8 +109,7 @@ class AccessibleImage extends StatelessWidget {
   final bool excludeFromSemantics;
 
   @override
-  Widget build(BuildContext context) {
-    return Semantics(
+  Widget build(BuildContext context) => Semantics(
       label: semanticLabel,
       image: true,
       excludeSemantics: excludeFromSemantics,
@@ -124,7 +121,6 @@ class AccessibleImage extends StatelessWidget {
         semanticLabel: excludeFromSemantics ? null : semanticLabel,
       ),
     );
-  }
 }
 
 /// Accessible text field with proper labels.
@@ -153,8 +149,7 @@ class AccessibleTextField extends StatelessWidget {
   final bool autofocus;
 
   @override
-  Widget build(BuildContext context) {
-    return Semantics(
+  Widget build(BuildContext context) => Semantics(
       label: labelText,
       textField: true,
       child: TextField(
@@ -172,7 +167,6 @@ class AccessibleTextField extends StatelessWidget {
         autofocus: autofocus,
       ),
     );
-  }
 }
 
 /// Extension for checking contrast ratio.
