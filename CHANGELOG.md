@@ -8,14 +8,53 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [3.2.0] - 2025-12-04
 
 ### Added
-- BackgroundTaskService for scheduled background work with retry logic
-- All 43 requirements from flutter-state-of-art-2025 spec implemented
-- Complete property-based testing coverage
+- CompositeRepository<T, ID> for orchestrating cache, local, and remote sources
+- CompositeUseCase<Params, R> for chaining multiple use cases
+- CancellableUseCase for cancellable operations
+- NoParamsStreamUseCase for streaming without parameters
+- fpdart 1.2.0 as functional programming reference
+- All 16 requirements from flutter-2025-state-of-art-review spec implemented
+- 12 correctness properties verified with property-based testing
+
+### Changed
+- Updated flutter_riverpod to 3.0.3+
+- Updated go_router to 17.0.0+
+- Updated drift to 2.29.0+
+- Updated freezed to 3.2.3+
+- Updated glados to 1.1.7+
+- Updated freezed_annotation to 3.0.0+
+- Project version bumped to 3.2.0
+
+### Verified Implementations
+- Result<T> with full monad laws (left identity, right identity, associativity)
+- BaseRepository<T, ID> with createMany, deleteMany, watchAll, exists, count, findFirst
+- ApiRepository<T, D, ID> with DTO-Entity conversion
+- DriftRepository<T, ID> for type-safe SQLite operations
+- CacheDataSource<T> with TTL and LRU eviction (MemoryCacheDataSource, LruCacheDataSource)
+- CompositeRepository<T, ID> with cache -> local -> remote strategy
+- ValidationResult with CompositeValidator aggregating all errors
+- PaginationNotifier<T> with loadInitial, loadMore, refresh, reset
+- WebSocketClient with typed messages and exponential backoff reconnection
+- FeatureFlags and ExperimentService with variant persistence
+- WCAG 2.1 accessibility utilities (contrast ratio, touch targets)
+- Exception to Failure exhaustive mapping
+
+### Property Tests (36 files in test/property/)
+- result_test.dart - Monad laws verification
+- dto_test.dart - Round-trip serialization
+- validation_test.dart - Composition aggregates all errors
+- cache_test.dart - TTL expiration and LRU eviction
+- exception_mapping_test.dart - Exhaustive mapping
+- accessibility_test.dart - WCAG contrast ratio symmetry
+- pagination_notifier_test.dart - State preservation on error
+- websocket_test.dart - Message round-trip
+- feature_flags_test.dart - Variant persistence
 
 ### Documentation
 - Updated architecture.md with all new services
-- Added Phase 16 to tasks.md for final verification
+- Complete property-based testing coverage for all correctness properties
 - All ADRs complete (ADR-008 through ADR-010)
+- All 23 tasks in spec completed and verified
 
 ## [3.1.0] - 2025-12-04
 
