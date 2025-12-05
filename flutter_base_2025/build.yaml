@@ -1,0 +1,58 @@
+targets:
+  $default:
+    builders:
+      # JSON Serialization - optimized settings
+      json_serializable:
+        options:
+          explicit_to_json: true
+          include_if_null: false
+          field_rename: snake
+          create_factory: true
+          create_to_json: true
+          checked: false  # Disable runtime checks for production
+          any_map: false
+          generic_argument_factories: true
+
+      # Freezed - selective generation for performance
+      freezed:
+        options:
+          from_json: true
+          to_json: true
+          union_key: type
+          union_value_case: snake
+          copy_with: true
+          equal: true
+          make_collections_unmodifiable: true
+          map: null  # Disable map generation unless needed
+          when: null  # Disable when generation unless needed
+
+      # Riverpod - optimized provider generation
+      riverpod_generator:
+        options:
+          provider_name_prefix: ''
+          provider_family_name_prefix: ''
+
+      # Drift - database code generation
+      drift_dev:
+        options:
+          generate_connect_constructor: true
+          scoped_dart_components: true
+          store_date_time_values_as_text: false
+          named_parameters: true
+          named_parameters_always_required: false
+
+# Global build options for faster builds
+global_options:
+  # Enable parallel builds
+  build_runner:
+    options:
+      delete_conflicting_outputs: true
+      enable_experiment: []
+
+  # Source generation optimization
+  source_gen:combining_builder:
+    options:
+      ignore_for_file:
+        - type=lint
+        - unused_element
+        - unnecessary_cast

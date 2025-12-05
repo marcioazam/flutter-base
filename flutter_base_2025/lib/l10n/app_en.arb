@@ -1,0 +1,57 @@
+{
+  "@@locale": "en",
+  "appTitle": "Flutter Base 2025",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "home": "Home",
+  "settings": "Settings",
+  "profile": "Profile",
+  "login": "Login",
+  "register": "Register",
+  "logout": "Logout",
+  "email": "Email",
+  "password": "Password",
+  "name": "Name",
+  "welcomeBack": "Welcome Back",
+  "createAccount": "Create Account",
+  "continueWithGoogle": "Continue with Google",
+  "continueWithApple": "Continue with Apple",
+  "or": "OR",
+  "theme": "Theme",
+  "themeSystem": "System",
+  "themeLight": "Light",
+  "themeDark": "Dark",
+  "language": "Language",
+  "about": "About",
+  "version": "Version {version}",
+  "@version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "errorGeneric": "An error occurred. Please try again.",
+  "errorNetwork": "No internet connection. Please check your network.",
+  "errorServer": "Server error. Please try again later.",
+  "errorValidation": "Please correct the errors in the form.",
+  "errorAuth": "Session expired. Please login again.",
+  "retry": "Retry",
+  "cancel": "Cancel",
+  "save": "Save",
+  "delete": "Delete",
+  "confirm": "Confirm",
+  "loading": "Loading...",
+  "noData": "No data available",
+  "offline": "You are offline",
+  "online": "Back online",
+  "syncPending": "{count, plural, =1{1 item pending sync} other{{count} items pending sync}}",
+  "@syncPending": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
+}
