@@ -37,6 +37,10 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
       }
 
       return Success(fromRow(row));
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
     } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
@@ -67,7 +71,11 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
         pageSize: pageSize,
         totalItems: totalItems,
       ));
-    } catch (e, st) {
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }
@@ -78,7 +86,11 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
       final companion = toCompanion(entity);
       await database.into(table).insert(companion);
       return Success(entity);
-    } catch (e, st) {
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }
@@ -98,7 +110,11 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
       }
 
       return Success(entity);
-    } catch (e, st) {
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }
@@ -115,7 +131,11 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
       }
 
       return const Success(null);
-    } catch (e, st) {
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }
@@ -129,7 +149,11 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
         }
       });
       return Success(entities);
-    } catch (e, st) {
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }
@@ -139,7 +163,11 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
     try {
       await (database.delete(table)..where((t) => idColumn.isIn(ids))).go();
       return const Success(null);
-    } catch (e, st) {
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }
@@ -156,7 +184,11 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
         ..where((t) => idColumn.equals(id));
       final row = await query.getSingleOrNull();
       return Success(row != null);
-    } catch (e, st) {
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }
@@ -169,7 +201,11 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
       final result = await query.getSingle();
       final total = result.read(table.primaryKey.first.count()) ?? 0;
       return Success(total);
-    } catch (e, st) {
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }
@@ -180,7 +216,11 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
       // This assumes the table has an isSynced column
       // Subclasses should override if different
       return const Success(null);
-    } catch (e, st) {
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }
@@ -191,7 +231,11 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
       // This assumes the table has an isSynced column
       // Subclasses should override with proper implementation
       return const Success([]);
-    } catch (e, st) {
+    } on SqliteException catch (e, st) {
+      return Failure(CacheFailure('Database error: ${e.message}', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Data format error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }

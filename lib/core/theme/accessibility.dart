@@ -26,9 +26,10 @@ abstract final class AccessibilityUtils {
           : math.pow((sRGB + 0.055) / 1.055, 2.4).toDouble();
     }
 
-    final r = linearize(color.red);
-    final g = linearize(color.green);
-    final b = linearize(color.blue);
+    // Updated to use non-deprecated API
+    final r = linearize((color.r * 255.0).round().clamp(0, 255));
+    final g = linearize((color.g * 255.0).round().clamp(0, 255));
+    final b = linearize((color.b * 255.0).round().clamp(0, 255));
 
     return 0.2126 * r + 0.7152 * g + 0.0722 * b;
   }

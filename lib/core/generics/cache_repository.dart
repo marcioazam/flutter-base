@@ -1,31 +1,6 @@
 import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/generics/cache_entry.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
-
-/// Cache entry with value and metadata.
-class CacheEntry<T> {
-
-  CacheEntry({
-    required this.value,
-    required this.cachedAt,
-    this.expiresAt,
-  });
-  final T value;
-  final DateTime cachedAt;
-  final DateTime? expiresAt;
-
-  /// Returns true if entry has expired.
-  bool get isExpired {
-    if (expiresAt == null) return false;
-    return DateTime.now().isAfter(expiresAt!);
-  }
-
-  /// Returns remaining TTL in milliseconds, or null if no expiration.
-  int? get remainingTtlMs {
-    if (expiresAt == null) return null;
-    final remaining = expiresAt!.difference(DateTime.now()).inMilliseconds;
-    return remaining > 0 ? remaining : 0;
-  }
-}
 
 /// Cache statistics for monitoring.
 class CacheStats {
@@ -166,12 +141,7 @@ abstract class CacheRepository<T, ID> {
   int get size => _cache.length;
 
   void _cacheValue(ID id, T value, {Duration? ttl}) {
-    final now = DateTime.now();
-    _cache[id] = CacheEntry(
-      value: value,
-      cachedAt: now,
-      expiresAt: ttl != null ? now.add(ttl) : null,
-    );
+    _cache[id] = CacheEntry.withTtl(value, ttl: ttl);
     _stats.size = _cache.length;
   }
 }

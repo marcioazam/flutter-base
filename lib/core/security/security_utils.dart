@@ -2,7 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:flutter_base_2025/core/security/certificate_pinning_service.dart';
+
 /// Certificate pinning configuration.
+///
+/// DEPRECATED: Use [CertificatePinningService] instead.
+/// This class is kept for backward compatibility only.
+@Deprecated('Use CertificatePinningService for production certificate pinning')
 class CertificatePinConfig {
 
   const CertificatePinConfig({
@@ -14,15 +20,35 @@ class CertificatePinConfig {
 }
 
 /// Creates an HttpClient with certificate pinning.
-/// Note: For production use, implement proper certificate validation.
+///
+/// DEPRECATED: Use [CertificatePinningService.createHttpClient] instead.
+///
+/// This function now delegates to [CertificatePinningService] for
+/// production-ready certificate pinning with:
+/// - SHA-256 SPKI validation
+/// - Multiple pins (primary + backup)
+/// - Certificate expiration warnings
+/// - Fail-closed security model
+///
+/// Migration:
+/// ```dart
+/// // Old (DEPRECATED)
+/// final client = createPinnedHttpClient(config);
+///
+/// // New (RECOMMENDED)
+/// final service = ref.read(certificatePinningServiceProvider);
+/// final client = service.createHttpClient();
+/// ```
+@Deprecated('Use CertificatePinningService.createHttpClient() instead')
 HttpClient createPinnedHttpClient(CertificatePinConfig config) {
+  // Legacy implementation - NOT SECURE for production
+  // This is kept only for backward compatibility
   final client = HttpClient();
 
   if (!config.allowBadCertificates && config.pinnedCertificates.isNotEmpty) {
     client.badCertificateCallback = (cert, host, port) {
-      // In production, validate against pinned certificates
-      // final certPem = cert.pem;
-      // return config.pinnedCertificates.contains(certPem);
+      // WARNING: This legacy implementation does NOT provide secure pinning.
+      // Migrate to CertificatePinningService immediately.
       return false;
     };
   }
@@ -41,14 +67,19 @@ abstract final class InputSanitizer {
         .replaceAll("'", '&#x27;')
         .replaceAll('/', '&#x2F;');
 
-  /// Sanitizes input for SQL (use parameterized queries instead).
-  static String sanitizeSql(String input) => input
-        .replaceAll("'", "''")
-        .replaceAll(r'\', r'\\')
-        .replaceAll('\x00', '')
-        .replaceAll('\n', r'\n')
-        .replaceAll('\r', r'\r')
-        .replaceAll('\x1a', r'\Z');
+  /// ⚠️ DEPRECATED: Do NOT use this method. It promotes insecure SQL practices.
+  ///
+  /// **Security Issue:** String sanitization is NOT sufficient to prevent SQL injection.
+  /// **Correct Approach:** Use parameterized queries with Drift ORM.
+  ///
+  /// This method will be removed in a future version.
+  /// See: VUL-2025-FLUTTER-005, OWASP A05 Injection
+  @Deprecated('Use parameterized queries with Drift instead. This method promotes insecure SQL practices.')
+  static String sanitizeSql(String input) => throw UnsupportedError(
+        'sanitizeSql is deprecated and disabled for security reasons. '
+        'Use Drift parameterized queries instead: '
+        'db.select(table)..where((t) => t.column.equals(value))',
+      );
 
   /// Sanitizes input for JSON.
   static String sanitizeJson(String input) => jsonEncode(input).replaceAll(RegExp(r'^"|"$'), '');

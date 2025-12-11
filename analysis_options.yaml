@@ -1,8 +1,14 @@
 # Analysis options for Flutter Base 2025
 # Strict linting for production-ready code
-# Last updated: 2025-12-05
+# Last updated: 2025-12-11
 
 include: package:flutter_lints/flutter.yaml
+
+# Coverage Configuration
+# - Generated files are excluded from coverage analysis
+# - Run: flutter test --coverage
+# - Filter: lcov --remove coverage/lcov.info '**/*.g.dart' '**/*.freezed.dart' -o coverage/filtered.info
+# - Threshold: 80% minimum (enforced in CI/CD)
 
 analyzer:
   exclude:

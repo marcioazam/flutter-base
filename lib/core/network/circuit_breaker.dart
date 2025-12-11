@@ -98,7 +98,10 @@ class CircuitBreaker<T> {
       final result = await execute();
       _onSuccess();
       return Success(result);
-    } catch (e, st) {
+    } on TimeoutException catch (e, st) {
+      _onFailure();
+      return Failure(TimeoutFailure('Operation timed out: $e', stackTrace: st));
+    } on Exception catch (e, st) {
       _onFailure();
       return Failure(UnexpectedFailure(e.toString(), stackTrace: st));
     }

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_base_2025/core/errors/exception_mapper.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/network/circuit_breaker.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
@@ -40,7 +41,11 @@ class ResilientApiClient {
     return result.flatMap((response) {
       try {
         return Success(fromJson(response.data as Map<String, dynamic>));
-      } catch (e, st) {
+      } on FormatException catch (e, st) {
+        return Failure(ValidationFailure('Invalid response format: ${e.message}', stackTrace: st));
+      } on TypeError catch (e, st) {
+        return Failure(ValidationFailure('Type mismatch in response: $e', stackTrace: st));
+      } on Exception catch (e, st) {
         return Failure(UnexpectedFailure(e.toString(), stackTrace: st));
       }
     });
@@ -87,7 +92,11 @@ class ResilientApiClient {
     return result.flatMap((response) {
       try {
         return Success(fromJson(response.data as Map<String, dynamic>));
-      } catch (e, st) {
+      } on FormatException catch (e, st) {
+        return Failure(ValidationFailure('Invalid response format: ${e.message}', stackTrace: st));
+      } on TypeError catch (e, st) {
+        return Failure(ValidationFailure('Type mismatch in response: $e', stackTrace: st));
+      } on Exception catch (e, st) {
         return Failure(UnexpectedFailure(e.toString(), stackTrace: st));
       }
     });

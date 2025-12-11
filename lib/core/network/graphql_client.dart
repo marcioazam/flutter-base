@@ -128,8 +128,12 @@ class GraphQLClientImpl implements GraphQLClient {
       // return Success(GraphQLResponse(data: parser?.call(response.data)));
 
       return Failure(ServerFailure('GraphQL client not configured'));
-    } catch (e) {
-      return Failure(NetworkFailure(e.toString()));
+    } on TimeoutException catch (e, st) {
+      return Failure(TimeoutFailure('GraphQL query timeout: $e', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(ValidationFailure('Invalid GraphQL response: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
+      return Failure(NetworkFailure(e.toString(), stackTrace: st));
     }
   }
 
@@ -141,8 +145,12 @@ class GraphQLClientImpl implements GraphQLClient {
     try {
       // Placeholder - requires ferry package
       return Failure(ServerFailure('GraphQL client not configured'));
-    } catch (e) {
-      return Failure(NetworkFailure(e.toString()));
+    } on TimeoutException catch (e, st) {
+      return Failure(TimeoutFailure('GraphQL mutation timeout: $e', stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(ValidationFailure('Invalid GraphQL response: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
+      return Failure(NetworkFailure(e.toString(), stackTrace: st));
     }
   }
 

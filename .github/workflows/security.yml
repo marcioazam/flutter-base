@@ -98,21 +98,65 @@ jobs:
         uses: ./.github/actions/setup-flutter
 
       - name: Check for outdated dependencies
-        run: flutter pub outdated --json > outdated.json
+        id: outdated
+        run: |
+          flutter pub outdated --json > outdated.json || true
+
+          if [ -f outdated.json ]; then
+            OUTDATED=$(jq '.packages | length' outdated.json || echo "0")
+            echo "outdated_count=$OUTDATED" >> $GITHUB_OUTPUT
+
+            # Check for packages with major version updates (potential breaking changes)
+            MAJOR_UPDATES=$(jq '[.packages[] | select(.upgradable.latest.version != .current.version)] | length' outdated.json || echo "0")
+            echo "major_updates=$MAJOR_UPDATES" >> $GITHUB_OUTPUT
+          fi
         continue-on-error: true
 
       - name: Analyze dependency security
         run: |
-          echo "## Dependency Security Report" >> $GITHUB_STEP_SUMMARY
+          echo "## 🔒 Dependency Security Report" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           if [ -f outdated.json ]; then
-            OUTDATED=$(cat outdated.json | jq '.packages | length')
-            echo "**Outdated packages:** $OUTDATED" >> $GITHUB_STEP_SUMMARY
+            OUTDATED=$(jq '.packages | length' outdated.json || echo "0")
+            MAJOR=$(echo "${{ steps.outdated.outputs.major_updates }}" || echo "0")
+
+            echo "| Metric | Count |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Outdated packages | $OUTDATED |" >> $GITHUB_STEP_SUMMARY
+            echo "| Major updates available | $MAJOR |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            if [ "$OUTDATED" -gt "0" ]; then
+              echo "### ⚠️ Recommendations" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "- Run \`flutter pub upgrade\` to update dependencies" >> $GITHUB_STEP_SUMMARY
+              echo "- Review major version updates for breaking changes" >> $GITHUB_STEP_SUMMARY
+              echo "- Test thoroughly after dependency updates" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "<details>" >> $GITHUB_STEP_SUMMARY
+              echo "<summary>View outdated packages</summary>" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              flutter pub outdated >> $GITHUB_STEP_SUMMARY || true
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "</details>" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "✅ All dependencies are up to date" >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "⚠️ Unable to check dependency status" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Run \`flutter pub upgrade\` to update dependencies" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload dependency analysis
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-analysis
+          path: outdated.json
+          retention-days: 30
 
   security-summary:
     name: Security Summary

@@ -3,11 +3,11 @@
 # Flutter Base 2025
 # =============================================================================
 
-.PHONY: help build run prod stop logs shell health clean security lint push validate test
+.PHONY: help build run prod stop logs shell health clean security lint push validate test coverage-report ci-test security-scan format
 
 # Default target
 help:
-	@echo "Flutter Base 2025 - Docker Deployment"
+	@echo "Flutter Base 2025 - Docker Deployment & CI/CD"
 	@echo ""
 	@echo "Usage: make [target]"
 	@echo ""
@@ -23,10 +23,14 @@ help:
 	@echo "  shell      Open shell in container"
 	@echo "  restart    Restart containers"
 	@echo ""
-	@echo "Quality:"
-	@echo "  health     Check health endpoints"
-	@echo "  security   Run security scan (Trivy)"
-	@echo "  lint       Lint Dockerfile (Hadolint)"
+	@echo "Quality & CI/CD:"
+	@echo "  ci-test         Run all CI checks locally (format, lint, test, coverage)"
+	@echo "  coverage-report Generate coverage report with threshold check"
+	@echo "  security-scan   Run comprehensive security scan"
+	@echo "  format          Check and fix code formatting"
+	@echo "  health          Check health endpoints"
+	@echo "  security        Run security scan (Trivy)"
+	@echo "  lint            Lint Dockerfile (Hadolint)"
 	@echo ""
 	@echo "Cleanup:"
 	@echo "  clean      Remove containers and images"
@@ -183,3 +187,125 @@ validate:
 test:
 	@echo "Running Flutter tests before build..."
 	cd ../.. && flutter test --reporter compact
+
+# =============================================================================
+# CI/CD Quality Gates
+# =============================================================================
+
+COVERAGE_THRESHOLD ?= 80
+PROJECT_ROOT = ../..
+
+format:
+	@echo "=== Checking code formatting ==="
+	@cd $(PROJECT_ROOT) && dart format --set-exit-if-changed . && echo "✅ All files properly formatted" || \
+		(echo "❌ Format check failed. Run: dart format ." && exit 1)
+
+format-fix:
+	@echo "=== Fixing code formatting ==="
+	@cd $(PROJECT_ROOT) && dart format .
+	@echo "✅ Code formatted successfully"
+
+ci-test:
+	@echo "=== Running CI Quality Gates Locally ==="
+	@echo ""
+	@echo "1/4 - Format Check..."
+	@$(MAKE) format
+	@echo ""
+	@echo "2/4 - Lint Analysis..."
+	@$(MAKE) ci-lint
+	@echo ""
+	@echo "3/4 - Tests with Coverage..."
+	@$(MAKE) coverage-report
+	@echo ""
+	@echo "4/4 - Security Scan..."
+	@$(MAKE) security-scan
+	@echo ""
+	@echo "✅ All CI quality gates passed!"
+
+ci-lint:
+	@echo "Running static analysis (fatal-infos)..."
+	@cd $(PROJECT_ROOT) && flutter analyze --fatal-infos > analyze_output.txt 2>&1 || FAILED=true; \
+	cat analyze_output.txt; \
+	if [ "$$FAILED" = "true" ]; then \
+		echo "❌ Static analysis failed"; \
+		rm -f analyze_output.txt; \
+		exit 1; \
+	fi; \
+	WARNINGS=$$(grep -c "warning •" analyze_output.txt 2>/dev/null || echo "0"); \
+	ERRORS=$$(grep -c "error •" analyze_output.txt 2>/dev/null || echo "0"); \
+	echo ""; \
+	echo "Errors:   $$ERRORS"; \
+	echo "Warnings: $$WARNINGS"; \
+	echo ""; \
+	rm -f analyze_output.txt; \
+	if [ $$ERRORS -gt 0 ]; then \
+		echo "❌ Found $$ERRORS errors"; \
+		exit 1; \
+	fi; \
+	if [ $$WARNINGS -gt 50 ]; then \
+		echo "❌ Warning threshold exceeded: $$WARNINGS > 50"; \
+		exit 1; \
+	fi; \
+	echo "✅ Static analysis passed"
+
+coverage-report:
+	@echo "=== Generating Coverage Report ==="
+	@cd $(PROJECT_ROOT) && flutter test --coverage
+	@echo ""
+	@echo "Filtering generated files from coverage..."
+	@if command -v lcov >/dev/null 2>&1; then \
+		cd $(PROJECT_ROOT) && \
+		lcov --remove coverage/lcov.info \
+			'**/*.g.dart' \
+			'**/*.freezed.dart' \
+			'**/*.gr.dart' \
+			'**/*.mocks.dart' \
+			'**/generated/**' \
+			-o coverage/lcov_filtered.info && \
+		mv coverage/lcov_filtered.info coverage/lcov.info; \
+		echo ""; \
+		echo "Generating HTML report..."; \
+		genhtml coverage/lcov.info -o coverage/html; \
+		echo ""; \
+		echo "Coverage report: coverage/html/index.html"; \
+		echo ""; \
+		COVERAGE=$$(lcov --summary coverage/lcov.info 2>&1 | grep "lines" | awk '{print $$2}' | sed 's/%//' | sed 's/\..*//'); \
+		echo "Line Coverage: $$COVERAGE%"; \
+		echo "Threshold:     $(COVERAGE_THRESHOLD)%"; \
+		echo ""; \
+		if [ -z "$$COVERAGE" ] || [ $$COVERAGE -lt $(COVERAGE_THRESHOLD) ]; then \
+			echo "❌ Coverage $$COVERAGE% is below threshold $(COVERAGE_THRESHOLD)%"; \
+			exit 1; \
+		else \
+			echo "✅ Coverage meets threshold: $$COVERAGE% >= $(COVERAGE_THRESHOLD)%"; \
+		fi; \
+	else \
+		echo "⚠️  lcov not installed. Install with: brew install lcov (macOS) or apt-get install lcov (Linux)"; \
+		echo "Coverage file generated at: coverage/lcov.info"; \
+	fi
+
+coverage-open:
+	@echo "Opening coverage report in browser..."
+	@cd $(PROJECT_ROOT) && open coverage/html/index.html || xdg-open coverage/html/index.html || start coverage/html/index.html
+
+security-scan:
+	@echo "=== Running Security Scans ==="
+	@echo ""
+	@echo "1. Secrets Detection (Gitleaks)..."
+	@if command -v gitleaks >/dev/null 2>&1; then \
+		cd $(PROJECT_ROOT) && gitleaks detect --source . --verbose && echo "✅ No secrets found"; \
+	else \
+		echo "⚠️  Gitleaks not installed. Install: https://github.com/gitleaks/gitleaks#installing"; \
+	fi
+	@echo ""
+	@echo "2. Dependency Vulnerability Check..."
+	@cd $(PROJECT_ROOT) && flutter pub outdated || true
+	@echo ""
+	@echo "3. Docker Image Security Scan..."
+	@if command -v docker >/dev/null 2>&1 && [ -n "$$(docker images -q $(IMAGE_NAME):$(VERSION) 2>/dev/null)" ]; then \
+		$(MAKE) security; \
+	else \
+		echo "⚠️  Docker image not built. Run 'make build' first"; \
+	fi
+	@echo ""
+	@echo "✅ Security scan complete"

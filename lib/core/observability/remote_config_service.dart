@@ -97,7 +97,11 @@ class LocalRemoteConfigService implements RemoteConfigService {
         final decoded = jsonDecode(cached) as Map<String, dynamic>;
         _active.addAll(decoded);
         AppLogger.instance.debug('Loaded cached remote config');
-      } catch (e) {
+      } on FormatException catch (e) {
+        AppLogger.instance.warning('Invalid JSON in cached config: ${e.message}');
+      } on TypeError catch (e) {
+        AppLogger.instance.warning('Type error in cached config: $e');
+      } on Exception catch (e) {
         AppLogger.instance.warning('Failed to load cached config: $e');
       }
     }
@@ -142,7 +146,11 @@ class LocalRemoteConfigService implements RemoteConfigService {
 
       AppLogger.instance.info('Remote config fetched successfully');
       return true;
-    } catch (e) {
+    } on TimeoutException catch (e) {
+      _status = RemoteConfigStatus.failure;
+      AppLogger.instance.error('Remote config fetch timeout', error: e);
+      return false;
+    } on Exception catch (e) {
       _status = RemoteConfigStatus.failure;
       AppLogger.instance.error('Remote config fetch failed', error: e);
       return false;
@@ -208,7 +216,9 @@ class LocalRemoteConfigService implements RemoteConfigService {
     if (value is String) {
       try {
         return jsonDecode(value) as Map<String, dynamic>;
-      } catch (_) {
+      } on FormatException {
+        return null;
+      } on TypeError {
         return null;
       }
     }

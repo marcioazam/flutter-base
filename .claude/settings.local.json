@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(measure-object:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(git ls-files:*)",
+      "Bash(flutter pub:*)",
+      "Bash(find:*)",
+      "Bash(flutter test:*)",
+      "Bash(wc:*)"
+    ]
+  }
+}

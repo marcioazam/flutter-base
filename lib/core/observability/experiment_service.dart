@@ -57,7 +57,7 @@ class Experiment<T> {
   Variant<T>? getVariantByName(String variantName) {
     try {
       return variants.firstWhere((v) => v.name == variantName);
-    } catch (_) {
+    } on StateError {
       return null;
     }
   }
@@ -149,7 +149,11 @@ class LocalExperimentService implements ExperimentService {
       try {
         final decoded = jsonDecode(stored) as Map<String, dynamic>;
         _assignments.addAll(decoded.cast<String, String>());
-      } catch (e) {
+      } on FormatException catch (e) {
+        AppLogger.instance.warning('Invalid JSON in experiment assignments: ${e.message}');
+      } on TypeError catch (e) {
+        AppLogger.instance.warning('Type error in experiment assignments: $e');
+      } on Exception catch (e) {
         AppLogger.instance.warning('Failed to load experiment assignments: $e');
       }
     }

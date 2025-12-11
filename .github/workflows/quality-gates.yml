@@ -1,0 +1,402 @@
+name: Quality Gates
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  FLUTTER_VERSION: '3.38.0'
+  COVERAGE_THRESHOLD: 80
+  MAX_WARNINGS: 50
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  # =============================================================================
+  # QUALITY GATE 1: Code Formatting
+  # =============================================================================
+  format-check:
+    name: Format Check
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.format.outcome }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Check Dart formatting
+        id: format
+        run: |
+          echo "Checking code formatting..."
+          dart format --set-exit-if-changed --output=none .
+          echo "✅ All files are properly formatted"
+
+      - name: Format report
+        if: failure()
+        run: |
+          echo "## ❌ Format Check Failed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Run the following to fix formatting:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "dart format ." >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+  # =============================================================================
+  # QUALITY GATE 2: Static Analysis
+  # =============================================================================
+  lint:
+    name: Lint Analysis
+    runs-on: ubuntu-latest
+    outputs:
+      status: ${{ steps.analyze.outcome }}
+      warnings: ${{ steps.count-warnings.outputs.warnings }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Analyze code with strict settings
+        id: analyze
+        run: |
+          echo "Running static analysis with fatal-infos..."
+          flutter analyze --fatal-infos > analyze_output.txt 2>&1 || ANALYZE_FAILED=true
+
+          cat analyze_output.txt
+
+          if [ "$ANALYZE_FAILED" = "true" ]; then
+            echo "❌ Static analysis found issues"
+            exit 1
+          fi
+
+          echo "✅ Static analysis passed"
+
+      - name: Count warnings
+        id: count-warnings
+        if: always()
+        run: |
+          if [ -f analyze_output.txt ]; then
+            WARNINGS=$(grep -c "warning •" analyze_output.txt || echo "0")
+            ERRORS=$(grep -c "error •" analyze_output.txt || echo "0")
+            INFO=$(grep -c "info •" analyze_output.txt || echo "0")
+
+            echo "warnings=$WARNINGS" >> $GITHUB_OUTPUT
+            echo "errors=$ERRORS" >> $GITHUB_OUTPUT
+            echo "info=$INFO" >> $GITHUB_OUTPUT
+
+            echo "## 📊 Lint Analysis Results" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "| Type | Count | Threshold |" >> $GITHUB_STEP_SUMMARY
+            echo "|------|-------|-----------|" >> $GITHUB_STEP_SUMMARY
+            echo "| Errors | $ERRORS | 0 |" >> $GITHUB_STEP_SUMMARY
+            echo "| Warnings | $WARNINGS | $MAX_WARNINGS |" >> $GITHUB_STEP_SUMMARY
+            echo "| Info | $INFO | - |" >> $GITHUB_STEP_SUMMARY
+
+            # Fail if warnings exceed threshold
+            if [ "$WARNINGS" -gt "$MAX_WARNINGS" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "❌ **Warning threshold exceeded:** $WARNINGS > $MAX_WARNINGS" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
+
+            # Fail if any errors
+            if [ "$ERRORS" -gt "0" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "❌ **Errors found:** $ERRORS" >> $GITHUB_STEP_SUMMARY
+              exit 1
+            fi
+          else
+            echo "warnings=0" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload analysis results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-analysis-results
+          path: analyze_output.txt
+          retention-days: 30
+
+  # =============================================================================
+  # QUALITY GATE 3: Tests with Coverage
+  # =============================================================================
+  test-coverage:
+    name: Tests & Coverage
+    runs-on: ubuntu-latest
+    needs: [format-check, lint]
+    outputs:
+      coverage: ${{ steps.coverage-check.outputs.coverage }}
+      status: ${{ steps.test.outcome }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Run tests with coverage
+        id: test
+        run: |
+          echo "Running tests with coverage..."
+          flutter test --coverage --reporter=expanded
+          echo "✅ All tests passed"
+
+      - name: Filter coverage (remove generated files)
+        run: |
+          # Install lcov tools
+          sudo apt-get update
+          sudo apt-get install -y lcov
+
+          # Remove generated files from coverage
+          lcov --remove coverage/lcov.info \
+            '**/*.g.dart' \
+            '**/*.freezed.dart' \
+            '**/*.gr.dart' \
+            '**/*.mocks.dart' \
+            '**/generated/**' \
+            -o coverage/lcov_filtered.info
+
+          # Replace original with filtered
+          mv coverage/lcov_filtered.info coverage/lcov.info
+
+      - name: Generate coverage report
+        run: |
+          # Generate HTML report
+          genhtml coverage/lcov.info -o coverage/html
+
+          echo "Coverage report generated at coverage/html/index.html"
+
+      - name: Check coverage threshold
+        id: coverage-check
+        run: |
+          # Calculate coverage percentage
+          COVERAGE=$(lcov --summary coverage/lcov.info 2>&1 | grep "lines" | awk '{print $2}' | sed 's/%//' | sed 's/\..*//')
+
+          echo "coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          echo "threshold=$COVERAGE_THRESHOLD" >> $GITHUB_OUTPUT
+
+          echo "## 📊 Test Coverage Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Line Coverage | ${COVERAGE}% |" >> $GITHUB_STEP_SUMMARY
+          echo "| Threshold | ${COVERAGE_THRESHOLD}% |" >> $GITHUB_STEP_SUMMARY
+
+          if [ -z "$COVERAGE" ] || [ "$COVERAGE" -lt "$COVERAGE_THRESHOLD" ]; then
+            echo "| Status | ❌ Failed |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "❌ **Coverage ${COVERAGE}% is below threshold of ${COVERAGE_THRESHOLD}%**" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "| Status | ✅ Passed |" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "✅ Coverage meets threshold: ${COVERAGE}% >= ${COVERAGE_THRESHOLD}%" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: coverage/lcov.info
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          name: flutter-base-2025
+
+      - name: Upload coverage reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            coverage/lcov.info
+            coverage/html/
+          retention-days: 30
+
+      - name: Comment coverage on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const coverage = '${{ steps.coverage-check.outputs.coverage }}';
+            const threshold = '${{ env.COVERAGE_THRESHOLD }}';
+            const passed = parseInt(coverage) >= parseInt(threshold);
+            const icon = passed ? '✅' : '❌';
+
+            const body = `## ${icon} Test Coverage Report
+
+            | Metric | Value |
+            |--------|-------|
+            | Line Coverage | **${coverage}%** |
+            | Threshold | ${threshold}% |
+            | Status | ${passed ? '✅ Passed' : '❌ Failed'} |
+
+            ${!passed ? `⚠️ Coverage is below the ${threshold}% threshold. Please add more tests.` : ''}
+
+            <details>
+            <summary>View detailed coverage report</summary>
+
+            Download the coverage artifact from the workflow run to view the HTML report.
+
+            </details>
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });
+
+  # =============================================================================
+  # QUALITY GATE 4: Security Scan
+  # =============================================================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+
+      - name: Check for vulnerable dependencies
+        id: outdated
+        run: |
+          echo "Checking for outdated and vulnerable dependencies..."
+
+          flutter pub outdated --json > outdated.json || true
+
+          if [ -f outdated.json ]; then
+            # Count packages with security advisories (if available in future Flutter versions)
+            OUTDATED_COUNT=$(jq '.packages | length' outdated.json || echo "0")
+
+            echo "outdated_count=$OUTDATED_COUNT" >> $GITHUB_OUTPUT
+
+            echo "## 🔒 Dependency Security Check" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "**Packages with updates available:** $OUTDATED_COUNT" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            if [ "$OUTDATED_COUNT" -gt "0" ]; then
+              echo "⚠️ Run \`flutter pub upgrade\` to update dependencies" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "<details>" >> $GITHUB_STEP_SUMMARY
+              echo "<summary>View outdated packages</summary>" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              flutter pub outdated >> $GITHUB_STEP_SUMMARY || true
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "</details>" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+      - name: Upload security scan results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-scan-results
+          path: outdated.json
+          retention-days: 30
+
+  # =============================================================================
+  # QUALITY GATE SUMMARY
+  # =============================================================================
+  quality-gates-summary:
+    name: Quality Gates Summary
+    runs-on: ubuntu-latest
+    needs: [format-check, lint, test-coverage, security-scan]
+    if: always()
+    steps:
+      - name: Generate summary
+        run: |
+          echo "# 🎯 Quality Gates Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Gate | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Format Check | ${{ needs.format-check.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Lint Analysis | ${{ needs.lint.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Tests & Coverage | ${{ needs.test-coverage.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Security Scan | ${{ needs.security-scan.result == 'success' && '✅ Passed' || '❌ Failed' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          # Determine overall status
+          if [ "${{ needs.format-check.result }}" = "success" ] && \
+             [ "${{ needs.lint.result }}" = "success" ] && \
+             [ "${{ needs.test-coverage.result }}" = "success" ] && \
+             [ "${{ needs.security-scan.result }}" = "success" ]; then
+            echo "## ✅ All Quality Gates Passed!" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Coverage: ${{ needs.test-coverage.outputs.coverage }}%" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "## ❌ Quality Gates Failed" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "Please review the failed checks above and fix the issues." >> $GITHUB_STEP_SUMMARY
+            exit 1
+          fi
+
+      - name: Comment summary on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const formatStatus = '${{ needs.format-check.result }}';
+            const lintStatus = '${{ needs.lint.result }}';
+            const testStatus = '${{ needs.test-coverage.result }}';
+            const securityStatus = '${{ needs.security-scan.result }}';
+            const coverage = '${{ needs.test-coverage.outputs.coverage }}';
+
+            const allPassed = formatStatus === 'success' &&
+                             lintStatus === 'success' &&
+                             testStatus === 'success' &&
+                             securityStatus === 'success';
+
+            const icon = allPassed ? '✅' : '❌';
+
+            const body = `## ${icon} Quality Gates Summary
+
+            | Gate | Status |
+            |------|--------|
+            | Format Check | ${formatStatus === 'success' ? '✅' : '❌'} |
+            | Lint Analysis | ${lintStatus === 'success' ? '✅' : '❌'} |
+            | Tests & Coverage (${coverage}%) | ${testStatus === 'success' ? '✅' : '❌'} |
+            | Security Scan | ${securityStatus === 'success' ? '✅' : '❌'} |
+
+            ${allPassed ? '🎉 **All quality gates passed!** Your code is ready for review.' : '⚠️ **Some quality gates failed.** Please check the workflow logs for details.'}
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: body
+            });

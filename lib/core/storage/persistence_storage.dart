@@ -35,8 +35,10 @@ class SharedPreferencesPersistence implements PersistenceStorage {
       final encoded = encode(value);
       await _prefs.setString(key, encoded);
       return const Success(null);
-    } catch (e, st) {
-      return Failure(UnexpectedFailure(e.toString(), stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Encoding error: ${e.message}', stackTrace: st));
+    } on Exception catch (e, st) {
+      return Failure(CacheFailure('Failed to save: $e', stackTrace: st));
     }
   }
 
@@ -46,8 +48,12 @@ class SharedPreferencesPersistence implements PersistenceStorage {
       final encoded = _prefs.getString(key);
       if (encoded == null) return const Success(null);
       return Success(decode(encoded));
-    } catch (e, st) {
-      return Failure(UnexpectedFailure(e.toString(), stackTrace: st));
+    } on FormatException catch (e, st) {
+      return Failure(CacheFailure('Decoding error: ${e.message}', stackTrace: st));
+    } on TypeError catch (e, st) {
+      return Failure(CacheFailure('Type mismatch: $e', stackTrace: st));
+    } on Exception catch (e, st) {
+      return Failure(CacheFailure('Failed to load: $e', stackTrace: st));
     }
   }
 
@@ -57,8 +63,8 @@ class SharedPreferencesPersistence implements PersistenceStorage {
     try {
       await _prefs.remove(key);
       return const Success(null);
-    } catch (e, st) {
-      return Failure(UnexpectedFailure(e.toString(), stackTrace: st));
+    } on Exception catch (e, st) {
+      return Failure(CacheFailure('Failed to delete: $e', stackTrace: st));
     }
   }
 
@@ -67,8 +73,8 @@ class SharedPreferencesPersistence implements PersistenceStorage {
     try {
       await _prefs.clear();
       return const Success(null);
-    } catch (e, st) {
-      return Failure(UnexpectedFailure(e.toString(), stackTrace: st));
+    } on Exception catch (e, st) {
+      return Failure(CacheFailure('Failed to clear: $e', stackTrace: st));
     }
   }
 }

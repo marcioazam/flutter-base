@@ -1,16 +1,6 @@
 import 'dart:async';
 
-/// Cache entry with value and expiration time.
-class CacheEntry<T> {
-
-  CacheEntry(this.value, {Duration? ttl})
-      : expiresAt = ttl != null ? DateTime.now().add(ttl) : null;
-  final T value;
-  final DateTime? expiresAt;
-
-  bool get isExpired =>
-      expiresAt != null && DateTime.now().isAfter(expiresAt!);
-}
+import 'package:flutter_base_2025/core/generics/cache_entry.dart';
 
 /// Generic cache data source with TTL support.
 /// 
@@ -70,7 +60,7 @@ class MemoryCacheDataSource<T> implements CacheDataSource<T> {
 
   @override
   Future<void> set(String key, T value, {Duration? ttl}) async {
-    _cache[key] = CacheEntry(value, ttl: ttl ?? _defaultTtl);
+    _cache[key] = CacheEntry.withTtl(value, ttl: ttl ?? _defaultTtl);
   }
 
   @override
@@ -181,7 +171,7 @@ class LruCacheDataSource<T> implements CacheDataSource<T> {
       _evictIfNeeded();
     }
 
-    _cache[key] = CacheEntry(value, ttl: ttl ?? _defaultTtl);
+    _cache[key] = CacheEntry.withTtl(value, ttl: ttl ?? _defaultTtl);
     _updateAccessOrder(key);
   }
 
