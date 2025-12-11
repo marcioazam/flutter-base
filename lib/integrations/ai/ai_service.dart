@@ -61,7 +61,7 @@ AppFailure mapAIError(AIErrorType type, [String? message]) => switch (type) {
 class MockAIService implements AIService {
   @override
   Future<Result<String>> generateText(String prompt) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     return Success('Mock response for: $prompt');
   }
 
@@ -69,7 +69,7 @@ class MockAIService implements AIService {
   Stream<Result<String>> generateTextStream(String prompt) async* {
     final words = 'Mock streaming response for: $prompt'.split(' ');
     for (final word in words) {
-      await Future.delayed(const Duration(milliseconds: 100));
+      await Future<void>.delayed(const Duration(milliseconds: 100));
       yield Success('$word ');
     }
   }
@@ -79,7 +79,7 @@ class MockAIService implements AIService {
     String prompt,
     T Function(Map<String, dynamic>) fromJson,
   ) async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future<void>.delayed(const Duration(milliseconds: 500));
     try {
       final mockData = <String, dynamic>{'mock': true, 'prompt': prompt};
       return Success(fromJson(mockData));

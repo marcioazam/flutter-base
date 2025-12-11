@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter_base_2025/core/database/drift_repository.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -8,6 +7,22 @@ import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, s
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig(numRuns: 100);
+
+/// Conflict resolution strategies for sync operations.
+enum ConflictResolution {
+  serverWins,
+  clientWins,
+  merge,
+  keepBoth,
+}
+
+/// Sync status for offline-first entities.
+enum SyncStatus {
+  synced,
+  pendingSync,
+  syncFailed,
+  syncing,
+}
 
 /// **Feature: flutter-2025-final-polish, Property 3: Repository CRUD Result Type**
 /// **Validates: Requirements 8.2**
@@ -94,14 +109,14 @@ void main() {
 
         // Initial emission
         controller.add([]);
-        await Future.delayed(Duration.zero);
+        await Future<void>.delayed(Duration.zero);
 
         // Add items one by one (simulating inserts)
         var currentList = <String>[];
         for (final item in items) {
           currentList = [...currentList, item];
           controller.add(currentList);
-          await Future.delayed(Duration.zero);
+          await Future<void>.delayed(Duration.zero);
         }
 
         // Verify emissions
@@ -124,7 +139,7 @@ void main() {
 
       // Simulate insert
       controller.add(['item1']);
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
 
       expect(emissions.any((e) => e.length == 1 && e.first == 'item1'), isTrue);
 
@@ -139,11 +154,11 @@ void main() {
 
       // Initial state
       controller.add(['item1']);
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
 
       // Simulate update
       controller.add(['item1_updated']);
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
 
       expect(emissions.length, equals(2));
       expect(emissions.last, equals(['item1_updated']));
@@ -159,11 +174,11 @@ void main() {
 
       // Initial state with items
       controller.add(['item1', 'item2']);
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
 
       // Simulate delete
       controller.add(['item1']);
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
 
       expect(emissions.length, equals(2));
       expect(emissions.last, equals(['item1']));
@@ -180,7 +195,7 @@ void main() {
       controller.stream.listen(emissions2.add);
 
       controller.add(['item1']);
-      await Future.delayed(Duration.zero);
+      await Future<void>.delayed(Duration.zero);
 
       expect(emissions1, equals(emissions2));
 

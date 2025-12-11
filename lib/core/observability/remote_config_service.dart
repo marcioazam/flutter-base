@@ -76,6 +76,8 @@ class LocalRemoteConfigService implements RemoteConfigService {
   static const String _lastFetchKey = 'remote_config_last_fetch';
 
   final Duration _minFetchInterval;
+  // TODO: Implement cache TTL validation in fetch()
+  // ignore: unused_field
   final Duration _cacheTtl;
 
   @override

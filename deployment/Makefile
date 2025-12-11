@@ -3,7 +3,7 @@
 # Flutter Base 2025
 # =============================================================================
 
-.PHONY: help build run prod stop logs shell health clean security lint push
+.PHONY: help build run prod stop logs shell health clean security lint push validate test
 
 # Default target
 help:
@@ -162,3 +162,24 @@ info:
 status:
 	@echo "=== Container Status ==="
 	docker compose -f docker/docker-compose.yml ps
+
+# =============================================================================
+# Validation Targets
+# =============================================================================
+
+validate:
+	@echo "=== Pre-flight Validation ==="
+	@echo "Checking Docker..."
+	@docker --version || (echo "Docker not found" && exit 1)
+	@echo "Checking Docker Compose..."
+	@docker compose version || (echo "Docker Compose not found" && exit 1)
+	@echo "Checking Dockerfile syntax..."
+	@docker run --rm -i hadolint/hadolint < docker/Dockerfile || true
+	@echo "Checking .env file..."
+	@test -f docker/.env || (echo "Warning: docker/.env not found. Copy from .env.example" && exit 0)
+	@echo ""
+	@echo "Validation complete!"
+
+test:
+	@echo "Running Flutter tests before build..."
+	cd ../.. && flutter test --reporter compact

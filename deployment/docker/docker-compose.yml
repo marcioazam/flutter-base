@@ -91,7 +91,7 @@ services:
   # Traefik Reverse Proxy (Optional - for production)
   # ===========================================================================
   traefik:
-    image: traefik:v3.2
+    image: traefik:v3.2.3
     container_name: traefik
     profiles:
       - production

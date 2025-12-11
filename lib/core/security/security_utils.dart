@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 /// Certificate pinning configuration.
 class CertificatePinConfig {
@@ -158,19 +159,24 @@ abstract final class DeepLinkValidator {
   }
 }
 
-/// Secure random generator.
+/// Secure random generator using cryptographically secure RNG.
 abstract final class SecureRandom {
-  /// Generates a secure random string.
+  static final _secureRandom = Random.secure();
+
+  /// Generates a cryptographically secure random string.
   static String generateString(int length) {
     const chars =
         'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    final random = List.generate(
+    return List.generate(
       length,
-      (_) => chars[DateTime.now().microsecondsSinceEpoch % chars.length],
-    );
-    return random.join();
+      (_) => chars[_secureRandom.nextInt(chars.length)],
+    ).join();
   }
 
-  /// Generates a secure token.
+  /// Generates a cryptographically secure token (32 chars).
   static String generateToken() => generateString(32);
+
+  /// Generates secure random bytes.
+  static List<int> generateBytes(int length) =>
+      List.generate(length, (_) => _secureRandom.nextInt(256));
 }

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/widgets.dart';
 
 import 'package:flutter_base_2025/core/utils/result.dart';
@@ -156,63 +158,22 @@ class GoogleMapService implements MapService {
 
   @override
   double calculateDistance(LatLng from, LatLng to) {
-    // Haversine formula
+    // Haversine formula using dart:math for precision
     const earthRadius = 6371000.0; // meters
     final dLat = _toRadians(to.latitude - from.latitude);
     final dLon = _toRadians(to.longitude - from.longitude);
 
-    final a = _sin(dLat / 2) * _sin(dLat / 2) +
-        _cos(_toRadians(from.latitude)) *
-            _cos(_toRadians(to.latitude)) *
-            _sin(dLon / 2) *
-            _sin(dLon / 2);
+    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(_toRadians(from.latitude)) *
+            math.cos(_toRadians(to.latitude)) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
 
-    final c = 2 * _atan2(_sqrt(a), _sqrt(1 - a));
+    final c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
     return earthRadius * c;
   }
 
-  double _toRadians(double degrees) => degrees * 3.141592653589793 / 180;
-  double _sin(double x) => _taylorSin(x);
-  double _cos(double x) => _taylorSin(x + 3.141592653589793 / 2);
-  double _sqrt(double x) => _newtonSqrt(x);
-  double _atan2(double y, double x) => _approximateAtan2(y, x);
-
-  double _taylorSin(double x) {
-    // Normalize to [-pi, pi]
-    while (x > 3.141592653589793) {
-      x -= 2 * 3.141592653589793;
-    }
-    while (x < -3.141592653589793) {
-      x += 2 * 3.141592653589793;
-    }
-    // Taylor series approximation
-    final x2 = x * x;
-    return x * (1 - x2 / 6 * (1 - x2 / 20 * (1 - x2 / 42)));
-  }
-
-  double _newtonSqrt(double x) {
-    if (x <= 0) return 0;
-    var guess = x / 2;
-    for (var i = 0; i < 10; i++) {
-      guess = (guess + x / guess) / 2;
-    }
-    return guess;
-  }
-
-  double _approximateAtan2(double y, double x) {
-    if (x == 0) return y > 0 ? 1.5707963267948966 : -1.5707963267948966;
-    final atan = _approximateAtan(y / x);
-    if (x > 0) return atan;
-    return y >= 0 ? atan + 3.141592653589793 : atan - 3.141592653589793;
-  }
-
-  double _approximateAtan(double x) {
-    // Approximation for atan
-    if (x.abs() > 1) {
-      return (x > 0 ? 1 : -1) * 1.5707963267948966 - _approximateAtan(1 / x);
-    }
-    return x - x * x * x / 3 + x * x * x * x * x / 5;
-  }
+  double _toRadians(double degrees) => degrees * math.pi / 180;
 }
 
 /// Mapbox implementation placeholder.

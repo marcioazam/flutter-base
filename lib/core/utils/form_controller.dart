@@ -143,7 +143,7 @@ class FormController<T> extends ChangeNotifier {
   FormController({
     required T Function(Map<String, dynamic>) fromMap,
   }) : _fromMap = fromMap;
-  final Map<String, FieldController> _fields = {};
+  final Map<String, FieldController<dynamic>> _fields = {};
   final T Function(Map<String, dynamic>) _fromMap;
   bool _isSubmitting = false;
 

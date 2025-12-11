@@ -1,8 +1,12 @@
 /// Generic validation system with type-safe validators and composable rules.
 /// 
+/// This is the primary validation module for the application.
+/// 
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 6.1, 6.2, 6.3, 6.4, 6.5**
 library;
+
+import 'package:flutter_base_2025/core/constants/validation_patterns.dart';
 
 /// Validator function type that returns a ValidationResult.
 typedef Validator<T> = ValidationResult<T> Function(T value);
@@ -32,7 +36,6 @@ sealed class ValidationResult<T> {
 
 /// Represents a successful validation with the validated value.
 final class Valid<T> extends ValidationResult<T> {
-
   const Valid(this.value);
   final T value;
 
@@ -52,6 +55,7 @@ final class Valid<T> extends ValidationResult<T> {
   ValidationResult<R> flatMap<R>(ValidationResult<R> Function(T) mapper) =>
       mapper(value);
 
+
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -66,7 +70,6 @@ final class Valid<T> extends ValidationResult<T> {
 
 /// Represents a failed validation with field-specific errors.
 final class Invalid<T> extends ValidationResult<T> {
-
   const Invalid(this.errors);
 
   /// Creates Invalid with a single field error.
@@ -76,6 +79,7 @@ final class Invalid<T> extends ValidationResult<T> {
   /// Creates Invalid with multiple errors for a single field.
   factory Invalid.field(String field, List<String> messages) =>
       Invalid({field: messages});
+
   final Map<String, List<String>> errors;
 
   @override
@@ -112,6 +116,7 @@ final class Invalid<T> extends ValidationResult<T> {
     }
     return Invalid(merged);
   }
+
 
   @override
   bool operator ==(Object other) =>
@@ -157,19 +162,39 @@ abstract final class TypedValidators {
       return Valid(value);
     };
 
-  /// Validates email format.
+  /// Validates email format using shared pattern.
   static Validator<String> email({
     String field = 'email',
     String? message,
-  }) {
-    final regex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    return (value) {
-      if (!regex.hasMatch(value.trim())) {
+  }) => (value) {
+      if (!ValidationPatterns.email.hasMatch(value.trim())) {
         return Invalid.single(field, message ?? 'Invalid email format');
       }
       return Valid(value);
     };
-  }
+
+
+  /// Validates phone format using shared pattern.
+  static Validator<String> phone({
+    String field = 'phone',
+    String? message,
+  }) => (value) {
+      if (!ValidationPatterns.phone.hasMatch(value.trim())) {
+        return Invalid.single(field, message ?? 'Invalid phone format');
+      }
+      return Valid(value);
+    };
+
+  /// Validates URL format using shared pattern.
+  static Validator<String> url({
+    String field = 'url',
+    String? message,
+  }) => (value) {
+      if (!ValidationPatterns.url.hasMatch(value.trim())) {
+        return Invalid.single(field, message ?? 'Invalid URL format');
+      }
+      return Valid(value);
+    };
 
   /// Validates minimum length.
   static Validator<String> minLength(
@@ -200,6 +225,7 @@ abstract final class TypedValidators {
       }
       return Valid(value);
     };
+
 
   /// Validates against a regex pattern.
   static Validator<String> pattern(
@@ -253,6 +279,7 @@ abstract final class TypedValidators {
 
       return accumulated ?? Valid(value);
     };
+
 
   /// Composes validators, stopping at first failure.
   static Validator<T> composeFailFast<T>(List<Validator<T>> validators) => (value) {

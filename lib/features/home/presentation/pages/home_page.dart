@@ -24,7 +24,7 @@ class HomePage extends ConsumerWidget {
           data: (state) {
             final user = state.user;
             return Column(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: .center,
               children: [
                 const Icon(Icons.home, size: 64),
                 const SizedBox(height: 16),

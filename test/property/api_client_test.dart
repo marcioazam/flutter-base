@@ -19,7 +19,7 @@ AppException handleDioError(DioException e) => switch (e.type) {
     _ => NetworkException(e.message ?? 'Unknown network error'),
   };
 
-AppException _handleBadResponse(Response? response) {
+AppException _handleBadResponse(Response<dynamic>? response) {
   final statusCode = response?.statusCode ?? 500;
   final data = response?.data;
 
@@ -283,10 +283,10 @@ void main() {
     });
 
     test('Uses default message when no message in response', () {
-      final response = Response(
+      final response = Response<Map<String, dynamic>>(
         statusCode: 500,
         requestOptions: RequestOptions(path: '/test'),
-        data: {},
+        data: <String, dynamic>{},
       );
 
       final exception = _handleBadResponse(response);

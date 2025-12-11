@@ -145,7 +145,7 @@ Matcher meetsAccessibilityGuidelines() => _AccessibilityMatcher();
 
 class _AccessibilityMatcher extends Matcher {
   @override
-  bool matches(dynamic item, Map matchState) {
+  bool matches(dynamic item, Map<dynamic, dynamic> matchState) {
     if (item is AccessibilityReport) {
       return item.passed;
     }
@@ -159,7 +159,7 @@ class _AccessibilityMatcher extends Matcher {
   Description describeMismatch(
     dynamic item,
     Description mismatchDescription,
-    Map matchState,
+    Map<dynamic, dynamic> matchState,
     bool verbose,
   ) {
     if (item is AccessibilityReport) {

@@ -1,12 +1,43 @@
 import 'package:drift/drift.dart';
-import 'package:flutter_base_2025/core/database/drift_repository.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/generics/drift_repository.dart' as generics;
 import 'package:flutter_base_2025/core/network/api_client.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
+/// Conflict resolution strategies for sync operations.
+enum ConflictResolution {
+  /// Server data wins in case of conflict.
+  serverWins,
+
+  /// Client data wins in case of conflict.
+  clientWins,
+
+  /// Merge both versions (requires custom implementation).
+  merge,
+
+  /// Keep both versions with different IDs.
+  keepBoth,
+}
+
+/// Sync status for offline-first entities.
+enum SyncStatus {
+  /// Entity is synced with server.
+  synced,
+
+  /// Entity has local changes pending sync.
+  pendingSync,
+
+  /// Entity sync failed.
+  syncFailed,
+
+  /// Entity is being synced.
+  syncing,
+}
+
 /// Repository with offline sync support and conflict resolution.
-abstract class SyncRepository<T extends DataClass, ID>
-    extends BaseDriftRepository<T, ID> {
+/// T = Entity type, D = Drift DataClass, C = Companion class
+abstract class SyncRepository<T, D extends DataClass, C extends UpdateCompanion<D>>
+    extends generics.DriftRepository<T, D, C> {
 
   SyncRepository({
     required this.apiClient,
@@ -19,16 +50,16 @@ abstract class SyncRepository<T extends DataClass, ID>
   Future<List<T>> getPendingSyncItems();
 
   /// Mark item as synced.
-  Future<void> markAsSynced(ID id);
+  Future<void> markItemAsSynced(String id);
 
   /// Mark item as sync failed.
-  Future<void> markAsSyncFailed(ID id, String error);
+  Future<void> markItemAsSyncFailed(String id, String error);
 
   /// Push local item to server.
   Future<Result<T>> pushToServer(T item);
 
   /// Pull item from server.
-  Future<Result<T>> pullFromServer(ID id);
+  Future<Result<T>> pullFromServer(String id);
 
   /// Sync all pending items.
   Future<Result<SyncResult>> syncAll() async {

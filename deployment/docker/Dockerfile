@@ -26,12 +26,12 @@ RUN flutter pub get
 COPY . .
 
 # Build optimized web release with tree-shaking
+# Note: --pwa-strategy was deprecated in Flutter 3.16+, PWA is configured via web/manifest.json
 RUN flutter build web \
     --release \
     --dart-define=BUILD_VERSION=${BUILD_VERSION} \
     --dart-define=BUILD_NUMBER=${BUILD_NUMBER} \
-    --web-renderer=canvaskit \
-    --pwa-strategy=offline-first
+    --web-renderer=canvaskit
 
 # -----------------------------------------------------------------------------
 # Stage 2: Production Runtime with Nginx (Security Hardened)

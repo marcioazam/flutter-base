@@ -81,6 +81,7 @@ void main() {
 
       expect(find.text('Content'), findsOneWidget);
       // Dialog would be shown on back gesture
+      expect(dialogShown, isFalse); // Not triggered without back gesture
     });
 
     testWidgets('onPopInvoked callback is called', (tester) async {
@@ -98,6 +99,8 @@ void main() {
           ),
         ),
       );
+
+      expect(callbackInvoked, isFalse); // Not triggered without pop attempt
 
       expect(find.text('Content'), findsOneWidget);
       // Callback would be invoked on back gesture

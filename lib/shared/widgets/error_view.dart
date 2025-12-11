@@ -187,7 +187,7 @@ Widget buildErrorWidget(FlutterErrorDetails details) => Material(
         color: Colors.red.shade50,
         padding: const EdgeInsets.all(16),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: .center,
           children: [
             const Icon(Icons.error, color: Colors.red, size: 48),
             const SizedBox(height: 16),

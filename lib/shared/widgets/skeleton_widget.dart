@@ -123,7 +123,7 @@ class SkeletonListItem extends StatelessWidget {
           ],
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: .start,
               children: [
                 for (var i = 0; i < titleLines; i++)
                   SkeletonWidget.text(
@@ -173,7 +173,7 @@ class SkeletonCard extends StatelessWidget {
         width: width,
         height: height,
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: .start,
           children: [
             if (hasImage)
               SkeletonWidget(
@@ -186,7 +186,7 @@ class SkeletonCard extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: .start,
                 children: [
                   SkeletonWidget.text(width: 200, height: 20),
                   const SizedBox(height: 12),

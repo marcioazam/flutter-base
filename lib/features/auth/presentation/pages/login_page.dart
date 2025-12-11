@@ -52,8 +52,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             child: Form(
               key: _formKey,
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: .center,
+                crossAxisAlignment: .stretch,
                 children: [
                   Text(
                     widget.isRegister ? 'Create Account' : 'Welcome Back',
@@ -90,7 +90,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       if (value == null || value.isEmpty) {
                         return 'Email is required';
                       }
-                      if (!value.contains('@')) {
+                      // Basic email format check (full validation in use case)
+                      if (!RegExp(r'^[^@]+@[^@]+\.[^@]+$').hasMatch(value)) {
                         return 'Invalid email format';
                       }
                       return null;

@@ -36,6 +36,17 @@ log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
+# Pre-flight checks
+if ! command -v docker &> /dev/null; then
+    log_error "Docker is not installed or not in PATH"
+    exit 1
+fi
+
+if ! docker info &> /dev/null; then
+    log_error "Docker daemon is not running"
+    exit 1
+fi
+
 # Validate
 if [[ -z "$VERSION" ]]; then
     log_error "Version not found. Provide as argument or ensure pubspec.yaml exists."
@@ -98,6 +109,10 @@ echo "  Image:   $FULL_IMAGE_NAME"
 echo "  Tags:    $VERSION, latest"
 echo "  Size:    $(docker images --format '{{.Size}}' "$FULL_IMAGE_NAME:$VERSION")"
 echo ""
+
+# Cleanup dangling images
+log_info "Cleaning up dangling images..."
+docker image prune -f --filter "dangling=true" 2>/dev/null || true
 
 # Security scan suggestion
 log_warn "Run security scan: docker run --rm aquasec/trivy image $FULL_IMAGE_NAME:$VERSION"

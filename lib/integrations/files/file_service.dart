@@ -180,7 +180,7 @@ class FileServiceImpl implements FileService {
       final total = bytes.length;
       for (var i = 0; i <= 10; i++) {
         if (_cancelTokens[operationId] ?? false) break;
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
         yield UploadProgress.fromBytes(total * i ~/ 10, total);
       }
 
@@ -244,7 +244,7 @@ class FileServiceImpl implements FileService {
       const total = 1000000;
       for (var i = 0; i <= 10; i++) {
         if (_cancelTokens[operationId] ?? false) break;
-        await Future.delayed(const Duration(milliseconds: 100));
+        await Future<void>.delayed(const Duration(milliseconds: 100));
         yield DownloadProgress.fromBytes(startByte + (total * i ~/ 10), total);
       }
 

@@ -148,7 +148,7 @@ void main() {
               body: ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(
+                    MaterialPageRoute<void>(
                       builder: (_) => const Scaffold(
                         body: Center(child: Text('Second Page')),
                       ),

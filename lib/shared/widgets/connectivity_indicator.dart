@@ -22,7 +22,7 @@ class ConnectivityIndicator extends ConsumerWidget {
               ? const SizedBox.shrink()
               : const Center(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: .center,
                     children: [
                       Icon(Icons.wifi_off, color: Colors.white, size: 16),
                       SizedBox(width: 8),

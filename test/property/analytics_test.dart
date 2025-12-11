@@ -111,7 +111,8 @@ class TestRoute extends PageRoute<void> {
 void main() {
   group('Analytics Screen View Logging Properties', () {
     late RecordingAnalyticsService analytics;
-    late AnalyticsNavigatorObserver observer;
+    // ignore: unused_local_variable
+    late AnalyticsNavigatorObserver observer; // Kept for future navigation tests
 
     setUp(() {
       analytics = RecordingAnalyticsService();

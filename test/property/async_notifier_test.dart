@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_use_of_internal_member
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -7,6 +9,7 @@ import '../helpers/riverpod_compat.dart';
 /// **Validates: Requirements 3.12**
 
 /// Test notifier that preserves previous data.
+/// Uses copyWithPrevious which is internal but necessary for state preservation testing.
 class TestAsyncNotifier extends AsyncNotifier<int> {
   @override
   Future<int> build() async => 0;

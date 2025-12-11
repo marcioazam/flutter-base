@@ -21,7 +21,7 @@ class InitErrorScreen extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: .center,
                 children: [
                   const Icon(
                     Icons.error_outline,
@@ -87,8 +87,8 @@ class InitErrorScreen extends StatelessWidget {
         title: const Text('Detalhes do erro'),
         content: SingleChildScrollView(
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: .start,
+            mainAxisSize: .min,
             children: [
               Text('Step: ${failure.step}'),
               const SizedBox(height: 8),

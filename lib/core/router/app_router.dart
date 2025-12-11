@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_base_2025/core/constants/app_constants.dart';
 import 'package:flutter_base_2025/core/router/route_guards.dart';
@@ -78,27 +76,6 @@ final routerProvider = Provider<GoRouter>((ref) {
 /// Simple notifier for GoRouter refresh.
 class _RouterRefreshNotifier extends ChangeNotifier {
   void notify() => notifyListeners();
-}
-
-/// Stream that notifies GoRouter when auth state changes.
-/// @deprecated Use _RouterRefreshNotifier instead
-class GoRouterRefreshStream extends ChangeNotifier {
-  GoRouterRefreshStream([Stream<dynamic>? stream]) {
-    notifyListeners();
-    if (stream != null) {
-      _subscription = stream.asBroadcastStream().listen((_) {
-        notifyListeners();
-      });
-    }
-  }
-
-  StreamSubscription<dynamic>? _subscription;
-
-  @override
-  void dispose() {
-    _subscription?.cancel();
-    super.dispose();
-  }
 }
 
 /// Deep link configuration.

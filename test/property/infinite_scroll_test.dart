@@ -16,7 +16,7 @@ void main() {
         controller = InfiniteScrollController<int>(
           fetchPage: (page, pageSize) async {
             // Simulate API response
-            await Future.delayed(const Duration(milliseconds: 10));
+            await Future<void>.delayed(const Duration(milliseconds: 10));
             if (page > 3) return []; // No more data after page 3
             return List.generate(pageSize, (i) => (page - 1) * pageSize + i);
           },

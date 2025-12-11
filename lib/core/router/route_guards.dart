@@ -1,5 +1,4 @@
 import 'package:flutter_base_2025/core/constants/app_constants.dart';
-import 'package:flutter_base_2025/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_base_2025/features/auth/presentation/providers/auth_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';

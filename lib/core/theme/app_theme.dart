@@ -47,7 +47,6 @@ abstract final class AppTheme {
     Brightness brightness, {
     bool highContrast = false,
   }) {
-    final isDark = brightness == Brightness.dark;
     final colorScheme = highContrast
         ? _buildHighContrastScheme(brightness)
         : ColorScheme.fromSeed(

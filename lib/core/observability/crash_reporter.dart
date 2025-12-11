@@ -56,8 +56,12 @@ class SentryCrashReporter implements CrashReporter {
   final Map<String, String> _tags = {};
   final Map<String, dynamic> _extras = {};
 
+  // User info stored for when Sentry is enabled
+  // ignore: unused_field
   String? _userId;
+  // ignore: unused_field
   String? _userEmail;
+  // ignore: unused_field
   String? _userName;
 
   @override

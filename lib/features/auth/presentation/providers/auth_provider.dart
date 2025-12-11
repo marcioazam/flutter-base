@@ -49,7 +49,12 @@ class LoginNotifier extends _$LoginNotifier {
   Timer? _debounceTimer;
 
   @override
-  Future<void> build() async {}
+  Future<void> build() async {
+    // Cleanup timer on dispose
+    ref.onDispose(() {
+      _debounceTimer?.cancel();
+    });
+  }
 
   Future<void> login(String email, String password) async {
     state = const AsyncLoading();

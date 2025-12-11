@@ -6,8 +6,21 @@ sealed class AppException implements Exception {
   final int? statusCode;
   final StackTrace? stackTrace;
 
+  /// Returns the exception type name for logging.
+  /// Using switch expression instead of runtimeType.toString() for production safety.
+  String get typeName => switch (this) {
+    NetworkException() => 'NetworkException',
+    ServerException() => 'ServerException',
+    ValidationException() => 'ValidationException',
+    UnauthorizedException() => 'UnauthorizedException',
+    ForbiddenException() => 'ForbiddenException',
+    NotFoundException() => 'NotFoundException',
+    RateLimitException() => 'RateLimitException',
+    CacheException() => 'CacheException',
+  };
+
   @override
-  String toString() => '$runtimeType: $message';
+  String toString() => '$typeName: $message';
 }
 
 /// Network-related exceptions.

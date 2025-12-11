@@ -22,13 +22,13 @@ class ReconnectStrategy {
 
   /// Calculates delay for attempt n (0-indexed).
   Duration getDelay(int attempt) {
-    final delayMs = initialDelay.inMilliseconds * 
-        (backoffMultiplier == 1.0 ? 1 : (1 << attempt).clamp(1, 1000));
+    final multiplier = backoffMultiplier == 1.0 ? 1 : (1 << attempt).clamp(1, 1000);
+    final delayMs = (initialDelay.inMilliseconds * multiplier).toInt();
     return Duration(
       milliseconds: delayMs.clamp(
         initialDelay.inMilliseconds,
         maxDelay.inMilliseconds,
-      ).toInt(),
+      ),
     );
   }
 }
@@ -55,7 +55,7 @@ class WebSocketClient<T> {
   final ReconnectStrategy _reconnectStrategy;
 
   WebSocketChannel? _channel;
-  StreamSubscription? _subscription;
+  StreamSubscription<dynamic>? _subscription;
   Timer? _reconnectTimer;
   Timer? _pingTimer;
 
@@ -102,7 +102,13 @@ class WebSocketClient<T> {
 
       _startPingTimer();
       _flushMessageQueue();
-    } catch (e) {
+    } on Exception catch (e) {
+      // Log connection error for debugging
+      assert(() {
+        // ignore: avoid_print
+        print('WebSocket connection error: $e');
+        return true;
+      }());
       _setState(WebSocketState.disconnected);
       _scheduleReconnect();
     }

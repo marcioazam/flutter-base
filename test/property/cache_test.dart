@@ -35,7 +35,7 @@ void main() {
       expect(fetchCount, equals(1));
 
       // Wait for TTL to expire
-      await Future.delayed(const Duration(milliseconds: 60));
+      await Future<void>.delayed(const Duration(milliseconds: 60));
 
       // Third fetch - should call fetcher again
       final result3 = await cache.getOrFetch('key', fetcher);
@@ -117,7 +117,7 @@ void main() {
       expect(cache.size, equals(2));
 
       // Wait for short TTL to expire
-      await Future.delayed(const Duration(milliseconds: 20));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
 
       final evicted = cache.invalidateExpired();
 

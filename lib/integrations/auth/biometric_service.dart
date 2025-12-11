@@ -90,24 +90,27 @@ class BiometricServiceImpl implements BiometricService {
       //   ),
       // );
 
-      // Simulated success for now
+      // Simulated success for now - replace with actual local_auth implementation
+      // ignore: dead_code
       const result = true;
 
-      if (result) {
-        _retryCount = 0;
-        return const Success(true);
-      }
+      _retryCount = 0;
+      return const Success(result);
 
-      _retryCount++;
-      if (_retryCount >= _maxRetries) {
-        _retryCount = 0;
-        if (!biometricOnly) {
-          return _authenticateWithFallback(reason);
-        }
-        return Failure(AuthFailure('Maximum retry attempts exceeded'));
-      }
-
-      return const Success(false);
+      // TODO(biometric): Uncomment when local_auth is integrated
+      // if (result) {
+      //   _retryCount = 0;
+      //   return const Success(true);
+      // }
+      // _retryCount++;
+      // if (_retryCount >= _maxRetries) {
+      //   _retryCount = 0;
+      //   if (!biometricOnly) {
+      //     return _authenticateWithFallback(reason);
+      //   }
+      //   return Failure(AuthFailure('Maximum retry attempts exceeded'));
+      // }
+      // return const Success(false);
     } on PlatformException catch (e) {
       _retryCount++;
       if (_retryCount >= _maxRetries && !biometricOnly) {

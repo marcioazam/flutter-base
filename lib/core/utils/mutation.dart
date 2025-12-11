@@ -1,8 +1,39 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Mutation state for tracking side-effect operations.
+/// 
+/// **Feature: flutter-2025-final-enhancements, Property 1: Mutation State Transitions**
+/// **Validates: Requirements 1.2**
 sealed class MutationState<T> {
   const MutationState();
+
+  /// Pattern matching helper for all states.
+  R when<R>({
+    required R Function() idle,
+    required R Function(double? progress) loading,
+    required R Function(T data) success,
+    required R Function(Object error, StackTrace stackTrace) error,
+  }) => switch (this) {
+    MutationIdle() => idle(),
+    MutationLoading(:final progress) => loading(progress),
+    MutationSuccess(:final data) => success(data),
+    final MutationError<T> e => error(e.error, e.stackTrace),
+  };
+
+  /// Pattern matching with default fallback.
+  R maybeWhen<R>({
+    R Function()? idle,
+    R Function(double? progress)? loading,
+    R Function(T data)? success,
+    R Function(Object error, StackTrace stackTrace)? error,
+    required R Function() orElse,
+  }) => switch (this) {
+    MutationIdle() => idle?.call() ?? orElse(),
+    MutationLoading(:final progress) => loading?.call(progress) ?? orElse(),
+    MutationSuccess(:final data) => success?.call(data) ?? orElse(),
+    final MutationError<T> e => error?.call(e.error, e.stackTrace) ?? orElse(),
+  };
 }
 
 /// Initial state before mutation starts.
@@ -134,4 +165,79 @@ extension MutationRefExtension on Ref {
   /// Creates or gets a mutation controller by key.
   MutationController<T> mutation<T>(String key) => 
       read(mutationControllerProvider(key)) as MutationController<T>;
+}
+
+
+/// Widget builder for MutationState.
+/// 
+/// **Feature: flutter-2025-final-enhancements**
+/// **Validates: Requirements 1.5**
+class MutationBuilder<T> extends StatelessWidget {
+  const MutationBuilder({
+    required this.state,
+    required this.idle,
+    required this.loading,
+    required this.success,
+    required this.error,
+    super.key,
+  });
+
+  final MutationState<T> state;
+  final Widget Function() idle;
+  final Widget Function(double? progress) loading;
+  final Widget Function(T data) success;
+  final Widget Function(Object error, StackTrace stackTrace) error;
+
+  @override
+  Widget build(BuildContext context) => state.when(
+    idle: idle,
+    loading: loading,
+    success: success,
+    error: error,
+  );
+}
+
+/// Simplified MutationBuilder with common defaults.
+class SimpleMutationBuilder<T> extends StatelessWidget {
+  const SimpleMutationBuilder({
+    required this.state,
+    required this.onIdle,
+    required this.onSuccess,
+    this.loadingWidget,
+    this.errorBuilder,
+    super.key,
+  });
+
+  final MutationState<T> state;
+  final Widget Function() onIdle;
+  final Widget Function(T data) onSuccess;
+  final Widget? loadingWidget;
+  final Widget Function(Object error)? errorBuilder;
+
+  @override
+  Widget build(BuildContext context) => state.when(
+    idle: onIdle,
+    loading: (_) => loadingWidget ?? const Center(child: _DefaultLoadingIndicator()),
+    success: onSuccess,
+    error: (e, _) => errorBuilder?.call(e) ?? Text('Error: $e'),
+  );
+}
+
+/// Default loading indicator for mutation builders.
+class _DefaultLoadingIndicator extends StatelessWidget {
+  const _DefaultLoadingIndicator();
+  
+  @override
+  Widget build(BuildContext context) => const SizedBox(
+    width: 24,
+    height: 24,
+    child: DecoratedBox(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.fromBorderSide(
+          BorderSide(width: 2, color: Color(0xFF6750A4)),
+        ),
+      ),
+    ),
+  );
 }

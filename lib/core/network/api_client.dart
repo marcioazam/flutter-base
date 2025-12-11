@@ -173,6 +173,11 @@ class ApiClient {
   }
 
   /// Handles Dio errors and converts to app exceptions.
+  /// 
+  /// TODO(refactor): Consider using ExceptionMapper.mapException() instead
+  /// to avoid duplicating error handling logic. This would require changing
+  /// the return type from AppException to AppFailure.
+  /// See: lib/core/errors/exception_mapper.dart
   AppException _handleDioError(DioException e) => switch (e.type) {
       DioExceptionType.connectionTimeout ||
       DioExceptionType.sendTimeout ||
@@ -185,7 +190,7 @@ class ApiClient {
       _ => NetworkException(e.message ?? 'Unknown network error'),
     };
 
-  AppException _handleBadResponse(Response? response) {
+  AppException _handleBadResponse(Response<dynamic>? response) {
     final statusCode = response?.statusCode ?? 500;
     final data = response?.data;
     

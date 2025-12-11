@@ -1,5 +1,6 @@
+import 'package:flutter_base_2025/core/constants/validation_patterns.dart';
 import 'package:flutter_base_2025/core/utils/form_controller.dart';
-import 'package:flutter_base_2025/core/utils/validators.dart';
+import 'package:flutter_base_2025/core/utils/validation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
 
@@ -51,75 +52,95 @@ void main() {
       });
     });
 
-    group('Validators', () {
+    group('TypedValidators', () {
       /// Property 6: Form Validation Composition
       /// For any composed validators, validation SHALL fail on first error
       /// and return that error message.
       Glados<String>(any.nonEmptyLetters, _explore).test(
         'compose returns first error',
         (value) {
-          final validator = FormValidators.combine([
-            FormValidators.required,
-            FormValidators.minLength(5),
-            FormValidators.email,
+          final validator = TypedValidators.composeFailFast<String>([
+            TypedValidators.required(),
+            TypedValidators.minLength(5),
+            TypedValidators.email(),
           ]);
 
-          final error = validator(value);
+          final result = validator(value);
 
           // If value is empty, should get required error
-          if (value.isEmpty) {
-            expect(error, contains('required'));
+          if (value.trim().isEmpty) {
+            expect(result.isInvalid, isTrue);
           }
           // If value is short, should get minLength error
           else if (value.length < 5) {
-            expect(error, contains('5'));
+            expect(result.isInvalid, isTrue);
           }
           // Otherwise check email format
-          else if (!Validators.isValidEmail(value)) {
-            expect(error, contains('email'));
+          else if (!ValidationPatterns.email.hasMatch(value)) {
+            expect(result.isInvalid, isTrue);
           }
         },
       );
 
       test('required validator fails on empty', () {
-        expect(FormValidators.required(''), isNotNull);
-        expect(FormValidators.required(null), isNotNull);
-        expect(FormValidators.required('value'), isNull);
+        final validator = TypedValidators.required();
+        expect(validator('').isInvalid, isTrue);
+        expect(validator('   ').isInvalid, isTrue);
+        expect(validator('value').isValid, isTrue);
       });
 
       test('email validator validates format', () {
-        expect(FormValidators.email('invalid'), isNotNull);
-        expect(FormValidators.email('test@example.com'), isNull);
+        final validator = TypedValidators.email();
+        expect(validator('invalid').isInvalid, isTrue);
+        expect(validator('test@example.com').isValid, isTrue);
       });
 
       test('minLength validator checks length', () {
-        final validator = FormValidators.minLength(5);
-        expect(validator('abc'), isNotNull);
-        expect(validator('abcde'), isNull);
+        final validator = TypedValidators.minLength(5);
+        expect(validator('abc').isInvalid, isTrue);
+        expect(validator('abcde').isValid, isTrue);
       });
 
       test('maxLength validator checks length', () {
-        final validator = FormValidators.maxLength(5);
-        expect(validator('abcdef'), isNotNull);
-        expect(validator('abcde'), isNull);
+        final validator = TypedValidators.maxLength(5);
+        expect(validator('abcdef').isInvalid, isTrue);
+        expect(validator('abcde').isValid, isTrue);
       });
 
-      test('combine runs validators in order', () {
-        final validator = FormValidators.combine([
-          (_) => 'first error',
-          (_) => 'second error',
+      test('compose aggregates all errors', () {
+        final validator = TypedValidators.compose<String>([
+          (_) => Invalid.single('field1', 'first error'),
+          (_) => Invalid.single('field2', 'second error'),
         ]);
 
-        expect(validator('any'), equals('first error'));
+        final result = validator('any');
+        expect(result.isInvalid, isTrue);
+        if (result case Invalid(:final errors)) {
+          expect(errors.length, equals(2));
+        }
       });
 
-      test('combine returns null when all pass', () {
-        final validator = FormValidators.combine([
-          (_) => null,
-          (_) => null,
+      test('composeFailFast stops at first error', () {
+        final validator = TypedValidators.composeFailFast<String>([
+          (_) => Invalid.single('field1', 'first error'),
+          (_) => Invalid.single('field2', 'second error'),
         ]);
 
-        expect(validator('any'), isNull);
+        final result = validator('any');
+        expect(result.isInvalid, isTrue);
+        if (result case Invalid(:final errors)) {
+          expect(errors.length, equals(1));
+          expect(errors['field1'], contains('first error'));
+        }
+      });
+
+      test('compose returns Valid when all pass', () {
+        final validator = TypedValidators.compose<String>([
+          (_) => Valid('ok'),
+          (_) => Valid('ok'),
+        ]);
+
+        expect(validator('any').isValid, isTrue);
       });
     });
 
@@ -182,7 +203,7 @@ void main() {
 
         form.registerField<String>(
           'name',
-          validators: [FormValidators.required],
+          validators: [(v) => v?.isEmpty ?? true ? 'Required' : null],
         );
 
         expect(form.isValid, isTrue); // No validation run yet

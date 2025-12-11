@@ -5,15 +5,29 @@ import 'package:flutter_base_2025/core/theme/app_theme.dart';
 import 'package:flutter_base_2025/shared/providers/locale_provider.dart';
 import 'package:flutter_base_2025/shared/providers/theme_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /// Main entry point - use flavor-specific main files for different environments.
+/// 
+/// **Feature: flutter-2025-final-enhancements**
+/// **Validates: Requirements 3.4**
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Default to development if running main.dart directly
   await AppConfig.initialize(Flavor.development);
   
-  runApp(const ProviderScope(child: FlutterBaseApp()));
+  // Initialize SharedPreferences before app starts
+  final prefs = await SharedPreferences.getInstance();
+  
+  runApp(
+    ProviderScope(
+      overrides: [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+      ],
+      child: const FlutterBaseApp(),
+    ),
+  );
 }
 
 /// Main app widget consuming Python API backend.

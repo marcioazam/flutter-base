@@ -52,8 +52,13 @@ class AppConfig {
       envLoaded = true;
       // Validate required keys only if env file was loaded
       _validateEnvironment();
-    } catch (_) {
+    } catch (e) {
       // Fallback to defaults if env file not found (useful for tests)
+      assert(() {
+        // ignore: avoid_print
+        print('AppConfig: Using defaults, env file not loaded: $e');
+        return true;
+      }());
     }
     
     _instance = AppConfig._(

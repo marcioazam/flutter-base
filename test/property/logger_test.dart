@@ -4,7 +4,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
 import 'package:logger/logger.dart';
 import 'package:mocktail/mocktail.dart' hide any;
-import 'package:mocktail/mocktail.dart' as mocktail;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig(numRuns: 100);
@@ -166,7 +165,7 @@ void main() {
 
     test('stopTrace returns duration', () async {
       monitor.startTrace('test-op');
-      await Future.delayed(const Duration(milliseconds: 20));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
       final duration = monitor.stopTrace('test-op');
 
       expect(duration, isNotNull);
@@ -193,7 +192,7 @@ void main() {
 
     test('measureAsync times asynchronous operation', () async {
       final result = await monitor.measureAsync('async-op', () async {
-        await Future.delayed(const Duration(milliseconds: 10));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
         return 'done';
       });
 
@@ -204,7 +203,7 @@ void main() {
     test('averageDuration calculates correctly', () async {
       for (var i = 0; i < 3; i++) {
         monitor.startTrace('repeated');
-        await Future.delayed(const Duration(milliseconds: 10));
+        await Future<void>.delayed(const Duration(milliseconds: 10));
         monitor.stopTrace('repeated');
       }
 
@@ -235,7 +234,7 @@ void main() {
       final trace = PerformanceTrace('test');
       final duration1 = trace.duration;
       
-      await Future.delayed(const Duration(milliseconds: 20));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
       
       final duration2 = trace.duration;
       expect(duration2.inMilliseconds, greaterThan(duration1.inMilliseconds));
@@ -243,10 +242,10 @@ void main() {
 
     test('stop freezes duration', () async {
       final trace = PerformanceTrace('test');
-      await Future.delayed(const Duration(milliseconds: 10));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
       
       final stoppedDuration = trace.stop();
-      await Future.delayed(const Duration(milliseconds: 20));
+      await Future<void>.delayed(const Duration(milliseconds: 20));
       
       expect(trace.duration, equals(stoppedDuration));
       expect(trace.isRunning, isFalse);

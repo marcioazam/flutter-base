@@ -37,7 +37,7 @@ abstract class DriftRepository<T, D extends DataClass, C extends UpdateCompanion
       }
 
       return Success(fromRow(row));
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       return Failure(CacheFailure(e.toString(), stackTrace: st));
     }
   }

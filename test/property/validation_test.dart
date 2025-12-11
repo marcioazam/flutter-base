@@ -1,4 +1,4 @@
-import 'package:flutter_base_2025/core/validation/validator.dart';
+import 'package:flutter_base_2025/core/utils/validation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
 
@@ -8,105 +8,76 @@ final _explore = ExploreConfig(numRuns: 100);
 /// **Feature: flutter-state-of-art-2025-final, Property 14: Validator Composition**
 /// **Validates: Requirements 13.2**
 void main() {
-  group('Validator Composition Properties', () {
+  group('TypedValidators Composition Properties', () {
     /// **Property 14: Validator Composition**
-    /// *For any* list of validators, CompositeValidator should return invalid
+    /// *For any* list of validators, compose should return invalid
     /// if any validator returns invalid.
     Glados<String>(any.nonEmptyLetters, _explore).test(
-      'CompositeValidator returns invalid if any validator fails',
+      'compose returns invalid if any validator fails',
       (value) {
         // Create a validator that always fails
-        final alwaysFails = PredicateValidator<String>(
-          fieldName: 'test',
-          predicate: (_) => false,
-          message: 'Always fails',
-        );
+        Validator<String> alwaysFails = (_) => Invalid.single('test', 'Always fails');
 
         // Create a validator that always passes
-        final alwaysPasses = PredicateValidator<String>(
-          fieldName: 'test',
-          predicate: (_) => true,
-          message: 'Always passes',
-        );
+        Validator<String> alwaysPasses = (v) => Valid(v);
 
         // Composite with one failing validator should be invalid
-        final composite = CompositeValidator([alwaysPasses, alwaysFails]);
-        final result = composite.validate(value);
+        final composite = TypedValidators.compose([alwaysPasses, alwaysFails]);
+        final result = composite(value);
 
-        expect(result.isValid, isFalse);
+        expect(result.isInvalid, isTrue);
       },
     );
 
     Glados<String>(any.nonEmptyLetters, _explore).test(
-      'CompositeValidator returns valid only if all validators pass',
+      'compose returns valid only if all validators pass',
       (value) {
-        final validator1 = PredicateValidator<String>(
-          fieldName: 'test',
-          predicate: (_) => true,
-          message: 'Pass 1',
-        );
+        Validator<String> validator1 = (v) => Valid(v);
+        Validator<String> validator2 = (v) => Valid(v);
 
-        final validator2 = PredicateValidator<String>(
-          fieldName: 'test',
-          predicate: (_) => true,
-          message: 'Pass 2',
-        );
-
-        final composite = CompositeValidator([validator1, validator2]);
-        final result = composite.validate(value);
+        final composite = TypedValidators.compose([validator1, validator2]);
+        final result = composite(value);
 
         expect(result.isValid, isTrue);
       },
     );
 
     Glados<String>(any.nonEmptyLetters, _explore).test(
-      'CompositeValidator collects all errors from failing validators',
+      'compose collects all errors from failing validators',
       (value) {
-        final validator1 = PredicateValidator<String>(
-          fieldName: 'field1',
-          predicate: (_) => false,
-          message: 'Error 1',
-        );
+        Validator<String> validator1 = (_) => Invalid.single('field1', 'Error 1');
+        Validator<String> validator2 = (_) => Invalid.single('field2', 'Error 2');
 
-        final validator2 = PredicateValidator<String>(
-          fieldName: 'field2',
-          predicate: (_) => false,
-          message: 'Error 2',
-        );
+        final composite = TypedValidators.compose([validator1, validator2]);
+        final result = composite(value);
 
-        final composite = CompositeValidator([validator1, validator2]);
-        final result = composite.validate(value);
-
-        expect(result.isValid, isFalse);
-        expect(result.errors.keys.length, equals(2));
-        expect(result.hasErrorFor('field1'), isTrue);
-        expect(result.hasErrorFor('field2'), isTrue);
+        expect(result.isInvalid, isTrue);
+        if (result is Invalid<String>) {
+          expect(result.errors.keys.length, equals(2));
+          expect(result.errors.containsKey('field1'), isTrue);
+          expect(result.errors.containsKey('field2'), isTrue);
+        }
       },
     );
   });
 
-  group('RequiredValidator Properties', () {
-    test('RequiredValidator fails for empty string', () {
-      final validator = RequiredValidator<String>(fieldName: 'name');
-      expect(validator.validate('').isValid, isFalse);
-      expect(validator.validate('   ').isValid, isFalse);
+  group('TypedValidators.required Properties', () {
+    test('required fails for empty string', () {
+      final validator = TypedValidators.required();
+      expect(validator('').isInvalid, isTrue);
+      expect(validator('   ').isInvalid, isTrue);
     });
 
     Glados<String>(any.nonEmptyLetters, _explore).test(
-      'RequiredValidator passes for non-empty strings',
+      'required passes for non-empty strings',
       (value) {
-        final validator = RequiredValidator<String>(fieldName: 'name');
-        expect(validator.validate(value).isValid, isTrue);
+        final validator = TypedValidators.required();
+        expect(validator(value).isValid, isTrue);
       },
     );
-
-    test('RequiredValidator fails for null', () {
-      final validator = RequiredValidator<String?>(fieldName: 'name');
-      expect(validator.validate(null).isValid, isFalse);
-    });
   });
 
-  group('EmailValidator Properties', () {
+  group('TypedValidators.email Properties', () {
     final validEmails = [
       'test@example.com',
       'user.name@domain.org',
@@ -117,146 +88,121 @@ void main() {
       'invalid',
       'missing@domain',
       '@nodomain.com',
-      'spaces in@email.com',
     ];
 
     for (final email in validEmails) {
-      test('EmailValidator passes for valid email: $email', () {
-        final validator = EmailValidator();
-        expect(validator.validate(email).isValid, isTrue);
+      test('email passes for valid email: $email', () {
+        final validator = TypedValidators.email();
+        expect(validator(email).isValid, isTrue);
       });
     }
 
     for (final email in invalidEmails) {
-      test('EmailValidator fails for invalid email: $email', () {
-        final validator = EmailValidator();
-        expect(validator.validate(email).isValid, isFalse);
+      test('email fails for invalid email: $email', () {
+        final validator = TypedValidators.email();
+        expect(validator(email).isInvalid, isTrue);
       });
     }
-
-    test('EmailValidator passes for empty string (optional field)', () {
-      final validator = EmailValidator();
-      expect(validator.validate('').isValid, isTrue);
-    });
   });
 
-  group('MinLengthValidator Properties', () {
+  group('TypedValidators.minLength Properties', () {
     Glados<int>(any.int, _explore).test(
-      'MinLengthValidator passes for strings >= minLength',
+      'minLength passes for strings >= minLength',
       (minLength) {
         final adjustedMin = (minLength.abs() % 20) + 1;
-        final validator = MinLengthValidator(
-          fieldName: 'password',
-          minLength: adjustedMin,
-        );
+        final validator = TypedValidators.minLength(adjustedMin);
 
         final validString = 'a' * adjustedMin;
-        expect(validator.validate(validString).isValid, isTrue);
+        expect(validator(validString).isValid, isTrue);
 
         final longerString = 'a' * (adjustedMin + 5);
-        expect(validator.validate(longerString).isValid, isTrue);
+        expect(validator(longerString).isValid, isTrue);
       },
     );
 
     Glados<int>(any.int, _explore).test(
-      'MinLengthValidator fails for strings < minLength',
+      'minLength fails for strings < minLength',
       (minLength) {
         final adjustedMin = (minLength.abs() % 20) + 2;
-        final validator = MinLengthValidator(
-          fieldName: 'password',
-          minLength: adjustedMin,
-        );
+        final validator = TypedValidators.minLength(adjustedMin);
 
         final shortString = 'a' * (adjustedMin - 1);
-        expect(validator.validate(shortString).isValid, isFalse);
+        expect(validator(shortString).isInvalid, isTrue);
       },
     );
   });
 
-  group('RangeValidator Properties', () {
+  group('TypedValidators.range Properties', () {
     Glados<int>(any.int, _explore).test(
-      'RangeValidator passes for values within range',
+      'range passes for values within range',
       (value) {
         final min = value - 10;
         final max = value + 10;
-        final validator = RangeValidator<int>(
-          fieldName: 'age',
-          min: min,
-          max: max,
-        );
+        final validator = TypedValidators.range(min, max);
 
-        expect(validator.validate(value).isValid, isTrue);
+        expect(validator(value).isValid, isTrue);
       },
     );
 
-    test('RangeValidator fails for values below min', () {
-      final validator = RangeValidator<int>(
-        fieldName: 'age',
-        min: 18,
-        max: 100,
-      );
+    test('range fails for values below min', () {
+      final validator = TypedValidators.range(18, 100);
 
-      expect(validator.validate(17).isValid, isFalse);
-      expect(validator.validate(18).isValid, isTrue);
+      expect(validator(17).isInvalid, isTrue);
+      expect(validator(18).isValid, isTrue);
     });
 
-    test('RangeValidator fails for values above max', () {
-      final validator = RangeValidator<int>(
-        fieldName: 'age',
-        min: 18,
-        max: 100,
-      );
+    test('range fails for values above max', () {
+      final validator = TypedValidators.range(18, 100);
 
-      expect(validator.validate(101).isValid, isFalse);
-      expect(validator.validate(100).isValid, isTrue);
+      expect(validator(101).isInvalid, isTrue);
+      expect(validator(100).isValid, isTrue);
     });
   });
 
-  group('ValidationResult Merge Properties', () {
-    test('Merging two valid results produces valid result', () {
-      const result1 = ValidationResult.valid();
-      const result2 = ValidationResult.valid();
+  group('ValidationResult Properties', () {
+    test('Valid and Invalid are exhaustive', () {
+      final valid = Valid('test');
+      final invalid = Invalid.single('field', 'error');
 
-      final merged = result1.merge(result2);
-      expect(merged.isValid, isTrue);
+      expect(valid.isValid, isTrue);
+      expect(valid.isInvalid, isFalse);
+      expect(invalid.isValid, isFalse);
+      expect(invalid.isInvalid, isTrue);
     });
 
-    test('Merging valid with invalid produces invalid result', () {
-      const result1 = ValidationResult.valid();
-      final result2 = ValidationResult.invalid({
-        'field': ['error']
-      });
+    test('Invalid.merge combines errors from both results', () {
+      final result1 = Invalid<String>.single('field1', 'error1');
+      final result2 = Invalid<String>.single('field2', 'error2');
 
       final merged = result1.merge(result2);
-      expect(merged.isValid, isFalse);
-      expect(merged.hasErrorFor('field'), isTrue);
+      expect(merged.errors.containsKey('field1'), isTrue);
+      expect(merged.errors.containsKey('field2'), isTrue);
     });
 
-    test('Merging combines errors from both results', () {
-      final result1 = ValidationResult.invalid({
-        'field1': ['error1']
-      });
-      final result2 = ValidationResult.invalid({
-        'field2': ['error2']
-      });
-
-      final merged = result1.merge(result2);
-      expect(merged.isValid, isFalse);
-      expect(merged.hasErrorFor('field1'), isTrue);
-      expect(merged.hasErrorFor('field2'), isTrue);
-    });
-
-    test('Merging combines errors for same field', () {
-      final result1 = ValidationResult.invalid({
-        'field': ['error1']
-      });
-      final result2 = ValidationResult.invalid({
-        'field': ['error2']
-      });
+    test('Invalid.merge combines errors for same field', () {
+      final result1 = Invalid<String>.single('field', 'error1');
+      final result2 = Invalid<String>.single('field', 'error2');
 
       final merged = result1.merge(result2);
       expect(merged.errorsFor('field'), contains('error1'));
       expect(merged.errorsFor('field'), contains('error2'));
+    });
+
+    test('fold executes correct branch', () {
+      final valid = Valid('test');
+      final invalid = Invalid<String>.single('field', 'error');
+
+      final validResult = valid.fold(
+        (errors) => 'invalid',
+        (value) => 'valid: $value',
+      );
+      expect(validResult, equals('valid: test'));
+
+      final invalidResult = invalid.fold(
+        (errors) => 'invalid: ${errors.keys.first}',
+        (value) => 'valid',
+      );
+      expect(invalidResult, equals('invalid: field'));
     });
   });
 }

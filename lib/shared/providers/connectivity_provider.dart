@@ -24,7 +24,11 @@ final isOnlineProvider = Provider<bool>((ref) {
 });
 
 /// Provider for connectivity service with additional utilities.
-final connectivityServiceProvider = Provider<ConnectivityService>((ref) => ConnectivityService(ref.watch(connectivityProvider)));
+final connectivityServiceProvider = Provider<ConnectivityService>((ref) {
+  final service = ConnectivityService(ref.watch(connectivityProvider));
+  ref.onDispose(service.dispose);
+  return service;
+});
 
 /// Callback type for sync operations.
 typedef SyncCallback = Future<void> Function();

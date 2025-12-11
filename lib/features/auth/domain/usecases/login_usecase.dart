@@ -1,3 +1,4 @@
+import 'package:flutter_base_2025/core/constants/validation_patterns.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
@@ -6,7 +7,6 @@ import 'package:flutter_base_2025/features/auth/domain/repositories/auth_reposit
 /// Use case for user login.
 /// Pure Dart - no external dependencies.
 class LoginUseCase {
-
   LoginUseCase(this._repository);
   final AuthRepository _repository;
 
@@ -56,5 +56,6 @@ class LoginUseCase {
     return null;
   }
 
-  bool _isValidEmail(String email) => RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
+  /// Uses shared ValidationPatterns to avoid regex duplication.
+  bool _isValidEmail(String email) => ValidationPatterns.email.hasMatch(email);
 }

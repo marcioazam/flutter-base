@@ -129,7 +129,7 @@ class AnalyticsNavigatorObserver extends NavigatorObserver {
     }
     _analytics.logScreenView(
       screenName: screenName,
-      screenClass: route.runtimeType.toString(),
+      // Note: Removed runtimeType.toString() as it's unsafe in production
     );
   }
 }

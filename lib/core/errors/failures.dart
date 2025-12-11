@@ -77,6 +77,14 @@ final class ValidationFailure extends AppFailure {
 }
 
 /// Falha de autenticação (token inválido, expirado, etc).
+/// 
+/// Use cases:
+/// - Token refresh failed
+/// - Invalid credentials
+/// - OAuth flow failed
+/// 
+/// See also: [UnauthorizedFailure] for 401 HTTP responses,
+/// [SessionExpiredFailure] for explicit session timeout.
 final class AuthFailure extends AppFailure {
   const AuthFailure(
     super.message, {
@@ -187,7 +195,14 @@ final class UnexpectedFailure extends AppFailure {
   String get userMessage => 'Erro inesperado. Tente novamente.';
 }
 
-/// Falha de não autorizado (401).
+/// Falha de não autorizado (401 HTTP response).
+/// 
+/// Use cases:
+/// - API returns 401 status code
+/// - Missing or invalid Authorization header
+/// 
+/// See also: [AuthFailure] for authentication flow failures,
+/// [SessionExpiredFailure] for explicit session timeout.
 final class UnauthorizedFailure extends AppFailure {
   const UnauthorizedFailure(
     super.message, {
@@ -200,7 +215,15 @@ final class UnauthorizedFailure extends AppFailure {
   String get userMessage => 'Não autorizado. Faça login novamente.';
 }
 
-/// Falha de sessão expirada.
+/// Falha de sessão expirada (explicit timeout).
+/// 
+/// Use cases:
+/// - JWT token expired (detected client-side)
+/// - Session timeout from server
+/// - Refresh token expired
+/// 
+/// See also: [AuthFailure] for authentication flow failures,
+/// [UnauthorizedFailure] for 401 HTTP responses.
 final class SessionExpiredFailure extends AppFailure {
   const SessionExpiredFailure(
     super.message, {
@@ -237,4 +260,21 @@ final class CacheExpiredFailure extends AppFailure {
 
   @override
   String get userMessage => 'Dados em cache expiraram.';
+}
+
+
+/// Failure when circuit breaker is open.
+/// 
+/// **Feature: flutter-2025-final-enhancements**
+/// **Validates: Requirements 5.3**
+final class CircuitOpenFailure extends AppFailure {
+  const CircuitOpenFailure(
+    super.message, {
+    super.code,
+    super.stackTrace,
+    super.context,
+  });
+
+  @override
+  String get userMessage => 'Serviço temporariamente indisponível. Tente novamente em alguns segundos.';
 }

@@ -4,8 +4,6 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-import 'package:flutter_base_2025/core/observability/app_logger.dart';
-
 /// Device information.
 /// 
 /// **Feature: flutter-state-of-art-2025**
