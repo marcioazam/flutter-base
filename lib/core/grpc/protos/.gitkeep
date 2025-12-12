@@ -1,0 +1,2 @@
+# Proto files for gRPC service definitions go here
+# Run protoc to generate Dart client stubs

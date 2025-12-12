@@ -1,3 +1,4 @@
+import 'package:flutter_base_2025/core/generics/cache_entry.dart';
 import 'package:flutter_base_2025/core/generics/cache_repository.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';

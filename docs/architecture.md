@@ -59,6 +59,45 @@ graph TB
 | Data | Domain, Core | Repository Impl, DataSources, DTOs |
 | Core | Nothing | Utils, Config, Network, Theme |
 
+## Communication Protocols
+
+### REST API (Dio)
+Primary communication with Python backend via HTTP/REST.
+
+### gRPC (grpc-dart)
+High-performance RPC for microservices communication.
+
+```mermaid
+graph LR
+    App[Flutter App] --> GrpcClient[GrpcClient]
+    GrpcClient --> AuthInterceptor[GrpcAuthInterceptor]
+    AuthInterceptor --> Channel[ClientChannel]
+    Channel --> Server[gRPC Server]
+```
+
+Components in `lib/core/grpc/`:
+- `GrpcClient`: Channel management with TLS
+- `GrpcAuthInterceptor`: Token attachment
+- `GrpcStatusMapper`: Error mapping to AppFailure
+- `GrpcConfig`: Environment configuration
+
+### Offline Cache (Hive)
+Local key-value storage for offline-first experience.
+
+```mermaid
+graph TB
+    Repo[CompositeRepository] --> Cache[HiveCacheDataSource]
+    Repo --> Remote[RemoteDataSource]
+    Cache --> Box[Hive Box]
+    Box --> Encrypted[Encrypted Storage]
+```
+
+Components in `lib/core/cache/`:
+- `HiveInitializer`: Initialization with encryption
+- `HiveCacheDataSource<T>`: Generic cache with TTL
+- `HiveCacheEntry<T>`: Entry with expiration metadata
+- `HiveCacheConfig`: TTL and encryption settings
+
 ## Key Patterns
 
 ### Result<T>

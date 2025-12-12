@@ -214,7 +214,7 @@ final class LoginNotifierProvider
   LoginNotifier create() => LoginNotifier();
 }
 
-String _$loginNotifierHash() => r'76445cab7c5ec21a75e2db476cb5c628ff7a4505';
+String _$loginNotifierHash() => r'1c32d6ecc5c956f2356282ec8728a31bbd194a98';
 
 /// Notifier for login operations with cleanup.
 

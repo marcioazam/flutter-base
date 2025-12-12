@@ -11,6 +11,8 @@ Flutter Base 2025 is a production-ready Flutter template implementing Clean Arch
 - Type-safe architecture with generic patterns (Repository, UseCase, Result monad)
 - 100% code generation: Freezed (DTOs), Riverpod (providers), Drift (database), go_router (navigation)
 - Property-based testing for mathematical invariants (36+ test suites)
+- gRPC support for high-performance microservices communication
+- Hive offline cache for seamless offline-first experience
 
 ## Development Commands
 
@@ -141,6 +143,72 @@ Routes are defined in `lib/core/router/app_router.dart`:
 - Route guards handle authentication checks
 - ShellRoute provides persistent bottom navigation
 - Use `context.go(RoutePaths.home)` or `context.pushNamed(RouteNames.profile)`
+
+### gRPC Client (grpc-dart 4.x)
+
+gRPC infrastructure is in `lib/core/grpc/`:
+
+**Components:**
+- `GrpcClient`: Centralized channel management with TLS support
+- `GrpcAuthInterceptor`: Attaches Bearer tokens from TokenStorage
+- `GrpcStatusMapper`: Converts gRPC status codes to AppFailure types
+- `GrpcConfig`: Configuration (host, port, TLS, timeout, retries)
+
+**Usage:**
+```dart
+// Get gRPC client from provider
+final grpcClient = ref.watch(grpcClientProvider);
+
+// Create a service stub
+final stub = grpcClient.createStub((channel) => MyServiceClient(channel));
+
+// Make calls (errors automatically mapped to AppFailure)
+try {
+  final response = await stub.myMethod(request);
+} on GrpcError catch (e) {
+  final failure = GrpcStatusMapper.mapGrpcError(e);
+  // Handle failure...
+}
+```
+
+**Proto files:** Place `.proto` files in `lib/core/grpc/protos/` and run protoc to generate Dart stubs.
+
+### Hive Offline Cache
+
+Hive cache infrastructure is in `lib/core/cache/`:
+
+**Components:**
+- `HiveInitializer`: Initialize Hive with encryption support
+- `HiveCacheDataSource<T>`: Generic cache with TTL support
+- `HiveCacheEntry<T>`: Cache entry with expiration metadata
+- `HiveCacheConfig`: Configuration (TTL, max entries, encryption)
+
+**Usage:**
+```dart
+// Initialize Hive (in app startup)
+await HiveInitializer.init();
+
+// Open a cache box
+final box = await HiveInitializer.openBox<Map<dynamic, dynamic>>('my_cache');
+
+// Create data source
+final cache = HiveCacheDataSource<User>(
+  box: box,
+  fromJson: User.fromJson,
+  toJson: (u) => u.toJson(),
+);
+
+// Store with TTL
+await cache.put('user_123', user, ttl: Duration(hours: 1));
+
+// Retrieve (returns null if expired)
+final cached = await cache.getData('user_123');
+
+// Retrieve stale data (for offline fallback)
+final stale = await cache.getData('user_123', allowStale: true);
+```
+
+**Encrypted boxes:** Use `HiveInitializer.openEncryptedBox()` for sensitive data.
 
 ### Error Handling
 
