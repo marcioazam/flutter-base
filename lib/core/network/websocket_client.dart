@@ -23,7 +23,7 @@ class ReconnectStrategy {
   /// Calculates delay for attempt n (0-indexed).
   Duration getDelay(int attempt) {
     final multiplier = backoffMultiplier == 1.0 ? 1 : (1 << attempt).clamp(1, 1000);
-    final delayMs = (initialDelay.inMilliseconds * multiplier).toInt();
+    final delayMs = initialDelay.inMilliseconds * multiplier;
     return Duration(
       milliseconds: delayMs.clamp(
         initialDelay.inMilliseconds,
@@ -108,7 +108,7 @@ class WebSocketClient<T> {
         // ignore: avoid_print
         print('WebSocket connection error: $e');
         return true;
-      }());
+      }(), 'WebSocket connection error');
       _setState(WebSocketState.disconnected);
       _scheduleReconnect();
     }
@@ -118,7 +118,11 @@ class WebSocketClient<T> {
   Future<void> disconnect() async {
     _reconnectTimer?.cancel();
     _pingTimer?.cancel();
-    _subscription?.cancel();
+    final subscription = _subscription;
+    if (subscription != null) {
+      await subscription.cancel();
+    }
+    _subscription = null;
 
     await _channel?.sink.close();
     _channel = null;
@@ -148,6 +152,10 @@ class WebSocketClient<T> {
 
   /// Disposes resources.
   Future<void> dispose() async {
+    if (_subscription != null) {
+      await _subscription!.cancel();
+      _subscription = null;
+    }
     await disconnect();
     await _messageController.close();
     await _stateController.close();
@@ -155,10 +163,16 @@ class WebSocketClient<T> {
 
   void _onMessage(dynamic data) {
     try {
-      final json = jsonDecode(data as String) as Map<String, dynamic>;
-      final message = fromJson(json);
+      if (data is! String) {
+        return;
+      }
+      final decoded = jsonDecode(data);
+      if (decoded is! Map<String, dynamic>) {
+        return;
+      }
+      final message = fromJson(decoded);
       _messageController.add(message);
-    } catch (e) {
+    } on Exception catch (_) {
       // Log error but don't crash
     }
   }
@@ -183,7 +197,7 @@ class WebSocketClient<T> {
     final delay = _calculateBackoff();
     _reconnectTimer = Timer(delay, () {
       _reconnectAttempts++;
-      connect();
+      unawaited(connect());
     });
   }
 

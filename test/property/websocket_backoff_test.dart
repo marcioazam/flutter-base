@@ -1,9 +1,9 @@
 import 'package:flutter_base_2025/core/network/websocket_client.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
-final _explore = ExploreConfig(numRuns: 100);
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-generics-production-2025, Property 8: WebSocket Reconnection Backoff**
 /// **Validates: Requirements 15.1, 15.4**
@@ -19,9 +19,7 @@ void main() {
       (attempt) {
         const strategy = ReconnectStrategy(
           initialDelay: Duration(milliseconds: 100),
-          backoffMultiplier: 2.0,
           maxDelay: Duration(seconds: 5),
-          maxAttempts: 10,
         );
 
         final delay = strategy.getDelay(attempt);
@@ -37,8 +35,6 @@ void main() {
     test('First attempt uses initial delay', () {
       const strategy = ReconnectStrategy(
         initialDelay: Duration(milliseconds: 500),
-        backoffMultiplier: 2.0,
-        maxDelay: Duration(seconds: 30),
       );
 
       final delay = strategy.getDelay(0);
@@ -48,8 +44,6 @@ void main() {
     test('Delay doubles with each attempt (multiplier 2.0)', () {
       const strategy = ReconnectStrategy(
         initialDelay: Duration(milliseconds: 100),
-        backoffMultiplier: 2.0,
-        maxDelay: Duration(seconds: 30),
       );
 
       final delay0 = strategy.getDelay(0);
@@ -64,7 +58,6 @@ void main() {
     test('Delay is capped at maxDelay', () {
       const strategy = ReconnectStrategy(
         initialDelay: Duration(milliseconds: 100),
-        backoffMultiplier: 2.0,
         maxDelay: Duration(milliseconds: 500),
       );
 

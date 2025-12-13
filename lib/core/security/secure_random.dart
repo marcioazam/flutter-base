@@ -102,12 +102,10 @@ class DefaultSecureRandom implements SecureRandom {
       'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
 
   @override
-  String generateString(int length) {
-    return List.generate(
+  String generateString(int length) => List.generate(
       length,
       (_) => _chars[_secureRandom.nextInt(_chars.length)],
     ).join();
-  }
 
   @override
   String generateToken() => generateString(32);

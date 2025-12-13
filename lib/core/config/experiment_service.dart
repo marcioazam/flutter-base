@@ -55,11 +55,12 @@ class Experiment<T> {
   }
 
   Variant<T>? getVariantByName(String variantName) {
-    try {
-      return variants.firstWhere((v) => v.name == variantName);
-    } on StateError {
-      return null;
+    for (final variant in variants) {
+      if (variant.name == variantName) {
+        return variant;
+      }
     }
+    return null;
   }
 }
 
@@ -147,12 +148,32 @@ class LocalExperimentService implements ExperimentService {
     final stored = _prefs?.getString(_assignmentsKey);
     if (stored != null) {
       try {
-        final decoded = jsonDecode(stored) as Map<String, dynamic>;
-        _assignments.addAll(decoded.cast<String, String>());
+        final decoded = jsonDecode(stored);
+        if (decoded is! Map) {
+          AppLogger.instance.warning(
+            'Type error in experiment assignments: Expected JSON object',
+          );
+          return;
+        }
+
+        var hasInvalidEntry = false;
+        for (final entry in decoded.entries) {
+          final key = entry.key;
+          final value = entry.value;
+          if (key is String && value is String) {
+            _assignments[key] = value;
+          } else {
+            hasInvalidEntry = true;
+          }
+        }
+
+        if (hasInvalidEntry) {
+          AppLogger.instance.warning(
+            'Type error in experiment assignments: Invalid entry types',
+          );
+        }
       } on FormatException catch (e) {
         AppLogger.instance.warning('Invalid JSON in experiment assignments: ${e.message}');
-      } on TypeError catch (e) {
-        AppLogger.instance.warning('Type error in experiment assignments: $e');
       } on Exception catch (e) {
         AppLogger.instance.warning('Failed to load experiment assignments: $e');
       }

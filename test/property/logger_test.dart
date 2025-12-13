@@ -1,12 +1,12 @@
 import 'package:flutter_base_2025/core/observability/app_logger.dart';
 import 'package:flutter_base_2025/core/observability/performance_monitor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 import 'package:logger/logger.dart';
 import 'package:mocktail/mocktail.dart' hide any;
 
 // Configure Glados for 100 iterations
-final _explore = ExploreConfig(numRuns: 100);
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-state-of-art-2025-final, Logging and Monitoring Tests**
 /// **Validates: Requirements 14.1, 15.5**
@@ -292,7 +292,7 @@ Map<String, dynamic> _redactSensitiveData(Map<String, dynamic> data) {
 
   bool isSensitiveKey(String key) {
     final lowerKey = key.toLowerCase();
-    return sensitiveFields.any((field) => lowerKey.contains(field));
+    return sensitiveFields.any(lowerKey.contains);
   }
 
   bool containsSensitivePattern(String value) {

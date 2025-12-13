@@ -1,5 +1,5 @@
 import 'package:flutter_base_2025/core/network/api_client.dart';
-import 'package:flutter_base_2025/features/auth/data/models/user_dto.dart';
+import 'package:flutter_base_2025/features/auth/data/dtos/user_dto.dart';
 
 /// Remote data source for authentication.
 abstract interface class AuthRemoteDataSource {

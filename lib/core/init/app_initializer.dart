@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_base_2025/core/config/app_config.dart';
+import 'package:flutter_base_2025/core/config/feature_flags.dart';
 import 'package:flutter_base_2025/core/observability/analytics_service.dart';
 import 'package:flutter_base_2025/core/observability/app_logger.dart';
 import 'package:flutter_base_2025/core/observability/crash_reporter.dart';
-import 'package:flutter_base_2025/core/observability/feature_flags.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 /// Initialization step with name and action.
@@ -61,7 +61,7 @@ class AppInitializer {
         onProgress?.call(step.name, currentStep / steps.length);
         await step.action();
         currentStep++;
-      } catch (e, st) {
+      } on Exception catch (e, st) {
         stopwatch.stop();
         // Only log detailed errors in non-production
         if (flavor != Flavor.production) {

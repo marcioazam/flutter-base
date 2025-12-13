@@ -25,6 +25,7 @@ class HiveCacheDataSource<T> {
   final T Function(Map<String, dynamic>) _fromJson;
   final Map<String, dynamic> Function(T) _toJson;
   final HiveCacheConfig _config;
+  Timer? _cleanupTimer;
 
   /// Get a cached entry by key.
   /// Returns null if not found or expired.
@@ -37,14 +38,16 @@ class HiveCacheDataSource<T> {
       final entry = HiveCacheEntry.fromJson(json, _fromJson);
 
       if (entry.isExpired && !allowStale) {
-        // Optionally delete expired entry
         await delete(key);
         return null;
       }
 
       return entry;
-    } catch (e) {
-      // Invalid data, remove it
+    } on FormatException {
+      await delete(key);
+      return null;
+    } on Exception {
+      // Catch any other parsing/casting exceptions
       await delete(key);
       return null;
     }
@@ -57,7 +60,12 @@ class HiveCacheDataSource<T> {
   }
 
   /// Store a value with optional TTL.
+  /// Automatically evicts oldest entries if maxEntries is exceeded.
   Future<void> put(String key, T value, {Duration? ttl}) async {
+    if (_box.length >= _config.maxEntries && !_box.containsKey(key)) {
+      await _evictOldest();
+    }
+
     final entry = HiveCacheEntry.withTtl(
       data: value,
       ttl: ttl ?? _config.defaultTtl,
@@ -66,6 +74,52 @@ class HiveCacheDataSource<T> {
 
     final json = entry.toJson(_toJson);
     await _box.put(key, json);
+  }
+
+  /// Store multiple values at once.
+  Future<void> putAll(Map<String, T> entries, {Duration? ttl}) async {
+    for (final entry in entries.entries) {
+      await put(entry.key, entry.value, ttl: ttl);
+    }
+  }
+
+  /// Get multiple values at once.
+  Future<Map<String, T?>> getMany(
+    List<String> keys, {
+    bool allowStale = false,
+  }) async {
+    final results = <String, T?>{};
+    for (final key in keys) {
+      results[key] = await getData(key, allowStale: allowStale);
+    }
+    return results;
+  }
+
+  /// Evict the oldest entry based on cachedAt timestamp.
+  Future<void> _evictOldest() async {
+    String? oldestKey;
+    DateTime? oldestTime;
+
+    for (final key in keys) {
+      final raw = _box.get(key);
+      if (raw == null) continue;
+
+      try {
+        final json = Map<String, dynamic>.from(raw);
+        final cachedAt = DateTime.parse(json['cachedAt'] as String);
+        if (oldestTime == null || cachedAt.isBefore(oldestTime)) {
+          oldestTime = cachedAt;
+          oldestKey = key;
+        }
+      } on FormatException {
+        await delete(key);
+        return;
+      }
+    }
+
+    if (oldestKey != null) {
+      await delete(oldestKey);
+    }
   }
 
   /// Delete an entry by key.
@@ -93,7 +147,7 @@ class HiveCacheDataSource<T> {
       final json = Map<String, dynamic>.from(raw);
       final expiresAt = DateTime.parse(json['expiresAt'] as String);
       return DateTime.now().isAfter(expiresAt);
-    } catch (e) {
+    } on FormatException {
       return true;
     }
   }
@@ -105,20 +159,16 @@ class HiveCacheDataSource<T> {
   int get length => _box.length;
 
   /// Watch for changes to a specific key.
-  Stream<T?> watch(String key) {
-    return _box.watch(key: key).asyncMap((event) async {
-      if (event.deleted || event.value == null) {
-        return null;
-      }
-      final entry = await get(key);
-      return entry?.data;
-    });
-  }
+  Stream<T?> watch(String key) => _box.watch(key: key).asyncMap((event) async {
+        if (event.deleted || event.value == null) {
+          return null;
+        }
+        final entry = await get(key);
+        return entry?.data;
+      });
 
   /// Watch for any changes in the cache.
-  Stream<BoxEvent> watchAll() {
-    return _box.watch();
-  }
+  Stream<BoxEvent> watchAll() => _box.watch();
 
   /// Remove all expired entries.
   Future<int> removeExpired() async {
@@ -151,5 +201,24 @@ class HiveCacheDataSource<T> {
     }
 
     return entries;
+  }
+
+  /// Start periodic cleanup of expired entries.
+  void startPeriodicCleanup({
+    Duration interval = const Duration(hours: 1),
+  }) {
+    _cleanupTimer?.cancel();
+    _cleanupTimer = Timer.periodic(interval, (_) => removeExpired());
+  }
+
+  /// Stop periodic cleanup.
+  void stopPeriodicCleanup() {
+    _cleanupTimer?.cancel();
+    _cleanupTimer = null;
+  }
+
+  /// Dispose resources (stop cleanup timer).
+  void dispose() {
+    stopPeriodicCleanup();
   }
 }

@@ -1,9 +1,8 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-
 import 'package:flutter_base_2025/core/grpc/grpc_client.dart';
 import 'package:flutter_base_2025/core/grpc/grpc_config.dart';
 import 'package:flutter_base_2025/core/storage/token_storage.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockTokenStorage extends Mock implements TokenStorage {}
 
@@ -124,6 +123,52 @@ void main() {
       );
 
       expect(client.defaultCallOptions.timeout, const Duration(seconds: 60));
+    });
+
+    test('config getter returns the configuration', () {
+      final client = GrpcClient(
+        config: config,
+        tokenStorage: mockTokenStorage,
+      );
+
+      expect(client.config, config);
+      expect(client.config.host, 'localhost');
+      expect(client.config.port, 50051);
+    });
+
+    test('callWithRetry succeeds on first attempt', () async {
+      final client = GrpcClient(
+        config: config,
+        tokenStorage: mockTokenStorage,
+      );
+
+      var callCount = 0;
+      final result = await client.callWithRetry(() async {
+        callCount++;
+        return 'success';
+      });
+
+      expect(result, 'success');
+      expect(callCount, 1);
+    });
+
+    test('callWithRetry respects maxRetries parameter', () async {
+      final client = GrpcClient(
+        config: config,
+        tokenStorage: mockTokenStorage,
+      );
+
+      var callCount = 0;
+      final result = await client.callWithRetry(
+        () async {
+          callCount++;
+          return 'success';
+        },
+        maxRetries: 5,
+      );
+
+      expect(result, 'success');
+      expect(callCount, 1);
     });
   });
 

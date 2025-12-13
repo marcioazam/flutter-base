@@ -1,4 +1,4 @@
-import 'package:flutter_base_2025/integrations/auth/social_auth_service.dart';
+import 'package:flutter_base_2025/core/integrations/auth/social_auth_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-state-of-art-2025, Property 5: Social Token Exchange**

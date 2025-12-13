@@ -2,10 +2,10 @@ import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/generics/base_usecase.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
-final _explore = ExploreConfig(numRuns: 100);
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-modernization-2025, Property 5: UseCase Return Type Consistency**
 /// **Validates: Requirements 14.1, 14.3**

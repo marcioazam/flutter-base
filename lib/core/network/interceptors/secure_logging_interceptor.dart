@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:logger/logger.dart';
-import 'package:uuid/uuid.dart';
 
 /// Secure logging interceptor that sanitizes sensitive data.
 ///
@@ -27,7 +26,6 @@ class SecureLoggingInterceptor extends Interceptor {
   final bool enableLogging;
   final int maxBodyLength;
   final Logger _logger;
-  final _uuid = const Uuid();
 
   /// Sensitive headers that should be redacted.
   static const _sensitiveHeaders = {
@@ -59,7 +57,7 @@ class SecureLoggingInterceptor extends Interceptor {
       return;
     }
 
-    final correlationId = _uuid.v4().substring(0, 8);
+    final correlationId = _generateCorrelationId();
     options.headers['X-Correlation-ID'] = correlationId;
 
     _logger.d(
@@ -111,15 +109,13 @@ class SecureLoggingInterceptor extends Interceptor {
   }
 
   /// Sanitizes headers by redacting sensitive ones.
-  Map<String, dynamic> _sanitizeHeaders(Map<String, dynamic> headers) {
-    return headers.map((key, value) {
+  Map<String, dynamic> _sanitizeHeaders(Map<String, dynamic> headers) => headers.map((key, value) {
       final lowerKey = key.toLowerCase();
       if (_sensitiveHeaders.contains(lowerKey)) {
         return MapEntry(key, '***REDACTED***');
       }
       return MapEntry(key, value);
     });
-  }
 
   /// Sanitizes request/response body by masking sensitive fields.
   String _sanitizeBody(dynamic data) {
@@ -135,9 +131,17 @@ class SecureLoggingInterceptor extends Interceptor {
       }
 
       return json;
-    } catch (e) {
+    } on Exception {
       return '<non-serializable: ${data.runtimeType}>';
     }
+  }
+
+  String _generateCorrelationId() {
+    final microsHex = DateTime.now().microsecondsSinceEpoch.toRadixString(16);
+    if (microsHex.length <= 8) {
+      return microsHex.padLeft(8, '0');
+    }
+    return microsHex.substring(microsHex.length - 8);
   }
 
   /// Recursively sanitizes data structures.

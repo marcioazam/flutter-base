@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter_base_2025/core/config/retry_config.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
@@ -15,10 +14,8 @@ void main() {
     Glados(any.intInRange(0, 10)).test(
       'Exponential backoff doubles delay with each retry',
       (retryCount) {
-        const baseDelay = Duration(milliseconds: 200);
         final delay = calculateExponentialBackoff(
           retryCount: retryCount,
-          baseDelay: baseDelay,
         );
 
         final expectedMs = 200 * (1 << retryCount);
@@ -75,7 +72,7 @@ void main() {
 extension JitterGenerators on Any {
   Generator<({int attempt, double jitterFactor})> get jitterParams => combine2(
         intInRange(0, 10),
-        doubleInRange(0.0, 1.0),
+        doubleInRange(0, 1),
         (attempt, jitter) => (attempt: attempt, jitterFactor: jitter),
       );
 }
@@ -99,8 +96,6 @@ void _jitterBoundsTests() {
         for (var i = 0; i < 100; i++) {
           final delay = calculateBackoffWithJitter(
             attempt: params.attempt,
-            baseDelay: baseDelay,
-            maxDelay: maxDelay,
             jitterFactor: params.jitterFactor,
           );
           
@@ -126,7 +121,6 @@ void _jitterBoundsTests() {
           final delay = calculateBackoffWithJitter(
             attempt: attempt,
             maxDelay: maxDelay,
-            jitterFactor: 0.5,
           );
           
           expect(
@@ -144,8 +138,7 @@ void _jitterBoundsTests() {
       for (var attempt = 0; attempt < 5; attempt++) {
         final delay = calculateBackoffWithJitter(
           attempt: attempt,
-          baseDelay: baseDelay,
-          jitterFactor: 0.0,
+          jitterFactor: 0,
         );
         
         final expected = baseDelay.inMilliseconds * (1 << attempt);

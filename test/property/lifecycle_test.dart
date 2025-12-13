@@ -1,4 +1,4 @@
-import 'package:flutter_base_2025/core/utils/app_lifecycle_service.dart';
+import 'package:flutter_base_2025/core/services/lifecycle/app_lifecycle_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 /// **Feature: flutter-state-of-art-2025, Property 10: Lifecycle Refresh Trigger**

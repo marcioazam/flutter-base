@@ -1,7 +1,7 @@
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -304,7 +304,7 @@ void main() {
     Glados<int>(any.int, _explore).test(
       'Result.fromCondition returns Success when condition is true',
       (value) {
-        final result = Result.fromCondition(true, () => value);
+        final result = Result.fromCondition(condition: true, value: () => value);
         expect(result.isSuccess, isTrue);
         expect(result.valueOrNull, equals(value));
       },
@@ -313,7 +313,7 @@ void main() {
     Glados<int>(any.int, _explore).test(
       'Result.fromCondition returns Failure when condition is false',
       (value) {
-        final result = Result.fromCondition(false, () => value);
+        final result = Result.fromCondition(condition: false, value: () => value);
         expect(result.isFailure, isTrue);
         expect(result.failureOrNull, isA<ValidationFailure>());
       },

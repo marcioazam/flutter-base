@@ -1,9 +1,9 @@
 import 'package:flutter_base_2025/core/observability/performance_monitor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
-final _explore = ExploreConfig(numRuns: 100);
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-2025-final-polish, Property 8: Performance Monitor Tests**
 /// **Validates: Requirements 12.4**

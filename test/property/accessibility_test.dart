@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base_2025/core/theme/accessibility.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 /// **Feature: flutter-state-of-art-analysis-2025, Accessibility Properties**
 void main() {

@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
-final _explore = ExploreConfig(numRuns: 100);
+final _explore = ExploreConfig();
 
 /// Conflict resolution strategies for sync operations.
 enum ConflictResolution {

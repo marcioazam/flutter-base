@@ -7,6 +7,7 @@
 library;
 
 import 'package:flutter_base_2025/core/constants/validation_patterns.dart';
+import 'package:meta/meta.dart';
 
 /// Validator function type that returns a ValidationResult.
 typedef Validator<T> = ValidationResult<T> Function(T value);
@@ -35,6 +36,7 @@ sealed class ValidationResult<T> {
 }
 
 /// Represents a successful validation with the validated value.
+@immutable
 final class Valid<T> extends ValidationResult<T> {
   const Valid(this.value);
   final T value;
@@ -69,6 +71,7 @@ final class Valid<T> extends ValidationResult<T> {
 }
 
 /// Represents a failed validation with field-specific errors.
+@immutable
 final class Invalid<T> extends ValidationResult<T> {
   const Invalid(this.errors);
 

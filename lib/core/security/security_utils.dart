@@ -11,6 +11,7 @@ import 'package:flutter_base_2025/core/security/certificate_pinning_service.dart
 @Deprecated('Use CertificatePinningService for production certificate pinning')
 class CertificatePinConfig {
 
+  @Deprecated('Use CertificatePinningService for production certificate pinning')
   const CertificatePinConfig({
     required this.pinnedCertificates,
     this.allowBadCertificates = false,
@@ -155,7 +156,7 @@ abstract final class DeepLinkValidator {
       }
 
       return true;
-    } catch (e) {
+    } on FormatException {
       return false;
     }
   }
@@ -167,7 +168,7 @@ abstract final class DeepLinkValidator {
     try {
       final uri = Uri.parse(url);
       return uri.path;
-    } catch (e) {
+    } on FormatException {
       return null;
     }
   }
@@ -184,7 +185,7 @@ abstract final class DeepLinkValidator {
           InputSanitizer.sanitizeHtml(value),
         ),
       );
-    } catch (e) {
+    } on FormatException {
       return null;
     }
   }

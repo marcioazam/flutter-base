@@ -153,7 +153,7 @@ class LocalNotificationServiceImpl implements LocalNotificationService {
       // );
 
       return const Success(null);
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(UnexpectedFailure('Notification init failed: $e'));
     }
   }
@@ -197,7 +197,7 @@ class LocalNotificationServiceImpl implements LocalNotificationService {
       // );
 
       return const Success(null);
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(UnexpectedFailure('Show notification failed: $e'));
     }
   }
@@ -221,7 +221,7 @@ class LocalNotificationServiceImpl implements LocalNotificationService {
       // );
 
       return const Success(null);
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(UnexpectedFailure('Schedule notification failed: $e'));
     }
   }
@@ -242,7 +242,7 @@ class LocalNotificationServiceImpl implements LocalNotificationService {
       // );
 
       return const Success(null);
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(UnexpectedFailure('Schedule recurring failed: $e'));
     }
   }

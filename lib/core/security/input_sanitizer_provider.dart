@@ -31,6 +31,4 @@ part 'input_sanitizer_provider.g.dart';
 /// });
 /// ```
 @riverpod
-InputSanitizer inputSanitizer(InputSanitizerRef ref) {
-  return const DefaultInputSanitizer();
-}
+InputSanitizer inputSanitizer(Ref ref) => const DefaultInputSanitizer();

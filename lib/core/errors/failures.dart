@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 
 /// Base class para todas as falhas da aplicação.
 /// Usa sealed class para pattern matching exaustivo.
-sealed class AppFailure extends Equatable {
+sealed class AppFailure extends Equatable implements Exception {
 
   const AppFailure(
     this.message, {

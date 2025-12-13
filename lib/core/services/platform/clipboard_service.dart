@@ -48,8 +48,12 @@ class ClipboardServiceImpl implements ClipboardService {
     try {
       await Clipboard.setData(ClipboardData(text: text));
       return const Success(null);
-    } catch (e) {
-      return Failure(UnexpectedFailure('Copy failed: $e'));
+    } on PlatformException catch (e) {
+      return Failure(UnexpectedFailure('Platform clipboard error: ${e.message}'));
+    } on MissingPluginException catch (e) {
+      return Failure(UnexpectedFailure('Clipboard plugin not available: ${e.message}'));
+    } on Object catch (e) {
+      return Failure(UnexpectedFailure('Unexpected clipboard error: $e'));
     }
   }
 
@@ -65,8 +69,12 @@ class ClipboardServiceImpl implements ClipboardService {
       _clearTimer = Timer(config.sensitiveDataTimeout, clear);
 
       return const Success(null);
-    } catch (e) {
-      return Failure(UnexpectedFailure('Copy sensitive failed: $e'));
+    } on PlatformException catch (e) {
+      return Failure(UnexpectedFailure('Platform clipboard error: ${e.message}'));
+    } on MissingPluginException catch (e) {
+      return Failure(UnexpectedFailure('Clipboard plugin not available: ${e.message}'));
+    } on Object catch (e) {
+      return Failure(UnexpectedFailure('Unexpected clipboard error: $e'));
     }
   }
 
@@ -75,8 +83,12 @@ class ClipboardServiceImpl implements ClipboardService {
     try {
       final data = await Clipboard.getData(Clipboard.kTextPlain);
       return Success(data?.text);
-    } catch (e) {
-      return Failure(UnexpectedFailure('Get clipboard failed: $e'));
+    } on PlatformException catch (e) {
+      return Failure(UnexpectedFailure('Platform clipboard error: ${e.message}'));
+    } on MissingPluginException catch (e) {
+      return Failure(UnexpectedFailure('Clipboard plugin not available: ${e.message}'));
+    } on Object catch (e) {
+      return Failure(UnexpectedFailure('Unexpected clipboard error: $e'));
     }
   }
 
@@ -85,7 +97,14 @@ class ClipboardServiceImpl implements ClipboardService {
     try {
       final data = await Clipboard.getData(Clipboard.kTextPlain);
       return data?.text?.isNotEmpty ?? false;
-    } catch (e) {
+    } on PlatformException catch (_) {
+      // Platform clipboard unavailable
+      return false;
+    } on MissingPluginException catch (_) {
+      // Clipboard plugin not available
+      return false;
+    } on Object catch (_) {
+      // Any other error
       return false;
     }
   }

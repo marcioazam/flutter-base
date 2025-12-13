@@ -1,6 +1,6 @@
 import 'package:flutter_base_2025/core/network/api_client.dart';
 import 'package:flutter_base_2025/core/storage/token_storage.dart';
-import 'package:flutter_base_2025/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:flutter_base_2025/features/auth/data/data_sources/auth_remote_datasource.dart';
 import 'package:flutter_base_2025/features/auth/domain/repositories/auth_repository.dart';
 import 'package:flutter_base_2025/shared/providers/connectivity_provider.dart';
 import 'package:mocktail/mocktail.dart';

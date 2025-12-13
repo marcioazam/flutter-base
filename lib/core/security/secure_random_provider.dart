@@ -35,6 +35,4 @@ part 'secure_random_provider.g.dart';
 /// This provider creates a new instance for each consumer. For most use cases,
 /// this is acceptable. If you need a singleton instance, use `.keepAlive()`.
 @riverpod
-SecureRandom secureRandom(SecureRandomRef ref) {
-  return DefaultSecureRandom();
-}
+SecureRandom secureRandom(Ref ref) => DefaultSecureRandom();

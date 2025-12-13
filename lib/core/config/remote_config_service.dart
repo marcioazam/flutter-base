@@ -94,13 +94,36 @@ class LocalRemoteConfigService implements RemoteConfigService {
     final cached = _prefs?.getString(_cacheKey);
     if (cached != null) {
       try {
-        final decoded = jsonDecode(cached) as Map<String, dynamic>;
-        _active.addAll(decoded);
-        AppLogger.instance.debug('Loaded cached remote config');
+        final decoded = jsonDecode(cached);
+        if (decoded is Map<String, dynamic>) {
+          _active.addAll(decoded);
+          AppLogger.instance.debug('Loaded cached remote config');
+        } else if (decoded is Map) {
+          final json = <String, dynamic>{};
+          var hasInvalidKeyType = false;
+          for (final entry in decoded.entries) {
+            final key = entry.key;
+            if (key is! String) {
+              hasInvalidKeyType = true;
+              continue;
+            }
+            json[key] = entry.value;
+          }
+
+          _active.addAll(json);
+          AppLogger.instance.debug('Loaded cached remote config');
+          if (hasInvalidKeyType) {
+            AppLogger.instance.warning(
+              'Type error in cached config: Invalid key types',
+            );
+          }
+        } else {
+          AppLogger.instance.warning(
+            'Type error in cached config: Expected JSON object',
+          );
+        }
       } on FormatException catch (e) {
         AppLogger.instance.warning('Invalid JSON in cached config: ${e.message}');
-      } on TypeError catch (e) {
-        AppLogger.instance.warning('Type error in cached config: $e');
       } on Exception catch (e) {
         AppLogger.instance.warning('Failed to load cached config: $e');
       }
@@ -215,10 +238,23 @@ class LocalRemoteConfigService implements RemoteConfigService {
     if (value is Map<String, dynamic>) return value;
     if (value is String) {
       try {
-        return jsonDecode(value) as Map<String, dynamic>;
+        final decoded = jsonDecode(value);
+        if (decoded is Map<String, dynamic>) {
+          return decoded;
+        }
+
+        if (decoded is Map) {
+          final json = <String, dynamic>{};
+          for (final entry in decoded.entries) {
+            final key = entry.key;
+            if (key is! String) {
+              return null;
+            }
+            json[key] = entry.value;
+          }
+          return json;
+        }
       } on FormatException {
-        return null;
-      } on TypeError {
         return null;
       }
     }

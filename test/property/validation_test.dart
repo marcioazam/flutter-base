@@ -1,9 +1,9 @@
 import 'package:flutter_base_2025/core/utils/validation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
-final _explore = ExploreConfig(numRuns: 100);
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-state-of-art-2025-final, Property 14: Validator Composition**
 /// **Validates: Requirements 13.2**
@@ -16,10 +16,10 @@ void main() {
       'compose returns invalid if any validator fails',
       (value) {
         // Create a validator that always fails
-        Validator<String> alwaysFails = (_) => Invalid.single('test', 'Always fails');
+        ValidationResult<Object?> alwaysFails(Object? _) => Invalid.single('test', 'Always fails');
 
         // Create a validator that always passes
-        Validator<String> alwaysPasses = (v) => Valid(v);
+        ValidationResult<Object?> alwaysPasses(Object? v) => Valid(v);
 
         // Composite with one failing validator should be invalid
         final composite = TypedValidators.compose([alwaysPasses, alwaysFails]);
@@ -32,8 +32,8 @@ void main() {
     Glados<String>(any.nonEmptyLetters, _explore).test(
       'compose returns valid only if all validators pass',
       (value) {
-        Validator<String> validator1 = (v) => Valid(v);
-        Validator<String> validator2 = (v) => Valid(v);
+        ValidationResult<Object?> validator1(Object? v) => Valid(v);
+        ValidationResult<Object?> validator2(Object? v) => Valid(v);
 
         final composite = TypedValidators.compose([validator1, validator2]);
         final result = composite(value);
@@ -45,8 +45,8 @@ void main() {
     Glados<String>(any.nonEmptyLetters, _explore).test(
       'compose collects all errors from failing validators',
       (value) {
-        Validator<String> validator1 = (_) => Invalid.single('field1', 'Error 1');
-        Validator<String> validator2 = (_) => Invalid.single('field2', 'Error 2');
+        ValidationResult<Object?> validator1(Object? _) => Invalid.single('field1', 'Error 1');
+        ValidationResult<Object?> validator2(Object? _) => Invalid.single('field2', 'Error 2');
 
         final composite = TypedValidators.compose([validator1, validator2]);
         final result = composite(value);
@@ -162,7 +162,7 @@ void main() {
   group('ValidationResult Properties', () {
     test('Valid and Invalid are exhaustive', () {
       final valid = Valid('test');
-      final invalid = Invalid.single('field', 'error');
+      final invalid = Invalid<String>.single('field', 'error');
 
       expect(valid.isValid, isTrue);
       expect(valid.isInvalid, isFalse);

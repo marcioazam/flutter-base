@@ -1,9 +1,8 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' as glados hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
-import 'package:mocktail/mocktail.dart';
-
 import 'package:flutter_base_2025/core/grpc/interceptors/grpc_auth_interceptor.dart';
 import 'package:flutter_base_2025/core/storage/token_storage.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' as glados hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:mocktail/mocktail.dart';
 
 class MockTokenStorage extends Mock implements TokenStorage {}
 

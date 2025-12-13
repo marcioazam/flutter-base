@@ -23,11 +23,10 @@ sealed class MutationState<T> {
 
   /// Pattern matching with default fallback.
   R maybeWhen<R>({
-    R Function()? idle,
+    required R Function() orElse, R Function()? idle,
     R Function(double? progress)? loading,
     R Function(T data)? success,
     R Function(Object error, StackTrace stackTrace)? error,
-    required R Function() orElse,
   }) => switch (this) {
     MutationIdle() => idle?.call() ?? orElse(),
     MutationLoading(:final progress) => loading?.call(progress) ?? orElse(),
@@ -117,7 +116,7 @@ class MutationController<T> {
       final result = await operation();
       _setState(MutationSuccess<T>(result));
       return result;
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       _setState(MutationError<T>(e, st));
       return null;
     }
@@ -134,7 +133,7 @@ class MutationController<T> {
       });
       _setState(MutationSuccess<T>(result));
       return result;
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       _setState(MutationError<T>(e, st));
       return null;
     }

@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
@@ -89,8 +91,14 @@ class AppUpdateServiceImpl implements AppUpdateService {
         latestVersion: currentVersion,
         availability: UpdateAvailability.notAvailable,
       ));
-    } catch (e) {
-      return Failure(UnexpectedFailure('Update check failed: $e'));
+    } on PlatformException catch (e) {
+      return Failure(UnexpectedFailure('Platform update check error: ${e.message}'));
+    } on SocketException catch (e) {
+      return Failure(NetworkFailure('Network error checking updates: ${e.message}'));
+    } on TimeoutException catch (_) {
+      return Failure(NetworkFailure('Timeout checking for updates'));
+    } on Object catch (e) {
+      return Failure(UnexpectedFailure('Unexpected update check error: $e'));
     }
   }
 
@@ -100,8 +108,13 @@ class AppUpdateServiceImpl implements AppUpdateService {
       // Placeholder - requires in_app_update package
       // await InAppUpdate.performImmediateUpdate();
       return const Success(null);
-    } catch (e) {
-      return Failure(UnexpectedFailure('Update failed: $e'));
+    } on PlatformException catch (e) {
+      if (e.code == 'DOWNLOAD_NOT_PRESENT') {
+        return Failure(ValidationFailure('No update available to install'));
+      }
+      return Failure(UnexpectedFailure('Platform update error: ${e.message}'));
+    } on Object catch (e) {
+      return Failure(UnexpectedFailure('Unexpected update error: $e'));
     }
   }
 
@@ -114,8 +127,12 @@ class AppUpdateServiceImpl implements AppUpdateService {
       //     : 'https://play.google.com/store/apps/details?id=$androidPackageName';
       // await launchUrl(Uri.parse(url));
       return const Success(null);
-    } catch (e) {
-      return Failure(UnexpectedFailure('Failed to open store: $e'));
+    } on PlatformException catch (e) {
+      return Failure(UnexpectedFailure('Platform error opening store: ${e.message}'));
+    } on FormatException catch (e) {
+      return Failure(ValidationFailure('Invalid store URL: ${e.message}'));
+    } on Object catch (e) {
+      return Failure(UnexpectedFailure('Unexpected error opening store: $e'));
     }
   }
 }

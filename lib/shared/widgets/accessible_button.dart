@@ -173,16 +173,16 @@ class AccessibleTextField extends StatelessWidget {
 extension ColorContrastExtension on Color {
   /// Calculates relative luminance per WCAG 2.1.
   double get relativeLuminance {
-    double adjustComponent(int component) {
-      final sRGB = component / 255;
+    double adjustComponent(double component) {
+      final sRGB = component;
       return sRGB <= 0.03928
           ? sRGB / 12.92
           : math.pow((sRGB + 0.055) / 1.055, 2.4).toDouble();
     }
 
-    return 0.2126 * adjustComponent(red) +
-        0.7152 * adjustComponent(green) +
-        0.0722 * adjustComponent(blue);
+    return 0.2126 * adjustComponent(r) +
+        0.7152 * adjustComponent(g) +
+        0.0722 * adjustComponent(b);
   }
 
   /// Calculates contrast ratio with another color.

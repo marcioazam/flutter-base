@@ -1,4 +1,5 @@
 import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:meta/meta.dart';
 
 /// Result type para operações que podem falhar.
 /// Implementa Either pattern simplificado com sealed classes do Dart 3.
@@ -113,7 +114,7 @@ sealed class Result<T> {
   }) {
     try {
       return Success(computation());
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       return Failure(
         onError?.call(e, st) ??
             UnexpectedFailure(e.toString(), stackTrace: st),
@@ -129,7 +130,7 @@ sealed class Result<T> {
   }) async {
     try {
       return Success(await computation());
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       return Failure(
         onError?.call(e, st) ??
             UnexpectedFailure(e.toString(), stackTrace: st),
@@ -140,8 +141,9 @@ sealed class Result<T> {
   /// Creates a Result from a boolean condition.
   /// Returns Success with value if condition is true, Failure otherwise.
   static Result<T> fromCondition<T>(
-    bool condition,
-    T Function() value, {
+    {
+    required bool condition,
+    required T Function() value,
     AppFailure Function()? onFalse,
   }) {
     if (condition) {
@@ -157,6 +159,7 @@ sealed class Result<T> {
 }
 
 /// Representa uma operação bem-sucedida com um valor.
+@immutable
 final class Success<T> extends Result<T> {
 
   const Success(this.value);
@@ -236,6 +239,7 @@ final class Success<T> extends Result<T> {
 }
 
 /// Representa uma operação que falhou com uma AppFailure.
+@immutable
 final class Failure<T> extends Result<T> {
 
   const Failure(this.failure);

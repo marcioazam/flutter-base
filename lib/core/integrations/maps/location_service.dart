@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_base_2025/core/errors/failures.dart';
+import 'package:flutter_base_2025/core/integrations/maps/map_service.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
-import 'package:flutter_base_2025/integrations/maps/map_service.dart';
 
 /// Location permission status.
 enum LocationPermission {
@@ -157,7 +157,7 @@ class LocationServiceImpl implements LocationService {
         longitude: 0,
         timestamp: DateTime.now(),
       ));
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(UnexpectedFailure('Failed to get location: $e'));
     }
   }

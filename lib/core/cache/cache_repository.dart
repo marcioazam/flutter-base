@@ -1,5 +1,5 @@
+import 'package:flutter_base_2025/core/cache/cache_entry.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
-import 'package:flutter_base_2025/core/generics/cache_entry.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Cache statistics for monitoring.

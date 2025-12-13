@@ -75,7 +75,7 @@ class AuthInterceptor extends QueuedInterceptor {
         return true;
       }
       return false;
-    } catch (_) {
+    } on Exception catch (_) {
       return false;
     }
   }

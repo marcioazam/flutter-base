@@ -28,13 +28,11 @@ class GrpcStatusMapper {
   GrpcStatusMapper._();
 
   /// Convert GrpcError to appropriate AppFailure
-  static AppFailure mapGrpcError(GrpcError error) {
-    return fromStatusCode(
-      error.code,
-      error.message ?? 'Unknown gRPC error',
-      details: error.details,
-    );
-  }
+  static AppFailure mapGrpcError(GrpcError error) => fromStatusCode(
+        error.code,
+        error.message ?? 'Unknown gRPC error',
+        details: error.details,
+      );
 
   /// Convert status code to failure type
   ///
@@ -195,7 +193,6 @@ class GrpcStatusMapper {
   }
 
   /// Get failure type for a status code (for testing consistency)
-  static Type getFailureType(int code) {
-    return fromStatusCode(code, 'test').runtimeType;
-  }
+  static Type getFailureType(int code) =>
+      fromStatusCode(code, 'test').runtimeType;
 }

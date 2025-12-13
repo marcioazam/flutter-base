@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_base_2025/core/observability/analytics_service.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
-final _explore = ExploreConfig(numRuns: 100);
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-modernization-2025, Property 11: Analytics Screen View Logging**
 /// **Validates: Requirements 22.1**
@@ -65,8 +65,8 @@ class RecordingAnalyticsService implements AnalyticsService {
   }
 
   @override
-  Future<void> setAnalyticsCollectionEnabled(bool value) async {
-    enabled = value;
+  Future<void> setAnalyticsCollectionEnabled({required bool enabled}) async {
+    this.enabled = enabled;
   }
 
   void clear() {
@@ -164,7 +164,7 @@ void main() {
     });
 
     test('disabled analytics does not log screen views', () async {
-      await analytics.setAnalyticsCollectionEnabled(false);
+      await analytics.setAnalyticsCollectionEnabled(enabled: false);
       await analytics.logScreenView(screenName: '/test');
 
       expect(analytics.screenViews, isEmpty);
@@ -200,8 +200,10 @@ void main() {
       );
 
       expect(analytics.events.first['parameters'], isNotNull);
+      final parameters =
+          analytics.events.first['parameters'] as Map<String, dynamic>;
       expect(
-        analytics.events.first['parameters']['button_id'],
+        parameters['button_id'],
         equals('submit'),
       );
     });

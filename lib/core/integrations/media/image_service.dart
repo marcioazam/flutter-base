@@ -148,7 +148,7 @@ class ImageServiceImpl implements ImageService {
 
       // Return original for now
       return Success(imageBytes);
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(UnexpectedFailure('Image compression failed: $e'));
     }
   }

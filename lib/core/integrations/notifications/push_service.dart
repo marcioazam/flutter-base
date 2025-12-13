@@ -123,7 +123,7 @@ class PushNotificationServiceImpl implements PushNotificationService {
       // });
 
       return const Success(null);
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(UnexpectedFailure('Push notification init failed: $e'));
     }
   }

@@ -9,7 +9,7 @@ extension UserPreferencesGenerator on Any {
         choose(['light', 'dark', 'system']),
         choose(['en', 'pt', 'es', 'fr']),
         any.bool,
-        doubleInRange(10.0, 24.0),
+        doubleInRange(10, 24),
         (theme, locale, notifications, fontSize) => UserPreferences(
           theme: theme,
           locale: locale,

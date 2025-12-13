@@ -1,5 +1,8 @@
+import 'package:meta/meta.dart';
+
 /// User entity - Pure Dart, no external dependencies.
 /// Domain layer entities are immutable and contain business logic.
+@immutable
 class User {
 
   const User({

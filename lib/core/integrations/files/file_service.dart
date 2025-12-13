@@ -140,7 +140,7 @@ class FileServiceImpl implements FileService {
       // )).toList());
 
       return Failure(ValidationFailure('File picker not configured'));
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(UnexpectedFailure('File picking failed: $e'));
     }
   }
@@ -185,7 +185,7 @@ class FileServiceImpl implements FileService {
       }
 
       onComplete?.call(const Success('upload_complete'));
-    } catch (e) {
+    } on Exception catch (e) {
       onComplete?.call(Failure(NetworkFailure('Upload failed: $e')));
     } finally {
       _cancelTokens.remove(operationId);
@@ -249,7 +249,7 @@ class FileServiceImpl implements FileService {
       }
 
       onComplete?.call(Success(savePath));
-    } catch (e) {
+    } on Exception catch (e) {
       onComplete?.call(Failure(NetworkFailure('Download failed: $e')));
     } finally {
       _cancelTokens.remove(operationId);

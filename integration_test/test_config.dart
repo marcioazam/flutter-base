@@ -10,10 +10,7 @@ import 'package:patrol/patrol.dart';
 ///
 /// Customize timeouts, frame policy, and other settings here.
 const patrolConfig = PatrolTesterConfig(
-  // Timeout for finding widgets
-  visibleTimeout: Duration(seconds: 10),
-  // Timeout for settling animations
-  settleTimeout: Duration(seconds: 10),
+  
   // Policy for handling frames during tests
   // Use fullyLive for tests that need real-time animations
   // Use benchmarkLive for faster execution

@@ -60,19 +60,25 @@ class SettingsPage extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Select Theme'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: ThemeMode.values.map((mode) => RadioListTile<ThemeMode>(
-              title: Text(_themeModeLabel(mode)),
-              value: mode,
-              groupValue: current,
-              onChanged: (value) {
-                if (value != null) {
-                  ref.read(themeModeProvider.notifier).setThemeMode(value);
-                  Navigator.pop(context);
-                }
-              },
-            )).toList(),
+        content: RadioGroup<ThemeMode>(
+          groupValue: current,
+          onChanged: (value) {
+            if (value != null) {
+              ref.read(themeModeProvider.notifier).setThemeMode(value);
+              Navigator.pop(context);
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: ThemeMode.values
+                .map(
+                  (mode) => RadioListTile<ThemeMode>(
+                    title: Text(_themeModeLabel(mode)),
+                    value: mode,
+                  ),
+                )
+                .toList(),
+          ),
         ),
       ),
     );
@@ -88,19 +94,25 @@ class SettingsPage extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Select Language'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: locales.map((locale) => RadioListTile<Locale>(
-              title: Text(_localeLabel(locale)),
-              value: locale,
-              groupValue: current,
-              onChanged: (value) {
-                if (value != null) {
-                  ref.read(localeProvider.notifier).setLocale(value);
-                  Navigator.pop(context);
-                }
-              },
-            )).toList(),
+        content: RadioGroup<Locale>(
+          groupValue: current,
+          onChanged: (value) {
+            if (value != null) {
+              ref.read(localeProvider.notifier).setLocale(value);
+              Navigator.pop(context);
+            }
+          },
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: locales
+                .map(
+                  (locale) => RadioListTile<Locale>(
+                    title: Text(_localeLabel(locale)),
+                    value: locale,
+                  ),
+                )
+                .toList(),
+          ),
         ),
       ),
     );

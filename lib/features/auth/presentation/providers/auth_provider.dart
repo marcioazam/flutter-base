@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:flutter_base_2025/core/network/api_client.dart';
 import 'package:flutter_base_2025/core/storage/token_storage.dart';
-import 'package:flutter_base_2025/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:flutter_base_2025/features/auth/data/data_sources/auth_remote_datasource.dart';
 import 'package:flutter_base_2025/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:flutter_base_2025/features/auth/domain/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-export '../../domain/repositories/auth_repository.dart' show AuthState, AuthStateExtension, AuthStateAuthenticated, AuthStateUnauthenticated, AuthStateLoading, AuthStateError;
+export '../../domain/repositories/auth_repository.dart' show AuthState, AuthStateAuthenticated, AuthStateError, AuthStateExtension, AuthStateLoading, AuthStateUnauthenticated;
 
 part 'auth_provider.g.dart';
 

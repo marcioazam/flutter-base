@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 /// Breadcrumb for crash reporting.
 class Breadcrumb {
 
@@ -190,16 +192,11 @@ class CrashReporterService {
   }
 
   /// Records a Flutter error.
-  static Future<void> recordFlutterError(dynamic details) async {
-    if (details is Error) {
-      await instance.reportError(details, StackTrace.current);
-    } else {
-      final dynamic rawException = details.exception;
-      final Object exception = rawException is Object ? rawException : details as Object;
-      final dynamic rawStack = details.stack;
-      final StackTrace stack = rawStack is StackTrace ? rawStack : StackTrace.current;
-      await instance.reportError(exception, stack);
-    }
+  static Future<void> recordFlutterError(FlutterErrorDetails details) async {
+    await instance.reportError(
+      details.exception,
+      details.stack ?? StackTrace.current,
+    );
   }
 
   /// Records an error with optional fatal flag.

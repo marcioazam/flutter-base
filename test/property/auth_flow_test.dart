@@ -1,7 +1,7 @@
 import 'package:flutter_base_2025/core/constants/app_constants.dart';
 import 'package:flutter_base_2025/core/router/route_guards.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 import 'package:mocktail/mocktail.dart' hide any;
 import 'package:mocktail/mocktail.dart' as mocktail;
 

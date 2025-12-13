@@ -137,7 +137,7 @@ class InMemoryBackgroundTaskService implements BackgroundTaskService {
       final result = await task.execute();
       task._status = BackgroundTaskStatus.completed;
       _completionController.add(BackgroundTaskSuccess<T>(result));
-    } catch (e, st) {
+    } on Exception catch (e, st) {
       task._retryCount++;
       
       if (task.canRetry) {

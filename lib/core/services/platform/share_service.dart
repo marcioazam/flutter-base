@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/services.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
@@ -70,8 +72,12 @@ class ShareServiceImpl implements ShareService {
       // ));
 
       return const Success(ShareResult(status: ShareStatus.success));
-    } catch (e) {
-      return Failure(UnexpectedFailure('Share failed: $e'));
+    } on PlatformException catch (e) {
+      return Failure(UnexpectedFailure('Platform share error: ${e.message}'));
+    } on MissingPluginException catch (e) {
+      return Failure(UnexpectedFailure('Share plugin not available: ${e.message}'));
+    } on Object catch (e) {
+      return Failure(UnexpectedFailure('Unexpected share error: $e'));
     }
   }
 
@@ -92,8 +98,14 @@ class ShareServiceImpl implements ShareService {
       // ));
 
       return const Success(ShareResult(status: ShareStatus.success));
-    } catch (e) {
-      return Failure(UnexpectedFailure('Share URL failed: $e'));
+    } on PlatformException catch (e) {
+      return Failure(UnexpectedFailure('Platform share error: ${e.message}'));
+    } on MissingPluginException catch (e) {
+      return Failure(UnexpectedFailure('Share plugin not available: ${e.message}'));
+    } on FormatException catch (e) {
+      return Failure(ValidationFailure('Invalid URL format: ${e.message}'));
+    } on Object catch (e) {
+      return Failure(UnexpectedFailure('Unexpected share error: $e'));
     }
   }
 
@@ -118,8 +130,14 @@ class ShareServiceImpl implements ShareService {
       // ));
 
       return const Success(ShareResult(status: ShareStatus.success));
-    } catch (e) {
-      return Failure(UnexpectedFailure('Share files failed: $e'));
+    } on PlatformException catch (e) {
+      return Failure(UnexpectedFailure('Platform share error: ${e.message}'));
+    } on MissingPluginException catch (e) {
+      return Failure(UnexpectedFailure('Share plugin not available: ${e.message}'));
+    } on FileSystemException catch (e) {
+      return Failure(UnexpectedFailure('File access error: ${e.message}'));
+    } on Object catch (e) {
+      return Failure(UnexpectedFailure('Unexpected share error: $e'));
     }
   }
 
@@ -146,8 +164,14 @@ class ShareServiceImpl implements ShareService {
       // ));
 
       return const Success(ShareResult(status: ShareStatus.success));
-    } catch (e) {
-      return Failure(UnexpectedFailure('Share image failed: $e'));
+    } on PlatformException catch (e) {
+      return Failure(UnexpectedFailure('Platform share error: ${e.message}'));
+    } on MissingPluginException catch (e) {
+      return Failure(UnexpectedFailure('Share plugin not available: ${e.message}'));
+    } on FileSystemException catch (e) {
+      return Failure(UnexpectedFailure('File system error: ${e.message}'));
+    } on Object catch (e) {
+      return Failure(UnexpectedFailure('Unexpected share error: $e'));
     }
   }
 }

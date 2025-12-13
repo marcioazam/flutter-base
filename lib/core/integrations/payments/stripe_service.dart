@@ -100,7 +100,7 @@ class StripePaymentService implements PaymentService {
       // await Stripe.instance.applySettings();
       _initialized = true;
       return const Success(null);
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(UnexpectedFailure('Stripe initialization failed: $e'));
     }
   }
@@ -140,7 +140,7 @@ class StripePaymentService implements PaymentService {
       return const Success(PaymentResult(
         status: PaymentStatus.success,
       ));
-    } catch (e) {
+    } on Exception catch (e) {
       // Handle StripeException for cancellation
       // if (e is StripeException && e.error.code == FailureCode.Canceled) {
       //   return Success(PaymentResult(status: PaymentStatus.cancelled));
@@ -176,7 +176,7 @@ class StripePaymentService implements PaymentService {
       return const Success(PaymentResult(
         status: PaymentStatus.success,
       ));
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(ValidationFailure('Payment confirmation failed: $e'));
     }
   }

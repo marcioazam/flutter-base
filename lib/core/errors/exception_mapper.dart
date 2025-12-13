@@ -12,10 +12,9 @@ class ExceptionMapper {
   const ExceptionMapper._();
 
   /// Maps any exception to an AppFailure.
-  static AppFailure mapException(Object error, [StackTrace? stackTrace]) {
-    return switch (error) {
-      DioException e => _mapDioException(e, stackTrace),
-      FormatException e => ValidationFailure(
+  static AppFailure mapException(Object error, [StackTrace? stackTrace]) => switch (error) {
+      final DioException e => _mapDioException(e, stackTrace),
+      final FormatException e => ValidationFailure(
           e.message,
           stackTrace: stackTrace,
         ),
@@ -23,21 +22,19 @@ class ExceptionMapper {
           'Operation timed out',
           stackTrace: stackTrace,
         ),
-      AppException e => _mapAppException(e, stackTrace),
-      AppFailure f => f,
+      final AppException e => _mapAppException(e, stackTrace),
+      final AppFailure f => f,
       _ => UnexpectedFailure(
           error.toString(),
           stackTrace: stackTrace,
         ),
     };
-  }
 
   /// Maps DioException to AppFailure.
   static AppFailure _mapDioException(
     DioException e, [
     StackTrace? stackTrace,
-  ]) {
-    return switch (e.type) {
+  ]) => switch (e.type) {
       DioExceptionType.connectionTimeout => TimeoutFailure(
           'Connection timeout',
           stackTrace: stackTrace ?? e.stackTrace,
@@ -68,7 +65,6 @@ class ExceptionMapper {
           stackTrace: stackTrace ?? e.stackTrace,
         ),
     };
-  }
 
   /// Maps HTTP status code to AppFailure.
   static AppFailure _mapStatusCode(
@@ -127,8 +123,7 @@ class ExceptionMapper {
   static AppFailure _mapAppException(
     AppException e, [
     StackTrace? stackTrace,
-  ]) {
-    return switch (e) {
+  ]) => switch (e) {
       NetworkException() => NetworkFailure(
           e.message,
           stackTrace: stackTrace ?? e.stackTrace,
@@ -164,7 +159,6 @@ class ExceptionMapper {
           stackTrace: stackTrace ?? e.stackTrace,
         ),
     };
-  }
 
   /// Extracts message from response data.
   static String? _extractMessage(dynamic data) {

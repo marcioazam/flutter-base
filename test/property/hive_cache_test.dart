@@ -1,29 +1,30 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
-import 'package:hive_flutter/hive_flutter.dart';
-
 import 'package:flutter_base_2025/core/cache/hive_cache_config.dart';
 import 'package:flutter_base_2025/core/cache/hive_cache_datasource.dart';
 import 'package:flutter_base_2025/core/cache/hive_cache_entry.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:meta/meta.dart';
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
 
 // Simple test entity
+@immutable
 class TestEntity {
-  TestEntity({required this.id, required this.name, required this.value});
-
-  final String id;
-  final String name;
-  final int value;
-
-  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'value': value};
 
   factory TestEntity.fromJson(Map<String, dynamic> json) => TestEntity(
         id: json['id'] as String,
         name: json['name'] as String,
         value: json['value'] as int,
       );
+  const TestEntity({required this.id, required this.name, required this.value});
+
+  final String id;
+  final String name;
+  final int value;
+
+  Map<String, dynamic> toJson() => {'id': id, 'name': name, 'value': value};
 
   @override
   bool operator ==(Object other) =>
@@ -57,7 +58,6 @@ void main() {
       box: box,
       fromJson: TestEntity.fromJson,
       toJson: (e) => e.toJson(),
-      config: const HiveCacheConfig(defaultTtl: Duration(hours: 1)),
     );
   });
 
@@ -206,6 +206,38 @@ void main() {
       final removed = await shortTtlDataSource.removeExpired();
       expect(removed, 1);
       expect(shortTtlDataSource.length, 0);
+    });
+
+    test('putAll stores multiple entries', () async {
+      final entries = {
+        'key1': TestEntity(id: '1', name: 'a', value: 1),
+        'key2': TestEntity(id: '2', name: 'b', value: 2),
+        'key3': TestEntity(id: '3', name: 'c', value: 3),
+      };
+
+      await dataSource.putAll(entries);
+
+      expect(dataSource.length, 3);
+      expect(await dataSource.getData('key1'), entries['key1']);
+      expect(await dataSource.getData('key2'), entries['key2']);
+      expect(await dataSource.getData('key3'), entries['key3']);
+    });
+
+    test('getMany retrieves multiple entries', () async {
+      await dataSource.put('key1', TestEntity(id: '1', name: 'a', value: 1));
+      await dataSource.put('key2', TestEntity(id: '2', name: 'b', value: 2));
+
+      final results = await dataSource.getMany(['key1', 'key2', 'key3']);
+
+      expect(results['key1'], isNotNull);
+      expect(results['key2'], isNotNull);
+      expect(results['key3'], isNull); // Not found
+    });
+
+    test('dispose stops periodic cleanup', () async {
+      dataSource.startPeriodicCleanup(interval: const Duration(seconds: 1));
+      dataSource.dispose();
+      // Should not throw
     });
   });
 }

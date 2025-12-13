@@ -169,6 +169,12 @@ try {
   final failure = GrpcStatusMapper.mapGrpcError(e);
   // Handle failure...
 }
+
+// Use callWithRetry for automatic retry on transient failures
+final response = await grpcClient.callWithRetry(
+  () => stub.myMethod(request),
+  maxRetries: 3, // optional, uses config default
+);
 ```
 
 **Proto files:** Place `.proto` files in `lib/core/grpc/protos/` and run protoc to generate Dart stubs.
@@ -201,11 +207,19 @@ final cache = HiveCacheDataSource<User>(
 // Store with TTL
 await cache.put('user_123', user, ttl: Duration(hours: 1));
 
+// Batch operations
+await cache.putAll({'user_1': user1, 'user_2': user2});
+final results = await cache.getMany(['user_1', 'user_2']);
+
 // Retrieve (returns null if expired)
 final cached = await cache.getData('user_123');
 
 // Retrieve stale data (for offline fallback)
 final stale = await cache.getData('user_123', allowStale: true);
+
+// Periodic cleanup of expired entries
+cache.startPeriodicCleanup(interval: Duration(hours: 1));
+cache.dispose(); // Stop cleanup on dispose
 ```
 
 **Encrypted boxes:** Use `HiveInitializer.openEncryptedBox()` for sensitive data.

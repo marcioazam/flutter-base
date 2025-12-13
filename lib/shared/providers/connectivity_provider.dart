@@ -65,7 +65,7 @@ class ConnectivityService {
     for (final callback in _syncCallbacks) {
       try {
         await callback();
-      } catch (e, stack) {
+      } on Exception catch (e, stack) {
         AppLogger.instance.error('Sync callback failed', error: e, stackTrace: stack);
       }
     }

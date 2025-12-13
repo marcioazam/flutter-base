@@ -3,12 +3,14 @@ import 'package:flutter_base_2025/core/generics/base_repository.dart';
 import 'package:flutter_base_2025/core/generics/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:meta/meta.dart';
 import 'package:mocktail/mocktail.dart';
 
 /// **Feature: flutter-modernization-2025, Property 1: Repository CRUD Type Safety**
 /// **Validates: Requirements 2.1, 2.2**
 
 /// Test entity.
+@immutable
 class TestEntity {
 
   const TestEntity({required this.id, required this.name});

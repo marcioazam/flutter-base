@@ -142,7 +142,7 @@ class LocalRateReviewService implements RateReviewService {
 
       AppLogger.instance.info('Review prompt shown');
       return true;
-    } catch (e) {
+    } on Exception catch (e) {
       AppLogger.instance.error('Failed to show review', error: e);
       return false;
     }
@@ -153,7 +153,7 @@ class LocalRateReviewService implements RateReviewService {
     try {
       AppLogger.instance.info('Opening store listing');
       return true;
-    } catch (e) {
+    } on Exception catch (e) {
       AppLogger.instance.error('Failed to open store listing', error: e);
       return false;
     }

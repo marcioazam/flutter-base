@@ -72,7 +72,7 @@ class InfiniteScrollController<T> extends ChangeNotifier {
       _state = _hasMoreData
           ? InfiniteScrollState.idle
           : InfiniteScrollState.noMoreData;
-    } catch (e) {
+    } on Exception catch (e) {
       _state = InfiniteScrollState.error;
       _errorMessage = e.toString();
       if (_currentPage > 1) _currentPage--;

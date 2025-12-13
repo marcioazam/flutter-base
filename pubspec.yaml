@@ -49,6 +49,7 @@ dependencies:
   # Utils
   intl: ^0.20.0
   equatable: ^2.0.7
+  meta: ^1.17.0
   flutter_dotenv: ^5.2.1
   flutter_native_splash: ^2.4.3
   share_plus: ^10.0.1
@@ -68,7 +69,6 @@ dependencies:
   # Hive - Offline cache database
   hive: ^2.2.3
   hive_flutter: ^1.1.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

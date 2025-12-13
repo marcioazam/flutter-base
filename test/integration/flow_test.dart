@@ -4,12 +4,14 @@ import 'package:flutter_base_2025/core/generics/base_usecase.dart';
 import 'package:flutter_base_2025/core/generics/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:meta/meta.dart';
 import 'package:mocktail/mocktail.dart';
 
 /// **Feature: flutter-state-of-art-2025-final, Integration Tests**
 /// **Validates: Requirements 16.3**
 
 // Test entities
+@immutable
 class User {
 
   const User({required this.id, required this.name, required this.email});

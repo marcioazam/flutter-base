@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/generics/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
-import 'package:flutter_base_2025/features/auth/data/models/user_dto.dart';
+import 'package:flutter_base_2025/features/auth/data/dtos/user_dto.dart';
 import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
 import 'package:glados/glados.dart';
 

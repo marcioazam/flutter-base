@@ -32,7 +32,7 @@ abstract interface class AnalyticsService {
   });
 
   /// Enables or disables analytics collection.
-  Future<void> setAnalyticsCollectionEnabled(bool enabled);
+  Future<void> setAnalyticsCollectionEnabled({required bool enabled});
 }
 
 /// Console-based analytics for development.
@@ -88,7 +88,7 @@ class ConsoleAnalyticsService implements AnalyticsService {
   }
 
   @override
-  Future<void> setAnalyticsCollectionEnabled(bool enabled) async {
+  Future<void> setAnalyticsCollectionEnabled({required bool enabled}) async {
     _enabled = enabled;
     AppLogger.instance.debug('[ANALYTICS] Collection enabled: $enabled');
   }

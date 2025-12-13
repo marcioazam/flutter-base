@@ -44,31 +44,33 @@ class TargetingRule {
     final contextValue = context[attribute];
     if (contextValue == null) return false;
 
+    final Object? ruleValue = value;
+
     switch (operator) {
       case TargetingOperator.equals:
-        return contextValue == value;
+        return contextValue == ruleValue;
       case TargetingOperator.notEquals:
-        return contextValue != value;
+        return contextValue != ruleValue;
       case TargetingOperator.contains:
-        return contextValue.toString().contains(value.toString());
+        return contextValue.toString().contains(ruleValue.toString());
       case TargetingOperator.startsWith:
-        return contextValue.toString().startsWith(value.toString());
+        return contextValue.toString().startsWith(ruleValue.toString());
       case TargetingOperator.endsWith:
-        return contextValue.toString().endsWith(value.toString());
+        return contextValue.toString().endsWith(ruleValue.toString());
       case TargetingOperator.greaterThan:
-        return _compareNumeric(contextValue, value) > 0;
+        return _compareNumeric(contextValue, ruleValue) > 0;
       case TargetingOperator.lessThan:
-        return _compareNumeric(contextValue, value) < 0;
+        return _compareNumeric(contextValue, ruleValue) < 0;
       case TargetingOperator.inList:
-        if (value is List) return value.contains(contextValue) == true;
+        if (ruleValue is List) return ruleValue.contains(contextValue);
         return false;
       case TargetingOperator.notInList:
-        if (value is List) return value.contains(contextValue) != true;
+        if (ruleValue is List) return !ruleValue.contains(contextValue);
         return true;
       case TargetingOperator.versionGreaterThan:
-        return _compareVersions(contextValue.toString(), value.toString()) > 0;
+        return _compareVersions(contextValue.toString(), ruleValue.toString()) > 0;
       case TargetingOperator.versionLessThan:
-        return _compareVersions(contextValue.toString(), value.toString()) < 0;
+        return _compareVersions(contextValue.toString(), ruleValue.toString()) < 0;
     }
   }
 

@@ -175,7 +175,7 @@ class VideoPlayerServiceImpl implements VideoPlayerService {
       ));
 
       return const Success(null);
-    } catch (e) {
+    } on Exception catch (e) {
       _updateState(_currentState.copyWith(
         playbackState: VideoPlaybackState.error,
         errorMessage: e.toString(),

@@ -8,12 +8,10 @@ import 'package:logger/logger.dart';
 
 /// Provider for CertificatePinningService.
 final certificatePinningServiceProvider =
-    Provider<CertificatePinningService>((ref) {
-  return CertificatePinningService(
+    Provider<CertificatePinningService>((ref) => CertificatePinningService(
     config: CertificatePinningConfig.fromEnvironment(),
     logger: ref.watch(loggerProvider),
-  );
-});
+  ));
 
 /// Logger provider.
 final loggerProvider = Provider<Logger>((ref) => Logger());
@@ -22,6 +20,37 @@ final loggerProvider = Provider<Logger>((ref) => Logger());
 ///
 /// OWASP MASVS MSTG-NETWORK-4: Certificate pinning with backup pins.
 class CertificatePinningConfig {
+
+  /// Create config from environment variables.
+  ///
+  /// Required env vars:
+  /// - CERT_PIN_PRIMARY: Primary certificate hash
+  /// - CERT_PIN_BACKUP: Backup certificate hash
+  ///
+  /// Optional env vars:
+  /// - CERT_PIN_ENABLED: Enable pinning (default: true)
+  /// - CERT_PIN_ALLOW_BAD: Allow bad certs (default: false, DANGER!)
+  factory CertificatePinningConfig.fromEnvironment() {
+    final primaryPin = const String.fromEnvironment('CERT_PIN_PRIMARY');
+    final backupPin = const String.fromEnvironment('CERT_PIN_BACKUP');
+    final enabled = const bool.fromEnvironment(
+      'CERT_PIN_ENABLED',
+      defaultValue: true,
+    );
+    final allowBad = const bool.fromEnvironment(
+      'CERT_PIN_ALLOW_BAD',
+    );
+
+    final pins = <String>[];
+    if (primaryPin.isNotEmpty) pins.add(primaryPin);
+    if (backupPin.isNotEmpty) pins.add(backupPin);
+
+    return CertificatePinningConfig(
+      pinnedHashes: pins,
+      enabled: enabled,
+      allowBadCertificates: allowBad,
+    );
+  }
   const CertificatePinningConfig({
     required this.pinnedHashes,
     this.allowBadCertificates = false,
@@ -53,38 +82,6 @@ class CertificatePinningConfig {
   /// Enable certificate pinning.
   /// MUST be true in production.
   final bool enabled;
-
-  /// Create config from environment variables.
-  ///
-  /// Required env vars:
-  /// - CERT_PIN_PRIMARY: Primary certificate hash
-  /// - CERT_PIN_BACKUP: Backup certificate hash
-  ///
-  /// Optional env vars:
-  /// - CERT_PIN_ENABLED: Enable pinning (default: true)
-  /// - CERT_PIN_ALLOW_BAD: Allow bad certs (default: false, DANGER!)
-  factory CertificatePinningConfig.fromEnvironment() {
-    final primaryPin = const String.fromEnvironment('CERT_PIN_PRIMARY');
-    final backupPin = const String.fromEnvironment('CERT_PIN_BACKUP');
-    final enabled = const bool.fromEnvironment(
-      'CERT_PIN_ENABLED',
-      defaultValue: true,
-    );
-    final allowBad = const bool.fromEnvironment(
-      'CERT_PIN_ALLOW_BAD',
-      defaultValue: false,
-    );
-
-    final pins = <String>[];
-    if (primaryPin.isNotEmpty) pins.add(primaryPin);
-    if (backupPin.isNotEmpty) pins.add(backupPin);
-
-    return CertificatePinningConfig(
-      pinnedHashes: pins,
-      enabled: enabled,
-      allowBadCertificates: allowBad,
-    );
-  }
 
   /// Validate configuration.
   ///
@@ -305,7 +302,7 @@ class CertificatePinningService {
         certificateHash: hashString,
         expirationDate: certificate.endValidity,
       );
-    } catch (e, stack) {
+    } on Exception catch (e, stack) {
       final error = 'Certificate validation error for $host:$port: $e';
       logger.e(error, error: e, stackTrace: stack);
 

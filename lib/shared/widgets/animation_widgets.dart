@@ -114,12 +114,11 @@ class CustomPageRoute<T> extends PageRouteBuilder<T> {
   CustomPageRoute({
     required this.page,
     this.transitionType = PageTransitionType.fade,
-    this.transitionDuration = const Duration(milliseconds: 300),
+    super.transitionDuration = const Duration(milliseconds: 300),
     this.curve = Curves.easeInOut,
     super.settings,
   }) : super(
           pageBuilder: (context, animation, secondaryAnimation) => page,
-          transitionDuration: transitionDuration,
           reverseTransitionDuration: transitionDuration,
           transitionsBuilder: (context, animation, secondaryAnimation, child) => _buildTransition(
               transitionType,
@@ -130,8 +129,6 @@ class CustomPageRoute<T> extends PageRouteBuilder<T> {
         );
   final Widget page;
   final PageTransitionType transitionType;
-  @override
-  final Duration transitionDuration;
   final Curve curve;
 
   static Widget _buildTransition(

@@ -1,13 +1,13 @@
 import 'dart:math' as math;
 
 import 'package:flutter/widgets.dart';
-
 import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Map provider type.
 enum MapProvider { google, mapbox }
 
 /// Geographic coordinates.
+@immutable
 class LatLng {
 
   const LatLng(this.latitude, this.longitude);

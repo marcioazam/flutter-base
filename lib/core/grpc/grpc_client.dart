@@ -48,9 +48,8 @@ class GrpcClient {
   ///   (channel) => MyServiceClient(channel),
   /// );
   /// ```
-  T createStub<T>(T Function(ClientChannel channel) stubFactory) {
-    return stubFactory(channel);
-  }
+  T createStub<T>(T Function(ClientChannel channel) stubFactory) =>
+      stubFactory(channel);
 
   /// Create a stub with custom call options.
   T createStubWithOptions<T>(
@@ -109,6 +108,55 @@ class GrpcClient {
   CallOptions get defaultCallOptions => CallOptions(
         timeout: _config.timeout,
       );
+
+  /// Execute a gRPC call with automatic retry on transient failures.
+  ///
+  /// Retries on: UNAVAILABLE, RESOURCE_EXHAUSTED, ABORTED
+  /// Uses exponential backoff based on config.retryDelay.
+  ///
+  /// Example:
+  /// ```dart
+  /// final response = await grpcClient.callWithRetry(
+  ///   () => stub.myMethod(request),
+  /// );
+  /// ```
+  Future<T> callWithRetry<T>(
+    Future<T> Function() call, {
+    int? maxRetries,
+  }) async {
+    final retries = maxRetries ?? _config.maxRetries;
+    Object? lastError;
+
+    for (var attempt = 0; attempt <= retries; attempt++) {
+      try {
+        return await call();
+      } on GrpcError catch (e) {
+        lastError = e;
+        if (!_isRetryableError(e.code) || attempt == retries) {
+          rethrow;
+        }
+        final delay = _config.retryDelay * (attempt + 1);
+        _logger.w(
+          'gRPC call failed (attempt ${attempt + 1}/$retries), '
+          'retrying in ${delay.inMilliseconds}ms: ${e.message}',
+        );
+        await Future<void>.delayed(delay);
+      }
+    }
+
+    // This should never be reached, but satisfies the analyzer
+    throw StateError('Retry loop completed without result: $lastError');
+  }
+
+  /// Check if a gRPC error code is retryable.
+  bool _isRetryableError(int code) => const [
+        StatusCode.unavailable,
+        StatusCode.resourceExhausted,
+        StatusCode.aborted,
+      ].contains(code);
+
+  /// Get the current configuration.
+  GrpcConfig get config => _config;
 }
 
 /// Logging interceptor for gRPC calls.

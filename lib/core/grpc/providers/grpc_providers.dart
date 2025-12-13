@@ -16,35 +16,14 @@ part 'grpc_providers.g.dart';
 @riverpod
 GrpcConfig grpcConfig(Ref ref) {
   final appConfig = ref.watch(appConfigProvider);
-  
-  // Default gRPC configuration based on flavor
-  // In production, these should come from environment variables
+
   return GrpcConfig(
-    host: _getGrpcHost(appConfig),
-    port: _getGrpcPort(appConfig),
-    useTls: appConfig.isProduction,
-    timeout: const Duration(seconds: 30),
-    maxRetries: 3,
+    host: appConfig.grpcHost,
+    port: appConfig.grpcPort,
+    useTls: appConfig.grpcUseTls,
+    timeout: Duration(seconds: appConfig.grpcTimeoutSeconds),
+    maxRetries: appConfig.grpcMaxRetries,
   );
-}
-
-String _getGrpcHost(AppConfig config) {
-  // TODO: Add GRPC_HOST to .env files and AppConfig
-  // For now, derive from API base URL or use defaults
-  return switch (config.flavor) {
-    Flavor.development => 'localhost',
-    Flavor.staging => 'grpc-staging.example.com',
-    Flavor.production => 'grpc.example.com',
-  };
-}
-
-int _getGrpcPort(AppConfig config) {
-  // TODO: Add GRPC_PORT to .env files and AppConfig
-  return switch (config.flavor) {
-    Flavor.development => 50051,
-    Flavor.staging => 443,
-    Flavor.production => 443,
-  };
 }
 
 /// Provider for GrpcClient.

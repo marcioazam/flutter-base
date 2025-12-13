@@ -1,7 +1,7 @@
-import 'package:flutter_base_2025/features/auth/data/models/user_dto.dart';
+import 'package:flutter_base_2025/features/auth/data/dtos/user_dto.dart';
 import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 import '../helpers/generators.dart';
 

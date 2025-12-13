@@ -38,6 +38,4 @@ part 'accessibility_service_provider.g.dart';
 /// });
 /// ```
 @riverpod
-AccessibilityService accessibilityService(AccessibilityServiceRef ref) {
-  return const DefaultAccessibilityService();
-}
+AccessibilityService accessibilityService(Ref ref) => const DefaultAccessibilityService();

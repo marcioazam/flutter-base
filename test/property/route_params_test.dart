@@ -1,14 +1,27 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:meta/meta.dart';
 
 // Configure Glados for 100 iterations
-final _explore = ExploreConfig(numRuns: 100);
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-generics-production-2025, Property 10: Route Parameter Round-Trip**
 /// **Validates: Requirements 5.3, 5.4**
 
 /// Helper class to simulate route parameters
+@immutable
 class RouteParams {
+
+  /// Creates from query parameters map
+  factory RouteParams.fromQueryParams(Map<String, String> params) => RouteParams(
+      id: params['id'],
+      name: params['name'] != null ? Uri.decodeComponent(params['name']!) : null,
+      page: params['page'] != null ? int.tryParse(params['page']!) : null,
+      enabled: params['enabled'] != null ? params['enabled'] == 'true' : null,
+    );
+
+  /// Creates from URI
+  factory RouteParams.fromUri(Uri uri) => RouteParams.fromQueryParams(uri.queryParameters);
   const RouteParams({
     this.id,
     this.name,
@@ -31,28 +44,11 @@ class RouteParams {
     return params;
   }
 
-  /// Creates from query parameters map
-  factory RouteParams.fromQueryParams(Map<String, String> params) {
-    return RouteParams(
-      id: params['id'],
-      name: params['name'] != null ? Uri.decodeComponent(params['name']!) : null,
-      page: params['page'] != null ? int.tryParse(params['page']!) : null,
-      enabled: params['enabled'] != null ? params['enabled'] == 'true' : null,
-    );
-  }
-
   /// Converts to URI
-  Uri toUri(String basePath) {
-    return Uri(
+  Uri toUri(String basePath) => Uri(
       path: basePath,
       queryParameters: toQueryParams().isNotEmpty ? toQueryParams() : null,
     );
-  }
-
-  /// Creates from URI
-  factory RouteParams.fromUri(Uri uri) {
-    return RouteParams.fromQueryParams(uri.queryParameters);
-  }
 
   @override
   bool operator ==(Object other) =>
@@ -146,7 +142,7 @@ void main() {
     });
 
     test('Null parameters are not included in URI', () {
-      final params = RouteParams(id: 'test', name: null);
+      final params = RouteParams(id: 'test');
       final queryParams = params.toQueryParams();
 
       expect(queryParams.containsKey('id'), isTrue);

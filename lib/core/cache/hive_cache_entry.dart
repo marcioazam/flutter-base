@@ -13,6 +13,33 @@ class HiveCacheEntry<T> {
     this.key,
   });
 
+  /// Create entry with TTL duration
+  factory HiveCacheEntry.withTtl({
+    required T data,
+    required Duration ttl,
+    String? key,
+  }) {
+    final now = DateTime.now();
+    return HiveCacheEntry(
+      data: data,
+      cachedAt: now,
+      expiresAt: now.add(ttl),
+      key: key,
+    );
+  }
+
+  /// Create from JSON map
+  factory HiveCacheEntry.fromJson(
+    Map<String, dynamic> json,
+    T Function(Map<String, dynamic>) dataFromJson,
+  ) =>
+      HiveCacheEntry(
+        data: dataFromJson(json['data'] as Map<String, dynamic>),
+        cachedAt: DateTime.parse(json['cachedAt'] as String),
+        expiresAt: DateTime.parse(json['expiresAt'] as String),
+        key: json['key'] as String?,
+      );
+
   /// The cached data
   final T data;
 
@@ -34,43 +61,13 @@ class HiveCacheEntry<T> {
     return remaining.isNegative ? Duration.zero : remaining;
   }
 
-  /// Create entry with TTL duration
-  factory HiveCacheEntry.withTtl({
-    required T data,
-    required Duration ttl,
-    String? key,
-  }) {
-    final now = DateTime.now();
-    return HiveCacheEntry(
-      data: data,
-      cachedAt: now,
-      expiresAt: now.add(ttl),
-      key: key,
-    );
-  }
-
   /// Convert to JSON map for storage
-  Map<String, dynamic> toJson(Map<String, dynamic> Function(T) dataToJson) {
-    return {
-      'data': dataToJson(data),
-      'cachedAt': cachedAt.toIso8601String(),
-      'expiresAt': expiresAt.toIso8601String(),
-      'key': key,
-    };
-  }
-
-  /// Create from JSON map
-  factory HiveCacheEntry.fromJson(
-    Map<String, dynamic> json,
-    T Function(Map<String, dynamic>) dataFromJson,
-  ) {
-    return HiveCacheEntry(
-      data: dataFromJson(json['data'] as Map<String, dynamic>),
-      cachedAt: DateTime.parse(json['cachedAt'] as String),
-      expiresAt: DateTime.parse(json['expiresAt'] as String),
-      key: json['key'] as String?,
-    );
-  }
+  Map<String, dynamic> toJson(Map<String, dynamic> Function(T) dataToJson) => {
+        'data': dataToJson(data),
+        'cachedAt': cachedAt.toIso8601String(),
+        'expiresAt': expiresAt.toIso8601String(),
+        'key': key,
+      };
 
   @override
   String toString() =>

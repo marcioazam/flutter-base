@@ -1,3 +1,5 @@
+import 'package:flutter_base_2025/core/security/input_sanitizer.dart';
+
 /// Abstract interface for deep link validation services.
 /// Provides security validation for deep links to prevent:
 /// - Open redirect vulnerabilities
@@ -8,6 +10,7 @@
 /// - OWASP A01: Broken Access Control
 /// - OWASP A05: Injection Prevention
 /// - CWE-601: URL Redirection to Untrusted Site
+
 abstract interface class DeepLinkValidator {
   /// List of allowed URL schemes (e.g., 'https', 'myapp').
   List<String> get allowedSchemes;
@@ -98,7 +101,7 @@ class DefaultDeepLinkValidator implements DeepLinkValidator {
   final DeepLinkValidatorConfig config;
 
   /// Input sanitizer for query parameter sanitization.
-  final dynamic inputSanitizer;
+  final InputSanitizer inputSanitizer;
 
   @override
   List<String> get allowedSchemes => config.allowedSchemes;
@@ -129,7 +132,7 @@ class DefaultDeepLinkValidator implements DeepLinkValidator {
       }
 
       return true;
-    } catch (e) {
+    } on FormatException {
       return false;
     }
   }
@@ -141,7 +144,7 @@ class DefaultDeepLinkValidator implements DeepLinkValidator {
     try {
       final uri = Uri.parse(url);
       return uri.path;
-    } catch (e) {
+    } on FormatException {
       return null;
     }
   }
@@ -158,7 +161,7 @@ class DefaultDeepLinkValidator implements DeepLinkValidator {
           inputSanitizer.sanitizeHtml(value),
         ),
       );
-    } catch (e) {
+    } on FormatException {
       return null;
     }
   }

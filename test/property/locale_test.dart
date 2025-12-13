@@ -80,7 +80,6 @@ void main() {
       container.listen(
         localeProvider,
         (_, next) => states.add(next),
-        fireImmediately: false,
       );
 
       await notifier.setLocale(const Locale('pt'));

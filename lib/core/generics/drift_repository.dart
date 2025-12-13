@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:drift/native.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/generics/base_repository.dart';
 import 'package:flutter_base_2025/core/generics/paginated_list.dart';

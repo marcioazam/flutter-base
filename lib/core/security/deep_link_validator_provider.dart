@@ -22,13 +22,10 @@ part 'deep_link_validator_provider.g.dart';
 /// ```
 @riverpod
 DeepLinkValidatorConfig deepLinkValidatorConfig(
-  DeepLinkValidatorConfigRef ref,
-) {
-  return const DeepLinkValidatorConfig(
-    allowedSchemes: ['https', 'http', 'myapp'],
-    allowedHosts: ['example.com', 'api.example.com'],
+  Ref ref,
+) => const DeepLinkValidatorConfig(
+    
   );
-}
 
 /// Provides DeepLinkValidator instance for dependency injection.
 ///
@@ -61,7 +58,7 @@ DeepLinkValidatorConfig deepLinkValidatorConfig(
 /// });
 /// ```
 @riverpod
-DeepLinkValidator deepLinkValidator(DeepLinkValidatorRef ref) {
+DeepLinkValidator deepLinkValidator(Ref ref) {
   final config = ref.watch(deepLinkValidatorConfigProvider);
   final sanitizer = ref.watch(inputSanitizerProvider);
 

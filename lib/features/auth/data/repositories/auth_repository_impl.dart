@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/storage/token_storage.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
-import 'package:flutter_base_2025/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:flutter_base_2025/features/auth/data/data_sources/auth_remote_datasource.dart';
 import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
 import 'package:flutter_base_2025/features/auth/domain/repositories/auth_repository.dart';
 
@@ -117,7 +117,7 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Result<void>> logout() async {
     try {
       await _remoteDataSource.logout();
-    } catch (_) {
+    } on Exception catch (_) {
       // Ignore remote logout errors
     }
 

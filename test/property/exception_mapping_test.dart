@@ -1,10 +1,10 @@
 import 'package:flutter_base_2025/core/errors/exceptions.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, test, setUp, tearDown, setUpAll, tearDownAll;
+import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
-final _explore = ExploreConfig(numRuns: 100);
+final _explore = ExploreConfig();
 
 /// **Feature: flutter-production-ready-2025, Property 21: Exception to Failure Mapping**
 /// **Validates: Requirements 11.1**

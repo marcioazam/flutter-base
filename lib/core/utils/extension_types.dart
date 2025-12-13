@@ -24,10 +24,6 @@ extension type const UserId(String value) {
 
 /// Email extension type with validation.
 extension type const Email(String value) {
-  static final _emailRegex = RegExp(
-    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
-  );
-
   /// Creates Email from string with validation.
   factory Email.fromString(String s) {
     final trimmed = s.trim().toLowerCase();
@@ -52,6 +48,10 @@ extension type const Email(String value) {
 
   /// Check if valid.
   bool get isValid => _emailRegex.hasMatch(value);
+
+  static final _emailRegex = RegExp(
+    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+  );
 }
 
 /// API path extension type for type-safe URL building.
@@ -83,8 +83,6 @@ extension type const ApiPath(String value) {
 
 /// Phone number extension type.
 extension type const PhoneNumber(String value) {
-  static final _phoneRegex = RegExp(r'^\+?[0-9]{10,15}$');
-
   /// Creates PhoneNumber from string with validation.
   factory PhoneNumber.fromString(String s) {
     final cleaned = s.replaceAll(RegExp(r'[\s\-\(\)]'), '');
@@ -103,6 +101,8 @@ extension type const PhoneNumber(String value) {
 
   /// Check if valid.
   bool get isValid => _phoneRegex.hasMatch(value);
+
+  static final _phoneRegex = RegExp(r'^\+?[0-9]{10,15}$');
 }
 
 /// Positive integer extension type.

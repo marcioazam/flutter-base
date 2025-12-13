@@ -83,7 +83,7 @@ class MockAIService implements AIService {
     try {
       final mockData = <String, dynamic>{'mock': true, 'prompt': prompt};
       return Success(fromJson(mockData));
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(mapAIError(AIErrorType.parseError, e.toString()));
     }
   }

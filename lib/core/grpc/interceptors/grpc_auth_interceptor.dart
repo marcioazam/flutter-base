@@ -18,13 +18,22 @@ class GrpcAuthInterceptor extends ClientInterceptor {
 
   final TokenStorage _tokenStorage;
   String? _cachedToken;
+  DateTime? _tokenCachedAt;
 
   static const _authorizationKey = 'authorization';
   static const _bearerPrefix = 'Bearer ';
+  static const _tokenCacheDuration = Duration(minutes: 5);
 
   /// Pre-fetch and cache the token for synchronous access in interceptor.
   Future<void> refreshToken() async {
     _cachedToken = await _tokenStorage.getAccessToken();
+    _tokenCachedAt = DateTime.now();
+  }
+
+  /// Check if cached token is still valid (not expired).
+  bool get _isTokenCacheValid {
+    if (_cachedToken == null || _tokenCachedAt == null) return false;
+    return DateTime.now().difference(_tokenCachedAt!) < _tokenCacheDuration;
   }
 
   @override
@@ -77,5 +86,9 @@ class GrpcAuthInterceptor extends ClientInterceptor {
   /// Clear cached token (call on logout).
   void clearCache() {
     _cachedToken = null;
+    _tokenCachedAt = null;
   }
+
+  /// Check if token needs refresh.
+  bool get needsRefresh => !_isTokenCacheValid;
 }

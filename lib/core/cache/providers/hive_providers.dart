@@ -59,11 +59,10 @@ HiveCacheDataSource<T> createHiveCacheDataSource<T>({
   required T Function(Map<String, dynamic>) fromJson,
   required Map<String, dynamic> Function(T) toJson,
   HiveCacheConfig? config,
-}) {
-  return HiveCacheDataSource<T>(
-    box: box,
-    fromJson: fromJson,
-    toJson: toJson,
-    config: config ?? const HiveCacheConfig(),
-  );
-}
+}) =>
+    HiveCacheDataSource<T>(
+      box: box,
+      fromJson: fromJson,
+      toJson: toJson,
+      config: config ?? const HiveCacheConfig(),
+    );

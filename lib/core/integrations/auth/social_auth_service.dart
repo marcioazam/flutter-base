@@ -82,7 +82,7 @@ class SocialAuthServiceImpl implements SocialAuthService {
       // ));
 
       return Failure(AuthFailure('Google Sign-In not configured'));
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(AuthFailure('Google sign in failed: $e'));
     }
   }
@@ -116,7 +116,7 @@ class SocialAuthServiceImpl implements SocialAuthService {
       // ));
 
       return Failure(AuthFailure('Apple Sign-In not configured'));
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(AuthFailure('Apple sign in failed: $e'));
     }
   }
@@ -154,7 +154,7 @@ class SocialAuthServiceImpl implements SocialAuthService {
       // ));
 
       return Failure(AuthFailure('Facebook Sign-In not configured'));
-    } catch (e) {
+    } on Exception catch (e) {
       return Failure(AuthFailure('Facebook sign in failed: $e'));
     }
   }

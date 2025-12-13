@@ -1,6 +1,7 @@
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_base_2025/features/auth/domain/entities/permission.dart';
 import 'package:flutter_base_2025/features/auth/domain/entities/user_role.dart';
+import 'package:meta/meta.dart';
 
 /// Authorization repository interface.
 /// Defines operations for role and permission management.
@@ -198,6 +199,7 @@ sealed class AuthorizationState {
 }
 
 /// Authorization data loaded and available.
+@immutable
 final class AuthorizationLoaded extends AuthorizationState {
   const AuthorizationLoaded({
     required this.roles,
@@ -225,6 +227,7 @@ final class AuthorizationLoading extends AuthorizationState {
 }
 
 /// Authorization data failed to load.
+@immutable
 final class AuthorizationError extends AuthorizationState {
   const AuthorizationError(this.message);
 

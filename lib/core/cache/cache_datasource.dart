@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:flutter_base_2025/core/generics/cache_entry.dart';
+import 'package:flutter_base_2025/core/cache/cache_entry.dart';
 
 /// Generic cache data source with TTL support.
 /// 

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
+import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Storage interface for offline persistence.
@@ -50,8 +51,6 @@ class SharedPreferencesPersistence implements PersistenceStorage {
       return Success(decode(encoded));
     } on FormatException catch (e, st) {
       return Failure(CacheFailure('Decoding error: ${e.message}', stackTrace: st));
-    } on TypeError catch (e, st) {
-      return Failure(CacheFailure('Type mismatch: $e', stackTrace: st));
     } on Exception catch (e, st) {
       return Failure(CacheFailure('Failed to load: $e', stackTrace: st));
     }
@@ -104,7 +103,26 @@ class JsonPersistence<T> {
 
   Future<Result<T?>> load() => storage.load<T>(
     key,
-    decode: (s) => fromJson(jsonDecode(s) as Map<String, dynamic>),
+    decode: (s) {
+      final decoded = jsonDecode(s);
+      if (decoded is Map<String, dynamic>) {
+        return fromJson(decoded);
+      }
+
+      if (decoded is Map) {
+        final json = <String, dynamic>{};
+        for (final entry in decoded.entries) {
+          final key = entry.key;
+          if (key is! String) {
+            throw const FormatException('Invalid JSON object');
+          }
+          json[key] = entry.value;
+        }
+        return fromJson(json);
+      }
+
+      throw const FormatException('Invalid JSON object');
+    },
   );
 
   Future<Result<void>> delete() => storage.delete(key);
@@ -114,7 +132,15 @@ class JsonPersistence<T> {
 /// 
 /// **Feature: flutter-2025-final-enhancements**
 /// **Validates: Requirements 2.2, 2.3**
+@immutable
 class UserPreferences {
+
+  factory UserPreferences.fromJson(Map<String, dynamic> json) => UserPreferences(
+    theme: json['theme'] as String? ?? 'system',
+    locale: json['locale'] as String? ?? 'en',
+    notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
+    fontSize: (json['fontSize'] as num?)?.toDouble() ?? 14.0,
+  );
   const UserPreferences({
     this.theme = 'system',
     this.locale = 'en',
@@ -133,13 +159,6 @@ class UserPreferences {
     'notificationsEnabled': notificationsEnabled,
     'fontSize': fontSize,
   };
-
-  factory UserPreferences.fromJson(Map<String, dynamic> json) => UserPreferences(
-    theme: json['theme'] as String? ?? 'system',
-    locale: json['locale'] as String? ?? 'en',
-    notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
-    fontSize: (json['fontSize'] as num?)?.toDouble() ?? 14.0,
-  );
 
   @override
   bool operator ==(Object other) =>

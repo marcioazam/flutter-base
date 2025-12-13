@@ -197,13 +197,11 @@ abstract final class RolePermissions {
 
   /// Get permissions for a specific role.
   /// Returns empty list for unknown roles.
-  static List<Permission> forRole(String role) {
-    return switch (role.toLowerCase()) {
+  static List<Permission> forRole(String role) => switch (role.toLowerCase()) {
       'admin' => admin,
       'moderator' => moderator,
       'user' => user,
       'guest' => guest,
       _ => <Permission>[],
     };
-  }
 }
