@@ -9,13 +9,12 @@ enum MapProvider { google, mapbox }
 /// Geographic coordinates.
 @immutable
 class LatLng {
-
   const LatLng(this.latitude, this.longitude);
 
   factory LatLng.fromJson(Map<String, dynamic> json) => LatLng(
-      (json['latitude'] as num).toDouble(),
-      (json['longitude'] as num).toDouble(),
-    );
+    (json['latitude'] as num).toDouble(),
+    (json['longitude'] as num).toDouble(),
+  );
   final double latitude;
   final double longitude;
 
@@ -33,14 +32,13 @@ class LatLng {
   String toString() => 'LatLng($latitude, $longitude)';
 
   Map<String, dynamic> toJson() => {
-        'latitude': latitude,
-        'longitude': longitude,
-      };
+    'latitude': latitude,
+    'longitude': longitude,
+  };
 }
 
 /// Map marker configuration.
 class MapMarker {
-
   const MapMarker({
     required this.id,
     required this.position,
@@ -59,7 +57,6 @@ class MapMarker {
 
 /// Map polyline configuration.
 class MapPolyline {
-
   const MapPolyline({
     required this.id,
     required this.points,
@@ -74,7 +71,6 @@ class MapPolyline {
 
 /// Map configuration.
 class MapConfig {
-
   const MapConfig({
     required this.initialCenter,
     this.initialZoom = 14.0,
@@ -163,7 +159,8 @@ class GoogleMapService implements MapService {
     final dLat = _toRadians(to.latitude - from.latitude);
     final dLon = _toRadians(to.longitude - from.longitude);
 
-    final a = math.sin(dLat / 2) * math.sin(dLat / 2) +
+    final a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
         math.cos(_toRadians(from.latitude)) *
             math.cos(_toRadians(to.latitude)) *
             math.sin(dLon / 2) *
@@ -192,14 +189,16 @@ class MapboxService implements MapService {
   }) => const Center(child: Text('Mapbox placeholder'));
 
   @override
-  Future<Result<List<LatLng>>> getRoute(LatLng from, LatLng to) async => const Success([]);
+  Future<Result<List<LatLng>>> getRoute(LatLng from, LatLng to) async =>
+      const Success([]);
 
   @override
-  double calculateDistance(LatLng from, LatLng to) => GoogleMapService().calculateDistance(from, to);
+  double calculateDistance(LatLng from, LatLng to) =>
+      GoogleMapService().calculateDistance(from, to);
 }
 
 /// Map service factory.
 MapService createMapService(MapProvider provider) => switch (provider) {
-    MapProvider.google => GoogleMapService(),
-    MapProvider.mapbox => MapboxService(),
-  };
+  MapProvider.google => GoogleMapService(),
+  MapProvider.mapbox => MapboxService(),
+};

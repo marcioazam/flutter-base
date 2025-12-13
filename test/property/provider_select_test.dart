@@ -6,7 +6,6 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Test state with multiple fields.
 class TestState {
-
   const TestState({
     required this.count,
     required this.name,
@@ -17,16 +16,17 @@ class TestState {
   final bool active;
 
   TestState copyWith({int? count, String? name, bool? active}) => TestState(
-        count: count ?? this.count,
-        name: name ?? this.name,
-        active: active ?? this.active,
-      );
+    count: count ?? this.count,
+    name: name ?? this.name,
+    active: active ?? this.active,
+  );
 }
 
 /// Test notifier for state management.
 class TestStateNotifier extends Notifier<TestState> {
   @override
-  TestState build() => const TestState(count: 0, name: 'initial', active: false);
+  TestState build() =>
+      const TestState(count: 0, name: 'initial', active: false);
 
   void incrementCount() {
     state = state.copyWith(count: state.count + 1);
@@ -41,8 +41,9 @@ class TestStateNotifier extends Notifier<TestState> {
   }
 }
 
-final testStateProvider =
-    NotifierProvider<TestStateNotifier, TestState>(TestStateNotifier.new);
+final testStateProvider = NotifierProvider<TestStateNotifier, TestState>(
+  TestStateNotifier.new,
+);
 
 void main() {
   group('Provider Select Rebuild Optimization Properties', () {

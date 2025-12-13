@@ -9,7 +9,9 @@ final sharedPreferencesProvider = Provider<SharedPreferences>((ref) {
 });
 
 /// Provider for current theme mode using Riverpod 3.0 Notifier pattern.
-final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(ThemeModeNotifier.new);
+final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
+  ThemeModeNotifier.new,
+);
 
 /// Notifier for theme mode state using Riverpod 3.0 pattern.
 class ThemeModeNotifier extends Notifier<ThemeMode> {

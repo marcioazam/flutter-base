@@ -184,7 +184,7 @@ class DefaultAccessibilityService implements AccessibilityService {
 
   @override
   Size ensureTouchTargetSize(Size size) => Size(
-        math.max(size.width, AccessibilityService.minTouchTargetSize),
-        math.max(size.height, AccessibilityService.minTouchTargetSize),
-      );
+    math.max(size.width, AccessibilityService.minTouchTargetSize),
+    math.max(size.height, AccessibilityService.minTouchTargetSize),
+  );
 }

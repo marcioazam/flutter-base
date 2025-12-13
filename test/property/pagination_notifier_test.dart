@@ -1,8 +1,9 @@
-import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/base/paginated_list.dart';
 import 'package:flutter_base_2025/shared/providers/pagination_notifier.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -195,29 +196,26 @@ void main() {
       any.list(any.nonEmptyLetters),
       any.list(any.nonEmptyLetters),
       _explore,
-    ).test(
-      'concat preserves all items from both lists',
-      (items1, items2) {
-        final list1 = PaginatedList.fromItems(
-          items1,
-          page: 1,
-          pageSize: 10,
-          totalItems: items1.length + items2.length,
-        );
+    ).test('concat preserves all items from both lists', (items1, items2) {
+      final list1 = PaginatedList.fromItems(
+        items1,
+        page: 1,
+        pageSize: 10,
+        totalItems: items1.length + items2.length,
+      );
 
-        final list2 = PaginatedList.fromItems(
-          items2,
-          page: 2,
-          pageSize: 10,
-          totalItems: items1.length + items2.length,
-        );
+      final list2 = PaginatedList.fromItems(
+        items2,
+        page: 2,
+        pageSize: 10,
+        totalItems: items1.length + items2.length,
+      );
 
-        final combined = list1.concat(list2);
+      final combined = list1.concat(list2);
 
-        expect(combined.items.length, equals(items1.length + items2.length));
-        expect(combined.items.sublist(0, items1.length), equals(items1));
-        expect(combined.items.sublist(items1.length), equals(items2));
-      },
-    );
+      expect(combined.items.length, equals(items1.length + items2.length));
+      expect(combined.items.sublist(0, items1.length), equals(items1));
+      expect(combined.items.sublist(items1.length), equals(items2));
+    });
   });
 }

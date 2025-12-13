@@ -103,9 +103,9 @@ class DefaultSecureRandom implements SecureRandom {
 
   @override
   String generateString(int length) => List.generate(
-      length,
-      (_) => _chars[_secureRandom.nextInt(_chars.length)],
-    ).join();
+    length,
+    (_) => _chars[_secureRandom.nextInt(_chars.length)],
+  ).join();
 
   @override
   String generateToken() => generateString(32);

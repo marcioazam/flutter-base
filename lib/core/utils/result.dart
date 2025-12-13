@@ -34,9 +34,7 @@ sealed class Result<T> {
   Future<Result<R>> mapAsync<R>(Future<R> Function(T value) mapper);
 
   /// Async flatMap operation.
-  Future<Result<R>> flatMapAsync<R>(
-    Future<Result<R>> Function(T value) mapper,
-  );
+  Future<Result<R>> flatMapAsync<R>(Future<Result<R>> Function(T value) mapper);
 
   /// Retorna o valor ou um valor padrão.
   T getOrElse(T Function() defaultValue);
@@ -60,7 +58,8 @@ sealed class Result<T> {
   Result<T> tapFailure(void Function(AppFailure) action);
 
   /// Zip two Results into a tuple.
-  static Result<(A, B)> zip<A, B>(Result<A> a, Result<B> b) => a.flatMap((va) => b.map((vb) => (va, vb)));
+  static Result<(A, B)> zip<A, B>(Result<A> a, Result<B> b) =>
+      a.flatMap((va) => b.map((vb) => (va, vb)));
 
   /// Zip three Results into a tuple.
   static Result<(A, B, C)> zip3<A, B, C>(
@@ -96,10 +95,7 @@ sealed class Result<T> {
 
   /// Creates a Result from a nullable value.
   /// Returns Success if value is not null, Failure otherwise.
-  static Result<T> fromNullable<T>(
-    T? value, {
-    AppFailure Function()? onNull,
-  }) {
+  static Result<T> fromNullable<T>(T? value, {AppFailure Function()? onNull}) {
     if (value != null) {
       return Success(value);
     }
@@ -116,8 +112,7 @@ sealed class Result<T> {
       return Success(computation());
     } on Exception catch (e, st) {
       return Failure(
-        onError?.call(e, st) ??
-            UnexpectedFailure(e.toString(), stackTrace: st),
+        onError?.call(e, st) ?? UnexpectedFailure(e.toString(), stackTrace: st),
       );
     }
   }
@@ -132,16 +127,14 @@ sealed class Result<T> {
       return Success(await computation());
     } on Exception catch (e, st) {
       return Failure(
-        onError?.call(e, st) ??
-            UnexpectedFailure(e.toString(), stackTrace: st),
+        onError?.call(e, st) ?? UnexpectedFailure(e.toString(), stackTrace: st),
       );
     }
   }
 
   /// Creates a Result from a boolean condition.
   /// Returns Success with value if condition is true, Failure otherwise.
-  static Result<T> fromCondition<T>(
-    {
+  static Result<T> fromCondition<T>({
     required bool condition,
     required T Function() value,
     AppFailure Function()? onFalse,
@@ -155,13 +148,13 @@ sealed class Result<T> {
   }
 
   /// Combines multiple Results, returning first failure or all successes.
-  static Result<List<T>> combine<T>(List<Result<T>> results) => sequence(results);
+  static Result<List<T>> combine<T>(List<Result<T>> results) =>
+      sequence(results);
 }
 
 /// Representa uma operação bem-sucedida com um valor.
 @immutable
 final class Success<T> extends Result<T> {
-
   const Success(this.value);
   final T value;
 
@@ -169,8 +162,7 @@ final class Success<T> extends Result<T> {
   R fold<R>(
     R Function(AppFailure failure) onFailure,
     R Function(T value) onSuccess,
-  ) =>
-      onSuccess(value);
+  ) => onSuccess(value);
 
   @override
   bool get isSuccess => true;
@@ -197,8 +189,7 @@ final class Success<T> extends Result<T> {
   @override
   Future<Result<R>> flatMapAsync<R>(
     Future<Result<R>> Function(T value) mapper,
-  ) =>
-      mapper(value);
+  ) => mapper(value);
 
   @override
   T getOrElse(T Function() defaultValue) => value;
@@ -241,7 +232,6 @@ final class Success<T> extends Result<T> {
 /// Representa uma operação que falhou com uma AppFailure.
 @immutable
 final class Failure<T> extends Result<T> {
-
   const Failure(this.failure);
   final AppFailure failure;
 
@@ -249,8 +239,7 @@ final class Failure<T> extends Result<T> {
   R fold<R>(
     R Function(AppFailure failure) onFailure,
     R Function(T value) onSuccess,
-  ) =>
-      onFailure(failure);
+  ) => onFailure(failure);
 
   @override
   bool get isSuccess => false;
@@ -277,8 +266,7 @@ final class Failure<T> extends Result<T> {
   @override
   Future<Result<R>> flatMapAsync<R>(
     Future<Result<R>> Function(T value) mapper,
-  ) async =>
-      Failure(failure);
+  ) async => Failure(failure);
 
   @override
   T getOrElse(T Function() defaultValue) => defaultValue();

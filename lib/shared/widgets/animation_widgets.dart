@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
 /// Lottie animation widget wrapper.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 31.1**
-/// 
+///
 /// Note: Requires lottie package. This is a wrapper that provides
 /// a consistent API for Lottie animations.
 class LottieWidget extends StatefulWidget {
-
   const LottieWidget({
-    required this.asset, super.key,
+    required this.asset,
+    super.key,
     this.url,
     this.width,
     this.height,
@@ -21,6 +21,7 @@ class LottieWidget extends StatefulWidget {
     this.onControllerReady,
     this.onComplete,
   });
+
   /// Asset path for the Lottie animation.
   final String asset;
 
@@ -95,22 +96,19 @@ class _LottieWidgetState extends State<LottieWidget>
 
   @override
   Widget build(BuildContext context) => SizedBox(
-      width: widget.width,
-      height: widget.height,
-      child: const Placeholder(
-        child: Center(
-          child: Text('Lottie Animation\n(requires lottie package)'),
-        ),
-      ),
-    );
+    width: widget.width,
+    height: widget.height,
+    child: const Placeholder(
+      child: Center(child: Text('Lottie Animation\n(requires lottie package)')),
+    ),
+  );
 }
 
 /// Custom page route with configurable transitions.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 31.2**
 class CustomPageRoute<T> extends PageRouteBuilder<T> {
-
   CustomPageRoute({
     required this.page,
     this.transitionType = PageTransitionType.fade,
@@ -118,15 +116,11 @@ class CustomPageRoute<T> extends PageRouteBuilder<T> {
     this.curve = Curves.easeInOut,
     super.settings,
   }) : super(
-          pageBuilder: (context, animation, secondaryAnimation) => page,
-          reverseTransitionDuration: transitionDuration,
-          transitionsBuilder: (context, animation, secondaryAnimation, child) => _buildTransition(
-              transitionType,
-              animation,
-              curve,
-              child,
-            ),
-        );
+         pageBuilder: (context, animation, secondaryAnimation) => page,
+         reverseTransitionDuration: transitionDuration,
+         transitionsBuilder: (context, animation, secondaryAnimation, child) =>
+             _buildTransition(transitionType, animation, curve, child),
+       );
   final Widget page;
   final PageTransitionType transitionType;
   final Curve curve;
@@ -209,13 +203,14 @@ enum PageTransitionType {
 }
 
 /// Staggered list animation widget.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 31.3**
 class StaggeredListView extends StatefulWidget {
-
   const StaggeredListView({
-    required this.itemCount, required this.itemBuilder, super.key,
+    required this.itemCount,
+    required this.itemBuilder,
+    super.key,
     this.staggerDelay = const Duration(milliseconds: 50),
     this.itemDuration = const Duration(milliseconds: 300),
     this.curve = Curves.easeOut,
@@ -295,31 +290,33 @@ class _StaggeredListViewState extends State<StaggeredListView>
 
   @override
   Widget build(BuildContext context) => ListView.builder(
-      controller: widget.controller,
-      padding: widget.padding,
-      physics: widget.physics,
-      itemCount: widget.itemCount,
-      itemBuilder: (context, index) {
-        if (index >= _animations.length) {
-          return widget.itemBuilder(
-            context,
-            index,
-            const AlwaysStoppedAnimation(1),
-          );
-        }
-        return AnimatedBuilder(
-          animation: _animations[index],
-          builder: (context, child) => widget.itemBuilder(context, index, _animations[index]),
+    controller: widget.controller,
+    padding: widget.padding,
+    physics: widget.physics,
+    itemCount: widget.itemCount,
+    itemBuilder: (context, index) {
+      if (index >= _animations.length) {
+        return widget.itemBuilder(
+          context,
+          index,
+          const AlwaysStoppedAnimation(1),
         );
-      },
-    );
+      }
+      return AnimatedBuilder(
+        animation: _animations[index],
+        builder: (context, child) =>
+            widget.itemBuilder(context, index, _animations[index]),
+      );
+    },
+  );
 }
 
 /// Staggered item wrapper with common animations.
 class StaggeredItem extends StatelessWidget {
-
   const StaggeredItem({
-    required this.animation, required this.child, super.key,
+    required this.animation,
+    required this.child,
+    super.key,
     this.type = StaggeredItemType.fadeSlide,
   });
   final Animation<double> animation;
@@ -359,9 +356,4 @@ class StaggeredItem extends StatelessWidget {
   }
 }
 
-enum StaggeredItemType {
-  fade,
-  scale,
-  fadeSlide,
-  fadeScale,
-}
+enum StaggeredItemType { fade, scale, fadeSlide, fadeScale }

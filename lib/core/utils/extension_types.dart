@@ -66,7 +66,9 @@ extension type const ApiPath(String value) {
 
   /// Concatenates path segments.
   ApiPath operator /(String segment) {
-    final cleanSegment = segment.startsWith('/') ? segment.substring(1) : segment;
+    final cleanSegment = segment.startsWith('/')
+        ? segment.substring(1)
+        : segment;
     return ApiPath('$value/$cleanSegment');
   }
 
@@ -75,7 +77,10 @@ extension type const ApiPath(String value) {
     if (params.isEmpty) return value;
     final query = params.entries
         .where((e) => e.value != null)
-        .map((e) => '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}')
+        .map(
+          (e) =>
+              '${Uri.encodeComponent(e.key)}=${Uri.encodeComponent(e.value.toString())}',
+        )
         .join('&');
     return '$value?$query';
   }

@@ -8,16 +8,19 @@ import 'package:flutter_test/flutter_test.dart';
 
 /// Helper to simulate ApiClient error handling logic.
 AppException handleDioError(DioException e) => switch (e.type) {
-    DioExceptionType.connectionTimeout ||
-    DioExceptionType.sendTimeout ||
-    DioExceptionType.receiveTimeout =>
-      NetworkException('Connection timeout', statusCode: 408),
-    DioExceptionType.connectionError =>
-      NetworkException('No internet connection'),
-    DioExceptionType.badResponse => _handleBadResponse(e.response),
-    DioExceptionType.cancel => NetworkException('Request cancelled'),
-    _ => NetworkException(e.message ?? 'Unknown network error'),
-  };
+  DioExceptionType.connectionTimeout ||
+  DioExceptionType.sendTimeout ||
+  DioExceptionType.receiveTimeout => NetworkException(
+    'Connection timeout',
+    statusCode: 408,
+  ),
+  DioExceptionType.connectionError => NetworkException(
+    'No internet connection',
+  ),
+  DioExceptionType.badResponse => _handleBadResponse(e.response),
+  DioExceptionType.cancel => NetworkException('Request cancelled'),
+  _ => NetworkException(e.message ?? 'Unknown network error'),
+};
 
 AppException _handleBadResponse(Response<dynamic>? response) {
   final statusCode = response?.statusCode ?? 500;
@@ -27,16 +30,15 @@ AppException _handleBadResponse(Response<dynamic>? response) {
   Map<String, List<String>>? fieldErrors;
 
   if (data is Map<String, dynamic>) {
-    message = data['message'] as String? ??
+    message =
+        data['message'] as String? ??
         data['detail'] as String? ??
         'Server error';
 
     if (data['errors'] is Map) {
       fieldErrors = (data['errors'] as Map<String, dynamic>).map(
-        (key, value) => MapEntry(
-          key,
-          (value as List).map((e) => e.toString()).toList(),
-        ),
+        (key, value) =>
+            MapEntry(key, (value as List).map((e) => e.toString()).toList()),
       );
     }
   }
@@ -178,8 +180,8 @@ void main() {
         data: {
           'message': 'Validation failed',
           'errors': {
-            'email': ['Invalid email format']
-          }
+            'email': ['Invalid email format'],
+          },
         },
       );
 
@@ -302,8 +304,8 @@ void main() {
           'message': 'Validation failed',
           'errors': {
             'email': ['Invalid format', 'Already exists'],
-            'password': ['Too short']
-          }
+            'password': ['Too short'],
+          },
         },
       );
 

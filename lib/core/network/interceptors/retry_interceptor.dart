@@ -4,11 +4,10 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 
 /// Interceptor for retrying failed requests with exponential backoff and jitter.
-/// 
+///
 /// **Feature: flutter-state-of-art-code-review-2025**
 /// **Validates: Requirements 8.3, 21.2, 39.1**
 class RetryInterceptor extends Interceptor {
-
   RetryInterceptor({
     required this.dio,
     this.maxRetries = 5,
@@ -26,7 +25,10 @@ class RetryInterceptor extends Interceptor {
   final Random _random;
 
   @override
-  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     if (_shouldRetry(err)) {
       final dynamic rawRetryCount = err.requestOptions.extra['retryCount'];
       final retryCount = rawRetryCount is int ? rawRetryCount : 0;
@@ -47,22 +49,23 @@ class RetryInterceptor extends Interceptor {
   }
 
   /// Calculates exponential backoff delay with jitter.
-  /// 
+  ///
   /// Formula: delay = min(baseDelay * 2^attempt * (1 ± jitter), maxDelay)
-  /// 
+  ///
   /// **Feature: flutter-state-of-art-code-review-2025, Property 5**
   /// **Validates: Requirements 8.3, 21.2, 39.1**
   Duration calculateBackoffDelay(int attempt) {
     // Calculate base exponential delay
     final exponentialMs = baseDelay.inMilliseconds * pow(2, attempt);
-    
+
     // Apply jitter: random value between (1 - jitterFactor) and (1 + jitterFactor)
-    final jitterMultiplier = 1.0 + ((_random.nextDouble() * 2 - 1) * jitterFactor);
+    final jitterMultiplier =
+        1.0 + ((_random.nextDouble() * 2 - 1) * jitterFactor);
     final delayMs = (exponentialMs * jitterMultiplier).round();
-    
+
     // Cap at maxDelay
     final cappedMs = min(delayMs, maxDelay.inMilliseconds);
-    
+
     return Duration(milliseconds: cappedMs);
   }
 
@@ -72,11 +75,10 @@ class RetryInterceptor extends Interceptor {
       DioExceptionType.connectionTimeout ||
       DioExceptionType.sendTimeout ||
       DioExceptionType.receiveTimeout ||
-      DioExceptionType.connectionError =>
-        true,
+      DioExceptionType.connectionError => true,
       DioExceptionType.badResponse => _isRetryableStatusCode(
-          err.response?.statusCode,
-        ),
+        err.response?.statusCode,
+      ),
       _ => false,
     };
   }

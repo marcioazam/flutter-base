@@ -8,10 +8,7 @@ abstract interface class AnalyticsService {
   Future<void> initialize();
 
   /// Logs a screen view event.
-  Future<void> logScreenView({
-    required String screenName,
-    String? screenClass,
-  });
+  Future<void> logScreenView({required String screenName, String? screenClass});
 
   /// Logs a custom event.
   Future<void> logEvent({
@@ -26,10 +23,7 @@ abstract interface class AnalyticsService {
   Future<void> clearUserId();
 
   /// Sets a user property.
-  Future<void> setUserProperty({
-    required String name,
-    required String value,
-  });
+  Future<void> setUserProperty({required String name, required String value});
 
   /// Enables or disables analytics collection.
   Future<void> setAnalyticsCollectionEnabled({required bool enabled});
@@ -96,7 +90,6 @@ class ConsoleAnalyticsService implements AnalyticsService {
 
 /// Navigator observer for automatic screen tracking.
 class AnalyticsNavigatorObserver extends NavigatorObserver {
-
   AnalyticsNavigatorObserver(this._analytics);
   final AnalyticsService _analytics;
 

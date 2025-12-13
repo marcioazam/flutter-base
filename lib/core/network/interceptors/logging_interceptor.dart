@@ -4,11 +4,7 @@ import 'package:logger/logger.dart';
 /// Interceptor for logging HTTP requests and responses.
 class LoggingInterceptor extends Interceptor {
   final Logger _logger = Logger(
-    printer: PrettyPrinter(
-      methodCount: 0,
-      errorMethodCount: 5,
-      lineLength: 80,
-    ),
+    printer: PrettyPrinter(methodCount: 0, errorMethodCount: 5, lineLength: 80),
   );
 
   @override
@@ -22,7 +18,10 @@ class LoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
     _logger.d(
       '← ${response.statusCode} ${response.requestOptions.uri}\n'
       'Data: ${response.data}',

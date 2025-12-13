@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base_2025/shared/widgets/responsive_builder.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -96,11 +97,7 @@ void main() {
         tester.view.devicePixelRatio = 1.0;
 
         await tester.pumpWidget(
-          const MaterialApp(
-            home: ResponsiveLayout(
-              mobile: Text('Mobile'),
-            ),
-          ),
+          const MaterialApp(home: ResponsiveLayout(mobile: Text('Mobile'))),
         );
 
         expect(find.text('Mobile'), findsOneWidget);
@@ -121,8 +118,8 @@ void main() {
           final expectedSize = normalizedWidth < Breakpoints.mobile
               ? ScreenSize.mobile
               : normalizedWidth < Breakpoints.tablet
-                  ? ScreenSize.tablet
-                  : ScreenSize.desktop;
+              ? ScreenSize.tablet
+              : ScreenSize.desktop;
 
           // Verify breakpoint logic
           if (normalizedWidth < 600) {
@@ -157,10 +154,7 @@ void main() {
 
       test('responsiveValue falls back correctly', () {
         // Tablet falls back to mobile when null
-        expect(
-          _getResponsiveValueForWidth(700, mobile: 1),
-          equals(1),
-        );
+        expect(_getResponsiveValueForWidth(700, mobile: 1), equals(1));
 
         // Desktop falls back to tablet when null
         expect(
@@ -169,10 +163,7 @@ void main() {
         );
 
         // Desktop falls back to mobile when both are null
-        expect(
-          _getResponsiveValueForWidth(1000, mobile: 1),
-          equals(1),
-        );
+        expect(_getResponsiveValueForWidth(1000, mobile: 1), equals(1));
       });
     });
   });
@@ -188,8 +179,8 @@ int _getResponsiveValueForWidth(
   final screenSize = width < Breakpoints.mobile
       ? ScreenSize.mobile
       : width < Breakpoints.tablet
-          ? ScreenSize.tablet
-          : ScreenSize.desktop;
+      ? ScreenSize.tablet
+      : ScreenSize.desktop;
 
   return switch (screenSize) {
     ScreenSize.desktop => desktop ?? tablet ?? mobile,

@@ -4,12 +4,12 @@ import 'package:meta/meta.dart';
 /// Domain layer entities are immutable and contain business logic.
 @immutable
 class User {
-
   const User({
     required this.id,
     required this.email,
     required this.name,
-    required this.createdAt, this.avatarUrl,
+    required this.createdAt,
+    this.avatarUrl,
     this.updatedAt,
   });
   final String id;
@@ -28,13 +28,13 @@ class User {
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => User(
-      id: id ?? this.id,
-      email: email ?? this.email,
-      name: name ?? this.name,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
+    id: id ?? this.id,
+    email: email ?? this.email,
+    name: name ?? this.name,
+    avatarUrl: avatarUrl ?? this.avatarUrl,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
 
   @override
   bool operator ==(Object other) =>

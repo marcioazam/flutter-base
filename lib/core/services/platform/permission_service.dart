@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_base_2025/core/observability/app_logger.dart';
 
 /// Permission types supported by the app.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 34.1**
 enum Permission {
@@ -21,7 +21,7 @@ enum Permission {
 }
 
 /// Permission status.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 34.2**
 enum PermissionStatus {
@@ -43,7 +43,6 @@ enum PermissionStatus {
 
 /// Result of a permission request.
 class PermissionResult {
-
   const PermissionResult({
     required this.permission,
     required this.status,
@@ -61,7 +60,6 @@ class PermissionResult {
 
 /// Permission rationale configuration.
 class PermissionRationale {
-
   const PermissionRationale({
     required this.title,
     required this.message,
@@ -140,7 +138,7 @@ abstract final class DefaultRationales {
 }
 
 /// Abstract interface for permission service.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 34.1, 34.2, 34.3, 34.4, 34.5**
 abstract interface class PermissionService {
@@ -165,7 +163,8 @@ class MockPermissionService implements PermissionService {
   final Map<Permission, PermissionStatus> _statuses = {};
 
   @override
-  Future<PermissionStatus> check(Permission permission) async => _statuses[permission] ?? PermissionStatus.denied;
+  Future<PermissionStatus> check(Permission permission) async =>
+      _statuses[permission] ?? PermissionStatus.denied;
 
   @override
   Future<PermissionResult> request(Permission permission) async {
@@ -191,7 +190,8 @@ class MockPermissionService implements PermissionService {
 
   @override
   Future<List<PermissionResult>> requestMultiple(
-      List<Permission> permissions) async {
+    List<Permission> permissions,
+  ) async {
     final results = <PermissionResult>[];
 
     for (final permission in permissions) {

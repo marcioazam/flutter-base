@@ -156,9 +156,8 @@ extension PermissionListExtension on List<Permission> {
       where((p) => p.action == action).toList();
 
   /// Check if has permission to perform action on resource.
-  bool canPerform(String action, String resource) => any(
-        (p) => p.action == action && p.resource == resource,
-      );
+  bool canPerform(String action, String resource) =>
+      any((p) => p.action == action && p.resource == resource);
 }
 
 /// Default role-permission mappings.
@@ -198,10 +197,10 @@ abstract final class RolePermissions {
   /// Get permissions for a specific role.
   /// Returns empty list for unknown roles.
   static List<Permission> forRole(String role) => switch (role.toLowerCase()) {
-      'admin' => admin,
-      'moderator' => moderator,
-      'user' => user,
-      'guest' => guest,
-      _ => <Permission>[],
-    };
+    'admin' => admin,
+    'moderator' => moderator,
+    'user' => user,
+    'guest' => guest,
+    _ => <Permission>[],
+  };
 }

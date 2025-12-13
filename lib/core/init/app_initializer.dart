@@ -41,11 +41,7 @@ final class InitFailure extends InitResult {
 
 /// App initializer that handles startup sequence.
 class AppInitializer {
-
-  AppInitializer({
-    required this.flavor,
-    this.onProgress,
-  });
+  AppInitializer({required this.flavor, this.onProgress});
   final Flavor flavor;
   final void Function(String step, double progress)? onProgress;
 
@@ -76,40 +72,33 @@ class AppInitializer {
     }
 
     stopwatch.stop();
-    AppLogger.instance.info('App initialized in ${stopwatch.elapsedMilliseconds}ms');
+    AppLogger.instance.info(
+      'App initialized in ${stopwatch.elapsedMilliseconds}ms',
+    );
     return InitSuccess(stopwatch.elapsed);
   }
 
   List<InitStep> _buildSteps() => [
-        (
-          name: 'Config',
-          action: () => AppConfig.initialize(flavor),
-        ),
-        (
-          name: 'Logger',
-          action: () async => _initializeLogger(),
-        ),
-        (
-          name: 'CrashReporter',
-          action: () => CrashReporterService.instance.initialize(),
-        ),
-        (
-          name: 'Analytics',
-          action: () => AnalyticsServiceInstance.instance.initialize(),
-        ),
-        (
-          name: 'FeatureFlags',
-          action: () => FeatureFlagsService.instance.initialize(),
-        ),
-      ];
+    (name: 'Config', action: () => AppConfig.initialize(flavor)),
+    (name: 'Logger', action: () async => _initializeLogger()),
+    (
+      name: 'CrashReporter',
+      action: () => CrashReporterService.instance.initialize(),
+    ),
+    (
+      name: 'Analytics',
+      action: () => AnalyticsServiceInstance.instance.initialize(),
+    ),
+    (
+      name: 'FeatureFlags',
+      action: () => FeatureFlagsService.instance.initialize(),
+    ),
+  ];
 
   /// Initializes logger with production-appropriate settings.
   void _initializeLogger() {
     AppLogger.initialize(
-      baseContext: {
-        'flavor': flavor.name,
-        'version': '1.0.0',
-      },
+      baseContext: {'flavor': flavor.name, 'version': '1.0.0'},
     );
   }
 
@@ -154,7 +143,7 @@ Future<void> runAppWithErrorHandling(
     (error, stack) {
       // Report to crash service
       CrashReporterService.recordError(error, stack);
-      
+
       // Only log details in non-production
       if (!AppConfig.instance.isProduction) {
         AppLogger.instance.error(

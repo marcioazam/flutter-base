@@ -12,14 +12,13 @@ class HiveCacheConfig {
 
   /// Create config for development (shorter TTL, no encryption)
   factory HiveCacheConfig.development() => const HiveCacheConfig(
-        defaultTtl: Duration(minutes: 5),
-        encryptSensitiveBoxes: false,
-      );
+    defaultTtl: Duration(minutes: 5),
+    encryptSensitiveBoxes: false,
+  );
 
   /// Create config for production (longer TTL, encryption enabled)
-  factory HiveCacheConfig.production() => const HiveCacheConfig(
-        defaultTtl: Duration(hours: 24),
-      );
+  factory HiveCacheConfig.production() =>
+      const HiveCacheConfig(defaultTtl: Duration(hours: 24));
 
   /// Default time-to-live for cache entries
   final Duration defaultTtl;

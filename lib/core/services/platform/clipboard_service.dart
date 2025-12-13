@@ -7,7 +7,6 @@ import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Clipboard service configuration.
 class ClipboardConfig {
-
   const ClipboardConfig({
     this.sensitiveDataTimeout = const Duration(seconds: 30),
     this.showCopyConfirmation = true,
@@ -36,10 +35,7 @@ abstract interface class ClipboardService {
 
 /// Clipboard service implementation.
 class ClipboardServiceImpl implements ClipboardService {
-
-  ClipboardServiceImpl({
-    this.config = const ClipboardConfig(),
-  });
+  ClipboardServiceImpl({this.config = const ClipboardConfig()});
   final ClipboardConfig config;
   Timer? _clearTimer;
 
@@ -49,9 +45,13 @@ class ClipboardServiceImpl implements ClipboardService {
       await Clipboard.setData(ClipboardData(text: text));
       return const Success(null);
     } on PlatformException catch (e) {
-      return Failure(UnexpectedFailure('Platform clipboard error: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Platform clipboard error: ${e.message}'),
+      );
     } on MissingPluginException catch (e) {
-      return Failure(UnexpectedFailure('Clipboard plugin not available: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Clipboard plugin not available: ${e.message}'),
+      );
     } on Object catch (e) {
       return Failure(UnexpectedFailure('Unexpected clipboard error: $e'));
     }
@@ -70,9 +70,13 @@ class ClipboardServiceImpl implements ClipboardService {
 
       return const Success(null);
     } on PlatformException catch (e) {
-      return Failure(UnexpectedFailure('Platform clipboard error: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Platform clipboard error: ${e.message}'),
+      );
     } on MissingPluginException catch (e) {
-      return Failure(UnexpectedFailure('Clipboard plugin not available: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Clipboard plugin not available: ${e.message}'),
+      );
     } on Object catch (e) {
       return Failure(UnexpectedFailure('Unexpected clipboard error: $e'));
     }
@@ -84,9 +88,13 @@ class ClipboardServiceImpl implements ClipboardService {
       final data = await Clipboard.getData(Clipboard.kTextPlain);
       return Success(data?.text);
     } on PlatformException catch (e) {
-      return Failure(UnexpectedFailure('Platform clipboard error: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Platform clipboard error: ${e.message}'),
+      );
     } on MissingPluginException catch (e) {
-      return Failure(UnexpectedFailure('Clipboard plugin not available: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Clipboard plugin not available: ${e.message}'),
+      );
     } on Object catch (e) {
       return Failure(UnexpectedFailure('Unexpected clipboard error: $e'));
     }

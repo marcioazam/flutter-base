@@ -38,10 +38,7 @@ GrpcClient grpcClient(Ref ref) {
   final config = ref.watch(grpcConfigProvider);
   final tokenStorage = ref.watch(tokenStorageProvider);
 
-  final client = GrpcClient(
-    config: config,
-    tokenStorage: tokenStorage,
-  );
+  final client = GrpcClient(config: config, tokenStorage: tokenStorage);
 
   // Cleanup on dispose
   ref.onDispose(() async {

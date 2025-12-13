@@ -1,6 +1,6 @@
 import 'package:flutter_base_2025/core/errors/failures.dart';
-import 'package:flutter_base_2025/core/generics/base_repository.dart';
-import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/base/base_repository.dart';
+import 'package:flutter_base_2025/core/base/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
@@ -12,7 +12,6 @@ import 'package:mocktail/mocktail.dart';
 /// Test entity.
 @immutable
 class TestEntity {
-
   const TestEntity({required this.id, required this.name});
   final String id;
   final String name;
@@ -27,7 +26,8 @@ class TestEntity {
 }
 
 /// Mock repository for testing.
-class MockTestRepository extends Mock implements BaseRepository<TestEntity, String> {}
+class MockTestRepository extends Mock
+    implements BaseRepository<TestEntity, String> {}
 
 void main() {
   group('Repository CRUD Type Safety Properties', () {
@@ -39,8 +39,9 @@ void main() {
 
     test('getById returns Result<T> with correct type', () async {
       const entity = TestEntity(id: '1', name: 'Test');
-      when(() => repository.getById('1'))
-          .thenAnswer((_) async => Success(entity));
+      when(
+        () => repository.getById('1'),
+      ).thenAnswer((_) async => Success(entity));
 
       final result = await repository.getById('1');
 
@@ -50,8 +51,9 @@ void main() {
     });
 
     test('getById returns Failure on error', () async {
-      when(() => repository.getById('1'))
-          .thenAnswer((_) async => Failure(NotFoundFailure('Not found')));
+      when(
+        () => repository.getById('1'),
+      ).thenAnswer((_) async => Failure(NotFoundFailure('Not found')));
 
       final result = await repository.getById('1');
 
@@ -74,8 +76,9 @@ void main() {
         hasMore: false,
       );
 
-      when(() => repository.getAll())
-          .thenAnswer((_) async => Success(paginatedList));
+      when(
+        () => repository.getAll(),
+      ).thenAnswer((_) async => Success(paginatedList));
 
       final result = await repository.getAll();
 
@@ -86,8 +89,9 @@ void main() {
 
     test('create returns Result<T> with created entity', () async {
       const entity = TestEntity(id: '1', name: 'New');
-      when(() => repository.create(entity))
-          .thenAnswer((_) async => Success(entity));
+      when(
+        () => repository.create(entity),
+      ).thenAnswer((_) async => Success(entity));
 
       final result = await repository.create(entity);
 
@@ -98,8 +102,9 @@ void main() {
 
     test('update returns Result<T> with updated entity', () async {
       const entity = TestEntity(id: '1', name: 'Updated');
-      when(() => repository.update(entity))
-          .thenAnswer((_) async => Success(entity));
+      when(
+        () => repository.update(entity),
+      ).thenAnswer((_) async => Success(entity));
 
       final result = await repository.update(entity);
 
@@ -109,8 +114,9 @@ void main() {
     });
 
     test('delete returns Result<void>', () async {
-      when(() => repository.delete('1'))
-          .thenAnswer((_) async => const Success(null));
+      when(
+        () => repository.delete('1'),
+      ).thenAnswer((_) async => const Success(null));
 
       final result = await repository.delete('1');
 
@@ -123,8 +129,9 @@ void main() {
         const TestEntity(id: '1', name: 'Test 1'),
         const TestEntity(id: '2', name: 'Test 2'),
       ];
-      when(() => repository.createMany(entities))
-          .thenAnswer((_) async => Success(entities));
+      when(
+        () => repository.createMany(entities),
+      ).thenAnswer((_) async => Success(entities));
 
       final result = await repository.createMany(entities);
 
@@ -134,8 +141,9 @@ void main() {
     });
 
     test('deleteMany returns Result<void>', () async {
-      when(() => repository.deleteMany(['1', '2']))
-          .thenAnswer((_) async => const Success(null));
+      when(
+        () => repository.deleteMany(['1', '2']),
+      ).thenAnswer((_) async => const Success(null));
 
       final result = await repository.deleteMany(['1', '2']);
 
@@ -145,8 +153,9 @@ void main() {
 
     test('watchAll returns Stream<List<T>>', () async {
       final entities = [const TestEntity(id: '1', name: 'Test')];
-      when(() => repository.watchAll())
-          .thenAnswer((_) => Stream.value(entities));
+      when(
+        () => repository.watchAll(),
+      ).thenAnswer((_) => Stream.value(entities));
 
       final stream = repository.watchAll();
 

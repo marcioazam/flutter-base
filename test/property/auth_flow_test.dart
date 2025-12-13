@@ -1,7 +1,8 @@
 import 'package:flutter_base_2025/core/constants/app_constants.dart';
 import 'package:flutter_base_2025/core/router/route_guards.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 import 'package:mocktail/mocktail.dart' hide any;
 import 'package:mocktail/mocktail.dart' as mocktail;
 
@@ -26,8 +27,9 @@ void main() {
       'Property 1: Unauthenticated users are redirected to login for any protected route',
       (protectedPath) {
         // Arrange: User is not authenticated
-        when(() => mockAuthRepository.isAuthenticated())
-            .thenAnswer((_) async => false);
+        when(
+          () => mockAuthRepository.isAuthenticated(),
+        ).thenAnswer((_) async => false);
 
         // Define protected routes (any route not in public list)
         final isProtected = !_isPublicRoute('/$protectedPath');
@@ -55,10 +57,12 @@ void main() {
         var accessTokenStored = false;
         var refreshTokenStored = false;
 
-        when(() => mockTokenStorage.saveTokens(
-              accessToken: mocktail.any(named: 'accessToken'),
-              refreshToken: mocktail.any(named: 'refreshToken'),
-            )).thenAnswer((_) async {
+        when(
+          () => mockTokenStorage.saveTokens(
+            accessToken: mocktail.any(named: 'accessToken'),
+            refreshToken: mocktail.any(named: 'refreshToken'),
+          ),
+        ).thenAnswer((_) async {
           accessTokenStored = true;
           refreshTokenStored = true;
         });
@@ -70,15 +74,23 @@ void main() {
         );
 
         // Assert: Both tokens must be stored
-        expect(accessTokenStored, isTrue,
-            reason: 'Access token must be stored after login');
-        expect(refreshTokenStored, isTrue,
-            reason: 'Refresh token must be stored after login');
+        expect(
+          accessTokenStored,
+          isTrue,
+          reason: 'Access token must be stored after login',
+        );
+        expect(
+          refreshTokenStored,
+          isTrue,
+          reason: 'Refresh token must be stored after login',
+        );
 
-        verify(() => mockTokenStorage.saveTokens(
-              accessToken: accessToken,
-              refreshToken: refreshToken,
-            )).called(1);
+        verify(
+          () => mockTokenStorage.saveTokens(
+            accessToken: accessToken,
+            refreshToken: refreshToken,
+          ),
+        ).called(1);
       },
     );
 
@@ -94,20 +106,25 @@ void main() {
           tokensCleared = true;
         });
 
-        when(() => mockTokenStorage.hasTokens())
-            .thenAnswer((_) async => false);
+        when(() => mockTokenStorage.hasTokens()).thenAnswer((_) async => false);
 
         // Act: Clear tokens (logout)
         await mockTokenStorage.clearTokens();
 
         // Assert: Tokens must be cleared
-        expect(tokensCleared, isTrue,
-            reason: 'All tokens must be cleared on logout');
+        expect(
+          tokensCleared,
+          isTrue,
+          reason: 'All tokens must be cleared on logout',
+        );
 
         // Verify no tokens remain
         final hasTokens = await mockTokenStorage.hasTokens();
-        expect(hasTokens, isFalse,
-            reason: 'No tokens should remain after logout');
+        expect(
+          hasTokens,
+          isFalse,
+          reason: 'No tokens should remain after logout',
+        );
       },
     );
   });
@@ -117,10 +134,7 @@ void main() {
     Glados<String>(any.nonEmptyLetters).test(
       'Public routes are never protected',
       (routeSuffix) {
-        final publicRoutes = [
-          RoutePaths.login,
-          RoutePaths.register,
-        ];
+        final publicRoutes = [RoutePaths.login, RoutePaths.register];
 
         for (final route in publicRoutes) {
           expect(
@@ -136,9 +150,6 @@ void main() {
 
 /// Helper to check if a route is public.
 bool _isPublicRoute(String path) {
-  const publicRoutes = [
-    '/auth/login',
-    '/auth/register',
-  ];
+  const publicRoutes = ['/auth/login', '/auth/register'];
   return publicRoutes.any((route) => path.startsWith(route));
 }

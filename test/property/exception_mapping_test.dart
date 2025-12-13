@@ -1,7 +1,8 @@
 import 'package:flutter_base_2025/core/errors/exceptions.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -11,22 +12,24 @@ final _explore = ExploreConfig();
 
 /// Maps AppException to AppFailure (same logic as ApiRepository)
 AppFailure mapExceptionToFailure(AppException e) => switch (e) {
-    NetworkException() => NetworkFailure(e.message),
-    ServerException() => ServerFailure(e.message, statusCode: e.statusCode),
-    ValidationException(:final fieldErrors) =>
-      ValidationFailure(e.message, fieldErrors: fieldErrors ?? {}),
-    UnauthorizedException() => AuthFailure(e.message),
-    ForbiddenException() => ForbiddenFailure(e.message),
-    NotFoundException() => NotFoundFailure(e.message),
-    RateLimitException() => RateLimitFailure(e.message),
-    CacheException() => CacheFailure(e.message),
-  };
+  NetworkException() => NetworkFailure(e.message),
+  ServerException() => ServerFailure(e.message, statusCode: e.statusCode),
+  ValidationException(:final fieldErrors) => ValidationFailure(
+    e.message,
+    fieldErrors: fieldErrors ?? {},
+  ),
+  UnauthorizedException() => AuthFailure(e.message),
+  ForbiddenException() => ForbiddenFailure(e.message),
+  NotFoundException() => NotFoundFailure(e.message),
+  RateLimitException() => RateLimitFailure(e.message),
+  CacheException() => CacheFailure(e.message),
+};
 
 void main() {
   group('Exception to Failure Mapping Properties', () {
     /// **Property 21: Exception to Failure Mapping**
     /// *For any* AppException, mapping should produce the correct AppFailure subtype.
-    
+
     Glados<String>(any.nonEmptyLetters, _explore).test(
       'NetworkException maps to NetworkFailure',
       (message) {
@@ -53,8 +56,13 @@ void main() {
     Glados<String>(any.nonEmptyLetters, _explore).test(
       'ValidationException maps to ValidationFailure with fieldErrors',
       (message) {
-        final fieldErrors = {'email': ['Invalid format']};
-        final exception = ValidationException(message, fieldErrors: fieldErrors);
+        final fieldErrors = {
+          'email': ['Invalid format'],
+        };
+        final exception = ValidationException(
+          message,
+          fieldErrors: fieldErrors,
+        );
         final failure = mapExceptionToFailure(exception);
 
         expect(failure, isA<ValidationFailure>());

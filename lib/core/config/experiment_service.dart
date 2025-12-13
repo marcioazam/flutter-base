@@ -7,30 +7,24 @@ import 'package:flutter_base_2025/core/observability/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Typed variant for A/B testing.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 22.2**
 class Variant<T> {
-
-  const Variant({
-    required this.name,
-    required this.value,
-    this.weight = 1.0,
-  });
+  const Variant({required this.name, required this.value, this.weight = 1.0});
   final String name;
   final T value;
   final double weight;
 
   Map<String, dynamic> toMap() => {
-        'name': name,
-        'value': value,
-        'weight': weight,
-      };
+    'name': name,
+    'value': value,
+    'weight': weight,
+  };
 }
 
 /// Experiment configuration.
 class Experiment<T> {
-
   const Experiment({
     required this.id,
     required this.name,
@@ -66,7 +60,6 @@ class Experiment<T> {
 
 /// User assignment to an experiment variant.
 class ExperimentAssignment<T> {
-
   const ExperimentAssignment({
     required this.experimentId,
     required this.variantName,
@@ -79,15 +72,15 @@ class ExperimentAssignment<T> {
   final DateTime assignedAt;
 
   Map<String, dynamic> toMap() => {
-        'experimentId': experimentId,
-        'variantName': variantName,
-        'value': value,
-        'assignedAt': assignedAt.toIso8601String(),
-      };
+    'experimentId': experimentId,
+    'variantName': variantName,
+    'value': value,
+    'assignedAt': assignedAt.toIso8601String(),
+  };
 }
 
 /// Abstract interface for experiment/A/B testing service.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 22.1, 22.4**
 abstract interface class ExperimentService {
@@ -125,9 +118,8 @@ abstract interface class ExperimentService {
 
 /// Local experiment service implementation.
 class LocalExperimentService implements ExperimentService {
-
   LocalExperimentService({AnalyticsService? analyticsService})
-      : _analyticsService = analyticsService;
+    : _analyticsService = analyticsService;
   final Map<String, Experiment<dynamic>> _experiments = {};
   final Map<String, String> _assignments = {};
   final Map<String, String> _forcedVariants = {};
@@ -173,7 +165,9 @@ class LocalExperimentService implements ExperimentService {
           );
         }
       } on FormatException catch (e) {
-        AppLogger.instance.warning('Invalid JSON in experiment assignments: ${e.message}');
+        AppLogger.instance.warning(
+          'Invalid JSON in experiment assignments: ${e.message}',
+        );
       } on Exception catch (e) {
         AppLogger.instance.warning('Failed to load experiment assignments: $e');
       }
@@ -211,8 +205,10 @@ class LocalExperimentService implements ExperimentService {
   }
 
   String _assignVariant(Experiment<dynamic> experiment) {
-    final totalWeight =
-        experiment.variants.fold<double>(0, (sum, v) => sum + v.weight);
+    final totalWeight = experiment.variants.fold<double>(
+      0,
+      (sum, v) => sum + v.weight,
+    );
     var randomValue = _random.nextDouble() * totalWeight;
 
     for (final variant in experiment.variants) {
@@ -226,7 +222,8 @@ class LocalExperimentService implements ExperimentService {
   }
 
   @override
-  T? getVariantValue<T>(String experimentId) => getVariant<T>(experimentId)?.value;
+  T? getVariantValue<T>(String experimentId) =>
+      getVariant<T>(experimentId)?.value;
 
   @override
   void forceVariant(String experimentId, String variantName) {
@@ -260,7 +257,8 @@ class LocalExperimentService implements ExperimentService {
   }
 
   @override
-  List<Experiment<dynamic>> getActiveExperiments() => _experiments.values.where((e) => e.isRunning).toList();
+  List<Experiment<dynamic>> getActiveExperiments() =>
+      _experiments.values.where((e) => e.isRunning).toList();
 
   @override
   bool isInVariant(String experimentId, String variantName) {

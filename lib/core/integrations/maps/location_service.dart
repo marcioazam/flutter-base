@@ -5,23 +5,18 @@ import 'package:flutter_base_2025/core/integrations/maps/map_service.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Location permission status.
-enum LocationPermission {
-  denied,
-  deniedForever,
-  whileInUse,
-  always,
-}
+enum LocationPermission { denied, deniedForever, whileInUse, always }
 
 /// Location accuracy level.
 enum LocationAccuracy { lowest, low, medium, high, best }
 
 /// Location data.
 class LocationData {
-
   const LocationData({
     required this.latitude,
     required this.longitude,
-    required this.timestamp, this.altitude,
+    required this.timestamp,
+    this.altitude,
     this.accuracy,
     this.heading,
     this.speed,
@@ -37,19 +32,18 @@ class LocationData {
   LatLng toLatLng() => LatLng(latitude, longitude);
 
   Map<String, dynamic> toJson() => {
-        'latitude': latitude,
-        'longitude': longitude,
-        'altitude': altitude,
-        'accuracy': accuracy,
-        'heading': heading,
-        'speed': speed,
-        'timestamp': timestamp.toIso8601String(),
-      };
+    'latitude': latitude,
+    'longitude': longitude,
+    'altitude': altitude,
+    'accuracy': accuracy,
+    'heading': heading,
+    'speed': speed,
+    'timestamp': timestamp.toIso8601String(),
+  };
 }
 
 /// Location service configuration.
 class LocationConfig {
-
   const LocationConfig({
     this.accuracy = LocationAccuracy.high,
     this.distanceFilter = 10,
@@ -134,7 +128,9 @@ class LocationServiceImpl implements LocationService {
       }
 
       if (permission == LocationPermission.deniedForever) {
-        return Failure(ValidationFailure('Location permission permanently denied'));
+        return Failure(
+          ValidationFailure('Location permission permanently denied'),
+        );
       }
 
       // Placeholder - requires geolocator package
@@ -152,11 +148,9 @@ class LocationServiceImpl implements LocationService {
       //   timestamp: position.timestamp,
       // ));
 
-      return Success(LocationData(
-        latitude: 0,
-        longitude: 0,
-        timestamp: DateTime.now(),
-      ));
+      return Success(
+        LocationData(latitude: 0, longitude: 0, timestamp: DateTime.now()),
+      );
     } on Exception catch (e) {
       return Failure(UnexpectedFailure('Failed to get location: $e'));
     }

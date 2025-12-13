@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 
 /// Route guard for authentication-based redirects.
 class RouteGuard {
-
   RouteGuard(this._ref);
   final Ref _ref;
 
@@ -33,7 +32,7 @@ class RouteGuard {
     if (!isAuthenticated && !isAuthRoute) {
       // Store the original path for redirect after login
       _pendingDeepLink = currentPath;
-      
+
       // Include redirect parameter in login URL
       return Uri(
         path: RoutePaths.login,
@@ -55,9 +54,10 @@ class RouteGuard {
     return null;
   }
 
-  bool _isAuthRoute(String path) => path.startsWith('/auth') || 
-           path == RoutePaths.login || 
-           path == RoutePaths.register;
+  bool _isAuthRoute(String path) =>
+      path.startsWith('/auth') ||
+      path == RoutePaths.login ||
+      path == RoutePaths.register;
 }
 
 /// Provider for route guard.
@@ -66,10 +66,7 @@ final routeGuardProvider = Provider<RouteGuard>(RouteGuard.new);
 /// Extension for checking route protection.
 extension RouteProtection on String {
   bool get isProtectedRoute {
-    const publicRoutes = [
-      RoutePaths.login,
-      RoutePaths.register,
-    ];
+    const publicRoutes = [RoutePaths.login, RoutePaths.register];
     return !publicRoutes.contains(this);
   }
 }

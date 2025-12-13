@@ -33,15 +33,15 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
-        onCreate: (m) => m.createAll(),
-        onUpgrade: (m, from, to) async {
-          // Handle future migrations here
-        },
-        beforeOpen: (details) async {
-          // Enable foreign keys
-          await customStatement('PRAGMA foreign_keys = ON');
-        },
-      );
+    onCreate: (m) => m.createAll(),
+    onUpgrade: (m, from, to) async {
+      // Handle future migrations here
+    },
+    beforeOpen: (details) async {
+      // Enable foreign keys
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
+  );
 
   /// Clear all cached items.
   Future<int> clearCache() => delete(cachedItems).go();
@@ -63,7 +63,7 @@ class AppDatabase extends _$AppDatabase {
       );
 
   /// Delete expired cache items.
-  Future<int> deleteExpiredCache() => (delete(cachedItems)
-        ..where((t) => t.expiresAt.isSmallerThanValue(DateTime.now())))
-      .go();
+  Future<int> deleteExpiredCache() => (delete(
+    cachedItems,
+  )..where((t) => t.expiresAt.isSmallerThanValue(DateTime.now()))).go();
 }

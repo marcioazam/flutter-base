@@ -8,11 +8,7 @@ void main() {
   group('PredictivePopScope Properties', () {
     testWidgets('allows pop when canPop is true', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: PredictivePopScope(
-            child: Text('Content'),
-          ),
-        ),
+        const MaterialApp(home: PredictivePopScope(child: Text('Content'))),
       );
 
       expect(find.text('Content'), findsOneWidget);
@@ -35,8 +31,9 @@ void main() {
       expect(find.text('Content'), findsOneWidget);
     });
 
-    testWidgets('unsavedChanges factory shows dialog when has changes',
-        (tester) async {
+    testWidgets('unsavedChanges factory shows dialog when has changes', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: PredictivePopScope.unsavedChanges(
@@ -49,8 +46,9 @@ void main() {
       expect(find.text('Form content'), findsOneWidget);
     });
 
-    testWidgets('unsavedChanges factory allows pop when no changes',
-        (tester) async {
+    testWidgets('unsavedChanges factory allows pop when no changes', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: PredictivePopScope.unsavedChanges(

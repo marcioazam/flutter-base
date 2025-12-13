@@ -6,7 +6,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 /// Rate and review service configuration.
 class RateReviewConfig {
-
   const RateReviewConfig({
     this.minLaunches = 5,
     this.minDaysSinceInstall = 7,
@@ -14,6 +13,7 @@ class RateReviewConfig {
     this.maxPromptsPerYear = 3,
     this.customConditions = const [],
   });
+
   /// Minimum app launches before showing review.
   final int minLaunches;
 
@@ -31,7 +31,7 @@ class RateReviewConfig {
 }
 
 /// Rate and review service.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 41.1, 41.2, 41.3, 41.4, 41.5**
 abstract interface class RateReviewService {
@@ -137,7 +137,9 @@ class LocalRateReviewService implements RateReviewService {
       _promptCount++;
 
       await _prefs?.setInt(
-          _lastPromptKey, _lastPromptDate!.millisecondsSinceEpoch);
+        _lastPromptKey,
+        _lastPromptDate!.millisecondsSinceEpoch,
+      );
       await _prefs?.setInt(_promptCountKey, _promptCount);
 
       AppLogger.instance.info('Review prompt shown');
@@ -163,7 +165,8 @@ class LocalRateReviewService implements RateReviewService {
   Future<bool> shouldRequestReview() async {
     if (_launchCount < _config.minLaunches) {
       AppLogger.instance.debug(
-          'Not enough launches: $_launchCount < ${_config.minLaunches}');
+        'Not enough launches: $_launchCount < ${_config.minLaunches}',
+      );
       return false;
     }
 
@@ -171,24 +174,28 @@ class LocalRateReviewService implements RateReviewService {
       final daysSinceInstall = DateTime.now().difference(_installDate!).inDays;
       if (daysSinceInstall < _config.minDaysSinceInstall) {
         AppLogger.instance.debug(
-            'Not enough days since install: $daysSinceInstall < ${_config.minDaysSinceInstall}');
+          'Not enough days since install: $daysSinceInstall < ${_config.minDaysSinceInstall}',
+        );
         return false;
       }
     }
 
     if (_lastPromptDate != null) {
-      final daysSincePrompt =
-          DateTime.now().difference(_lastPromptDate!).inDays;
+      final daysSincePrompt = DateTime.now()
+          .difference(_lastPromptDate!)
+          .inDays;
       if (daysSincePrompt < _config.minDaysBetweenPrompts) {
         AppLogger.instance.debug(
-            'Not enough days since last prompt: $daysSincePrompt < ${_config.minDaysBetweenPrompts}');
+          'Not enough days since last prompt: $daysSincePrompt < ${_config.minDaysBetweenPrompts}',
+        );
         return false;
       }
     }
 
     if (_promptCount >= _config.maxPromptsPerYear) {
       AppLogger.instance.debug(
-          'Max prompts reached: $_promptCount >= ${_config.maxPromptsPerYear}');
+        'Max prompts reached: $_promptCount >= ${_config.maxPromptsPerYear}',
+      );
       return false;
     }
 

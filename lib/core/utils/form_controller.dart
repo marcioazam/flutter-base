@@ -10,7 +10,6 @@ typedef AsyncValidator<T> = Future<String?> Function(T? value);
 
 /// Field state.
 class FieldState<T> {
-
   const FieldState({
     this.value,
     this.error,
@@ -32,12 +31,12 @@ class FieldState<T> {
     bool? isValidating,
     bool clearError = false,
   }) => FieldState<T>(
-      value: value ?? this.value,
-      error: clearError ? null : (error ?? this.error),
-      isDirty: isDirty ?? this.isDirty,
-      isTouched: isTouched ?? this.isTouched,
-      isValidating: isValidating ?? this.isValidating,
-    );
+    value: value ?? this.value,
+    error: clearError ? null : (error ?? this.error),
+    isDirty: isDirty ?? this.isDirty,
+    isTouched: isTouched ?? this.isTouched,
+    isValidating: isValidating ?? this.isValidating,
+  );
 
   bool get isValid => error == null;
   bool get hasError => error != null;
@@ -46,16 +45,15 @@ class FieldState<T> {
 
 /// Form field controller.
 class FieldController<T> extends ChangeNotifier {
-
   FieldController({
     T? initialValue,
     List<Validator<T>>? validators,
     List<AsyncValidator<T>>? asyncValidators,
     Duration debounce = const Duration(milliseconds: 300),
-  })  : _state = FieldState<T>(value: initialValue),
-        _validators = validators ?? [],
-        _asyncValidators = asyncValidators ?? [],
-        _debounce = debounce;
+  }) : _state = FieldState<T>(value: initialValue),
+       _validators = validators ?? [],
+       _asyncValidators = asyncValidators ?? [],
+       _debounce = debounce;
   FieldState<T> _state;
   final List<Validator<T>> _validators;
   final List<AsyncValidator<T>> _asyncValidators;
@@ -70,11 +68,7 @@ class FieldController<T> extends ChangeNotifier {
   bool get isTouched => _state.isTouched;
 
   void setValue(T? value) {
-    _state = _state.copyWith(
-      value: value,
-      isDirty: true,
-      clearError: true,
-    );
+    _state = _state.copyWith(value: value, isDirty: true, clearError: true);
     notifyListeners();
     _scheduleValidation();
   }
@@ -139,10 +133,8 @@ class FieldController<T> extends ChangeNotifier {
 
 /// Generic form controller.
 class FormController<T> extends ChangeNotifier {
-
-  FormController({
-    required T Function(Map<String, dynamic>) fromMap,
-  }) : _fromMap = fromMap;
+  FormController({required T Function(Map<String, dynamic>) fromMap})
+    : _fromMap = fromMap;
   final Map<String, FieldController<dynamic>> _fields = {};
   final T Function(Map<String, dynamic>) _fromMap;
   bool _isSubmitting = false;
@@ -174,7 +166,8 @@ class FormController<T> extends ChangeNotifier {
   }
 
   /// Gets a field controller.
-  FieldController<V>? getField<V>(String name) => _fields[name] as FieldController<V>?;
+  FieldController<V>? getField<V>(String name) =>
+      _fields[name] as FieldController<V>?;
 
   /// Gets field value.
   V? getValue<V>(String name) => _fields[name]?.value as V?;
@@ -186,9 +179,7 @@ class FormController<T> extends ChangeNotifier {
 
   /// Validates all fields.
   Future<bool> validate() async {
-    final results = await Future.wait(
-      _fields.values.map((f) => f.validate()),
-    );
+    final results = await Future.wait(_fields.values.map((f) => f.validate()));
     return results.every((valid) => valid);
   }
 
@@ -209,7 +200,8 @@ class FormController<T> extends ChangeNotifier {
   }
 
   /// Gets form data as map.
-  Map<String, dynamic> toMap() => _fields.map((key, field) => MapEntry(key, field.value));
+  Map<String, dynamic> toMap() =>
+      _fields.map((key, field) => MapEntry(key, field.value));
 
   /// Gets form data as typed object.
   T toObject() => _fromMap(toMap());

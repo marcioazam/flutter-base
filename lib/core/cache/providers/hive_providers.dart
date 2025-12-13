@@ -37,12 +37,13 @@ Future<Box<Map<dynamic, dynamic>>> cacheBox(
 }
 
 /// Factory function type for creating HiveCacheDataSource.
-typedef HiveCacheDataSourceFactory<T> = HiveCacheDataSource<T> Function({
-  required Box<Map<dynamic, dynamic>> box,
-  required T Function(Map<String, dynamic>) fromJson,
-  required Map<String, dynamic> Function(T) toJson,
-  HiveCacheConfig? config,
-});
+typedef HiveCacheDataSourceFactory<T> =
+    HiveCacheDataSource<T> Function({
+      required Box<Map<dynamic, dynamic>> box,
+      required T Function(Map<String, dynamic>) fromJson,
+      required Map<String, dynamic> Function(T) toJson,
+      HiveCacheConfig? config,
+    });
 
 /// Create a HiveCacheDataSource for a specific type.
 ///
@@ -59,10 +60,9 @@ HiveCacheDataSource<T> createHiveCacheDataSource<T>({
   required T Function(Map<String, dynamic>) fromJson,
   required Map<String, dynamic> Function(T) toJson,
   HiveCacheConfig? config,
-}) =>
-    HiveCacheDataSource<T>(
-      box: box,
-      fromJson: fromJson,
-      toJson: toJson,
-      config: config ?? const HiveCacheConfig(),
-    );
+}) => HiveCacheDataSource<T>(
+  box: box,
+  fromJson: fromJson,
+  toJson: toJson,
+  config: config ?? const HiveCacheConfig(),
+);

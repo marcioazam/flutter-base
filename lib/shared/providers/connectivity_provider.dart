@@ -8,8 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final connectivityProvider = Provider<Connectivity>((ref) => Connectivity());
 
 /// Provider for current connectivity status.
-final connectivityStatusProvider =
-    StreamProvider<List<ConnectivityResult>>((ref) {
+final connectivityStatusProvider = StreamProvider<List<ConnectivityResult>>((
+  ref,
+) {
   final connectivity = ref.watch(connectivityProvider);
   return connectivity.onConnectivityChanged;
 });
@@ -34,11 +35,10 @@ final connectivityServiceProvider = Provider<ConnectivityService>((ref) {
 typedef SyncCallback = Future<void> Function();
 
 /// Service for connectivity-related operations.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 36.4**
 class ConnectivityService {
-
   ConnectivityService(this._connectivity) {
     _initConnectivityListener();
   }
@@ -60,13 +60,19 @@ class ConnectivityService {
   }
 
   Future<void> _triggerSync() async {
-    AppLogger.instance.info('Connectivity restored, triggering sync operations');
+    AppLogger.instance.info(
+      'Connectivity restored, triggering sync operations',
+    );
 
     for (final callback in _syncCallbacks) {
       try {
         await callback();
       } on Exception catch (e, stack) {
-        AppLogger.instance.error('Sync callback failed', error: e, stackTrace: stack);
+        AppLogger.instance.error(
+          'Sync callback failed',
+          error: e,
+          stackTrace: stack,
+        );
       }
     }
   }
@@ -112,24 +118,24 @@ class ConnectivityService {
   }
 
   /// Stream of connectivity changes.
-  Stream<bool> get onConnectivityChanged => _connectivity.onConnectivityChanged.map(
-      (results) => !results.contains(ConnectivityResult.none),
-    );
+  Stream<bool> get onConnectivityChanged => _connectivity.onConnectivityChanged
+      .map((results) => !results.contains(ConnectivityResult.none));
 
   /// Stream of connection type changes.
-  Stream<ConnectionType> get onConnectionTypeChanged => _connectivity.onConnectivityChanged.map((results) {
-      if (results.contains(ConnectivityResult.wifi)) {
-        return ConnectionType.wifi;
-      } else if (results.contains(ConnectivityResult.mobile)) {
-        return ConnectionType.mobile;
-      } else if (results.contains(ConnectivityResult.ethernet)) {
-        return ConnectionType.ethernet;
-      } else if (results.contains(ConnectivityResult.vpn)) {
-        return ConnectionType.vpn;
-      } else {
-        return ConnectionType.none;
-      }
-    });
+  Stream<ConnectionType> get onConnectionTypeChanged =>
+      _connectivity.onConnectivityChanged.map((results) {
+        if (results.contains(ConnectivityResult.wifi)) {
+          return ConnectionType.wifi;
+        } else if (results.contains(ConnectivityResult.mobile)) {
+          return ConnectionType.mobile;
+        } else if (results.contains(ConnectivityResult.ethernet)) {
+          return ConnectionType.ethernet;
+        } else if (results.contains(ConnectivityResult.vpn)) {
+          return ConnectionType.vpn;
+        } else {
+          return ConnectionType.none;
+        }
+      });
 
   /// Disposes resources.
   void dispose() {
@@ -139,10 +145,4 @@ class ConnectivityService {
 }
 
 /// Connection type enum.
-enum ConnectionType {
-  wifi,
-  mobile,
-  ethernet,
-  vpn,
-  none,
-}
+enum ConnectionType { wifi, mobile, ethernet, vpn, none }

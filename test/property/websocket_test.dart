@@ -75,9 +75,7 @@ void main() {
     });
 
     test('StringWebSocketClient is a convenience wrapper', () {
-      final client = StringWebSocketClient(
-        url: 'ws://localhost:8080',
-      );
+      final client = StringWebSocketClient(url: 'ws://localhost:8080');
 
       expect(client, isA<WebSocketClient<String>>());
       expect(client.state, equals(WebSocketState.disconnected));

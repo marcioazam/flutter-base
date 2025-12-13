@@ -1,7 +1,8 @@
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -10,51 +11,45 @@ final _explore = ExploreConfig();
 /// **Validates: Requirements 4.2**
 void main() {
   group('Result Chaining Properties', () {
-    Glados<int>(any.int, _explore).test(
-      'andThen chains Success correctly',
-      (value) {
-        final result = Success(value);
-        final chained = result.andThen((v) => Success(v.toString()));
+    Glados<int>(any.int, _explore).test('andThen chains Success correctly', (
+      value,
+    ) {
+      final result = Success(value);
+      final chained = result.andThen((v) => Success(v.toString()));
 
-        expect(chained.isSuccess, isTrue);
-        expect(chained.valueOrNull, equals(value.toString()));
-      },
-    );
+      expect(chained.isSuccess, isTrue);
+      expect(chained.valueOrNull, equals(value.toString()));
+    });
 
-    Glados<int>(any.int, _explore).test(
-      'andThen preserves Failure',
-      (value) {
-        final failure = NetworkFailure('error');
-        final Result<int> result = Failure(failure);
-        final chained = result.andThen((v) => Success(v.toString()));
+    Glados<int>(any.int, _explore).test('andThen preserves Failure', (value) {
+      final failure = NetworkFailure('error');
+      final Result<int> result = Failure(failure);
+      final chained = result.andThen((v) => Success(v.toString()));
 
-        expect(chained.isFailure, isTrue);
-        expect(chained.failureOrNull, equals(failure));
-      },
-    );
+      expect(chained.isFailure, isTrue);
+      expect(chained.failureOrNull, equals(failure));
+    });
 
-    Glados<int>(any.int, _explore).test(
-      'tap executes side effect on Success',
-      (value) {
-        var sideEffectValue = 0;
-        final result = Success(value);
-        final tapped = result.tap((v) => sideEffectValue = v);
+    Glados<int>(any.int, _explore).test('tap executes side effect on Success', (
+      value,
+    ) {
+      var sideEffectValue = 0;
+      final result = Success(value);
+      final tapped = result.tap((v) => sideEffectValue = v);
 
-        expect(tapped.valueOrNull, equals(value));
-        expect(sideEffectValue, equals(value));
-      },
-    );
+      expect(tapped.valueOrNull, equals(value));
+      expect(sideEffectValue, equals(value));
+    });
 
-    Glados<int>(any.int, _explore).test(
-      'tap does not execute on Failure',
-      (value) {
-        var sideEffectCalled = false;
-        final Result<int> result = Failure(NetworkFailure('error'));
-        result.tap((_) => sideEffectCalled = true);
+    Glados<int>(any.int, _explore).test('tap does not execute on Failure', (
+      value,
+    ) {
+      var sideEffectCalled = false;
+      final Result<int> result = Failure(NetworkFailure('error'));
+      result.tap((_) => sideEffectCalled = true);
 
-        expect(sideEffectCalled, isFalse);
-      },
-    );
+      expect(sideEffectCalled, isFalse);
+    });
 
     Glados<int>(any.int, _explore).test(
       'tapFailure executes side effect on Failure',
@@ -138,11 +133,7 @@ void main() {
 
     test('sequence returns first Failure', () {
       final failure = NetworkFailure('error');
-      final results = [
-        Success(1),
-        Failure<int>(failure),
-        Success(3),
-      ];
+      final results = [Success(1), Failure<int>(failure), Success(3)];
       final sequenced = Result.sequence(results);
 
       expect(sequenced.isFailure, isTrue);

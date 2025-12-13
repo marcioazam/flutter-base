@@ -74,10 +74,7 @@ void main() {
           theme: ThemeData(useMaterial3: true),
           home: Scaffold(
             body: Center(
-              child: TextButton(
-                onPressed: () {},
-                child: const Text('Text'),
-              ),
+              child: TextButton(onPressed: () {}, child: const Text('Text')),
             ),
           ),
         ),
@@ -95,10 +92,7 @@ void main() {
           theme: ThemeData(useMaterial3: true),
           home: Scaffold(
             body: Center(
-              child: IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.add),
-              ),
+              child: IconButton(onPressed: () {}, icon: const Icon(Icons.add)),
             ),
           ),
         ),

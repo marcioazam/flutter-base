@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Mutation state for tracking side-effect operations.
-/// 
+///
 /// **Feature: flutter-2025-final-enhancements, Property 1: Mutation State Transitions**
 /// **Validates: Requirements 1.2**
 sealed class MutationState<T> {
@@ -23,7 +23,8 @@ sealed class MutationState<T> {
 
   /// Pattern matching with default fallback.
   R maybeWhen<R>({
-    required R Function() orElse, R Function()? idle,
+    required R Function() orElse,
+    R Function()? idle,
     R Function(double? progress)? loading,
     R Function(T data)? success,
     R Function(Object error, StackTrace stackTrace)? error,
@@ -83,14 +84,12 @@ class MutationController<T> {
   bool get isIdle => _state is MutationIdle<T>;
 
   /// Gets the success data if available.
-  T? get data => _state is MutationSuccess<T> 
-      ? (_state as MutationSuccess<T>).data 
-      : null;
+  T? get data =>
+      _state is MutationSuccess<T> ? (_state as MutationSuccess<T>).data : null;
 
   /// Gets the error if available.
-  Object? get error => _state is MutationError<T> 
-      ? (_state as MutationError<T>).error 
-      : null;
+  Object? get error =>
+      _state is MutationError<T> ? (_state as MutationError<T>).error : null;
 
   void _setState(MutationState<T> newState) {
     _state = newState;
@@ -151,24 +150,22 @@ class MutationController<T> {
 }
 
 /// Provider for creating mutation controller instances.
-final mutationControllerProvider = Provider.family<MutationController<dynamic>, String>(
-  (ref, key) {
-    final controller = MutationController<dynamic>();
-    ref.onDispose(controller.dispose);
-    return controller;
-  },
-);
+final mutationControllerProvider =
+    Provider.family<MutationController<dynamic>, String>((ref, key) {
+      final controller = MutationController<dynamic>();
+      ref.onDispose(controller.dispose);
+      return controller;
+    });
 
 /// Extension for using mutations with Ref.
 extension MutationRefExtension on Ref {
   /// Creates or gets a mutation controller by key.
-  MutationController<T> mutation<T>(String key) => 
+  MutationController<T> mutation<T>(String key) =>
       read(mutationControllerProvider(key)) as MutationController<T>;
 }
 
-
 /// Widget builder for MutationState.
-/// 
+///
 /// **Feature: flutter-2025-final-enhancements**
 /// **Validates: Requirements 1.5**
 class MutationBuilder<T> extends StatelessWidget {
@@ -188,12 +185,8 @@ class MutationBuilder<T> extends StatelessWidget {
   final Widget Function(Object error, StackTrace stackTrace) error;
 
   @override
-  Widget build(BuildContext context) => state.when(
-    idle: idle,
-    loading: loading,
-    success: success,
-    error: error,
-  );
+  Widget build(BuildContext context) =>
+      state.when(idle: idle, loading: loading, success: success, error: error);
 }
 
 /// Simplified MutationBuilder with common defaults.
@@ -216,7 +209,8 @@ class SimpleMutationBuilder<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) => state.when(
     idle: onIdle,
-    loading: (_) => loadingWidget ?? const Center(child: _DefaultLoadingIndicator()),
+    loading: (_) =>
+        loadingWidget ?? const Center(child: _DefaultLoadingIndicator()),
     success: onSuccess,
     error: (e, _) => errorBuilder?.call(e) ?? Text('Error: $e'),
   );
@@ -225,7 +219,7 @@ class SimpleMutationBuilder<T> extends StatelessWidget {
 /// Default loading indicator for mutation builders.
 class _DefaultLoadingIndicator extends StatelessWidget {
   const _DefaultLoadingIndicator();
-  
+
   @override
   Widget build(BuildContext context) => const SizedBox(
     width: 24,

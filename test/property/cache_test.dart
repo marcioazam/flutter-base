@@ -2,7 +2,8 @@ import 'package:flutter_base_2025/core/cache/cache_entry.dart';
 import 'package:flutter_base_2025/core/cache/cache_repository.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -155,10 +156,7 @@ void main() {
 
   group('CacheEntry Properties', () {
     test('CacheEntry without expiration never expires', () {
-      final entry = CacheEntry(
-        value: 'test',
-        cachedAt: DateTime.now(),
-      );
+      final entry = CacheEntry(value: 'test', cachedAt: DateTime.now());
 
       expect(entry.isExpired, isFalse);
       expect(entry.remainingTtlMs, isNull);

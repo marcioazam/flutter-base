@@ -31,31 +31,31 @@ enum AIErrorType {
 
 /// Maps AI errors to AppFailure hierarchy.
 AppFailure mapAIError(AIErrorType type, [String? message]) => switch (type) {
-    AIErrorType.invalidApiKey => AuthFailure(
-        message ?? 'Invalid AI API key',
-        code: 'AI_INVALID_KEY',
-      ),
-    AIErrorType.quotaExceeded => RateLimitFailure(
-        message ?? 'AI quota exceeded',
-        code: 'AI_QUOTA_EXCEEDED',
-      ),
-    AIErrorType.contentBlocked => ValidationFailure(
-        message ?? 'Content blocked by safety filters',
-        code: 'AI_CONTENT_BLOCKED',
-      ),
-    AIErrorType.networkError => NetworkFailure(
-        message ?? 'AI service unreachable',
-        code: 'AI_NETWORK_ERROR',
-      ),
-    AIErrorType.parseError => ValidationFailure(
-        message ?? 'Failed to parse AI response',
-        code: 'AI_PARSE_ERROR',
-      ),
-    AIErrorType.unknown => UnexpectedFailure(
-        message ?? 'Unknown AI error',
-        code: 'AI_UNKNOWN_ERROR',
-      ),
-  };
+  AIErrorType.invalidApiKey => AuthFailure(
+    message ?? 'Invalid AI API key',
+    code: 'AI_INVALID_KEY',
+  ),
+  AIErrorType.quotaExceeded => RateLimitFailure(
+    message ?? 'AI quota exceeded',
+    code: 'AI_QUOTA_EXCEEDED',
+  ),
+  AIErrorType.contentBlocked => ValidationFailure(
+    message ?? 'Content blocked by safety filters',
+    code: 'AI_CONTENT_BLOCKED',
+  ),
+  AIErrorType.networkError => NetworkFailure(
+    message ?? 'AI service unreachable',
+    code: 'AI_NETWORK_ERROR',
+  ),
+  AIErrorType.parseError => ValidationFailure(
+    message ?? 'Failed to parse AI response',
+    code: 'AI_PARSE_ERROR',
+  ),
+  AIErrorType.unknown => UnexpectedFailure(
+    message ?? 'Unknown AI error',
+    code: 'AI_UNKNOWN_ERROR',
+  ),
+};
 
 /// Mock AI service for development/testing.
 class MockAIService implements AIService {

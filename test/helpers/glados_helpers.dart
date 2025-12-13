@@ -1,5 +1,5 @@
 /// Glados helpers to avoid import conflicts with flutter_test.
-/// 
+///
 /// Usage: Import this file instead of glados directly in test files.
 /// ```dart
 /// import 'package:flutter_test/flutter_test.dart';

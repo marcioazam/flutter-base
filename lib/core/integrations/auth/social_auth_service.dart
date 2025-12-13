@@ -6,7 +6,6 @@ enum SocialProvider { google, apple, facebook }
 
 /// Social credential returned after successful authentication.
 class SocialCredential {
-
   const SocialCredential({
     required this.provider,
     required this.token,
@@ -23,13 +22,13 @@ class SocialCredential {
   final String? userId;
 
   Map<String, dynamic> toJson() => {
-        'provider': provider.name,
-        'token': token,
-        'email': email,
-        'name': name,
-        'photoUrl': photoUrl,
-        'userId': userId,
-      };
+    'provider': provider.name,
+    'token': token,
+    'email': email,
+    'name': name,
+    'photoUrl': photoUrl,
+    'userId': userId,
+  };
 }
 
 /// Abstract social auth service interface.

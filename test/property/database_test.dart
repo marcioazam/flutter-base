@@ -3,26 +3,17 @@ import 'dart:async';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
 
 /// Conflict resolution strategies for sync operations.
-enum ConflictResolution {
-  serverWins,
-  clientWins,
-  merge,
-  keepBoth,
-}
+enum ConflictResolution { serverWins, clientWins, merge, keepBoth }
 
 /// Sync status for offline-first entities.
-enum SyncStatus {
-  synced,
-  pendingSync,
-  syncFailed,
-  syncing,
-}
+enum SyncStatus { synced, pendingSync, syncFailed, syncing }
 
 /// **Feature: flutter-2025-final-polish, Property 3: Repository CRUD Result Type**
 /// **Validates: Requirements 8.2**
@@ -59,8 +50,14 @@ void main() {
 
     test('ConflictResolution enum has all expected values', () {
       expect(ConflictResolution.values, hasLength(4));
-      expect(ConflictResolution.values, contains(ConflictResolution.serverWins));
-      expect(ConflictResolution.values, contains(ConflictResolution.clientWins));
+      expect(
+        ConflictResolution.values,
+        contains(ConflictResolution.serverWins),
+      );
+      expect(
+        ConflictResolution.values,
+        contains(ConflictResolution.clientWins),
+      );
       expect(ConflictResolution.values, contains(ConflictResolution.merge));
       expect(ConflictResolution.values, contains(ConflictResolution.keepBoth));
     });
@@ -120,7 +117,10 @@ void main() {
         }
 
         // Verify emissions
-        expect(emissions.length, equals(items.length + 1)); // +1 for initial empty
+        expect(
+          emissions.length,
+          equals(items.length + 1),
+        ); // +1 for initial empty
         expect(emissions.first, isEmpty);
         if (items.isNotEmpty) {
           expect(emissions.last, equals(items));

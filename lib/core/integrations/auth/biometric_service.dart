@@ -117,7 +117,9 @@ class BiometricServiceImpl implements BiometricService {
         _retryCount = 0;
         return _authenticateWithFallback(reason);
       }
-      return Failure(AuthFailure(e.message ?? 'Biometric authentication failed'));
+      return Failure(
+        AuthFailure(e.message ?? 'Biometric authentication failed'),
+      );
     }
   }
 

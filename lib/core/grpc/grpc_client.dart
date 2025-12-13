@@ -19,9 +19,9 @@ class GrpcClient {
     required GrpcConfig config,
     required TokenStorage tokenStorage,
     Logger? logger,
-  })  : _config = config,
-        _tokenStorage = tokenStorage,
-        _logger = logger ?? Logger();
+  }) : _config = config,
+       _tokenStorage = tokenStorage,
+       _logger = logger ?? Logger();
 
   final GrpcConfig _config;
   final TokenStorage _tokenStorage;
@@ -100,14 +100,12 @@ class GrpcClient {
 
   /// Get interceptors for this client.
   List<ClientInterceptor> get interceptors => [
-        GrpcAuthInterceptor(_tokenStorage),
-        _LoggingInterceptor(_logger),
-      ];
+    GrpcAuthInterceptor(_tokenStorage),
+    _LoggingInterceptor(_logger),
+  ];
 
   /// Create call options with default timeout.
-  CallOptions get defaultCallOptions => CallOptions(
-        timeout: _config.timeout,
-      );
+  CallOptions get defaultCallOptions => CallOptions(timeout: _config.timeout);
 
   /// Execute a gRPC call with automatic retry on transient failures.
   ///
@@ -150,10 +148,10 @@ class GrpcClient {
 
   /// Check if a gRPC error code is retryable.
   bool _isRetryableError(int code) => const [
-        StatusCode.unavailable,
-        StatusCode.resourceExhausted,
-        StatusCode.aborted,
-      ].contains(code);
+    StatusCode.unavailable,
+    StatusCode.resourceExhausted,
+    StatusCode.aborted,
+  ].contains(code);
 
   /// Get the current configuration.
   GrpcConfig get config => _config;
@@ -177,13 +175,20 @@ class _LoggingInterceptor extends ClientInterceptor {
 
     final response = invoker(method, request, options);
 
-    response.then((_) {
-      stopwatch.stop();
-      _logger.d('gRPC call completed: ${method.path} (${stopwatch.elapsedMilliseconds}ms)');
-    }).catchError((Object error) {
-      stopwatch.stop();
-      _logger.e('gRPC call failed: ${method.path} (${stopwatch.elapsedMilliseconds}ms)', error: error);
-    });
+    response
+        .then((_) {
+          stopwatch.stop();
+          _logger.d(
+            'gRPC call completed: ${method.path} (${stopwatch.elapsedMilliseconds}ms)',
+          );
+        })
+        .catchError((Object error) {
+          stopwatch.stop();
+          _logger.e(
+            'gRPC call failed: ${method.path} (${stopwatch.elapsedMilliseconds}ms)',
+            error: error,
+          );
+        });
 
     return response;
   }

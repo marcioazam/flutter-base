@@ -1,7 +1,8 @@
 import 'package:flutter_base_2025/features/auth/data/dtos/user_dto.dart';
 import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 import '../helpers/generators.dart';
 
@@ -22,26 +23,29 @@ void main() {
         expect(restored.id, equals(dto.id));
         expect(restored.email, equals(dto.email));
         expect(restored.name, equals(dto.name));
-        expect(restored.createdAt.millisecondsSinceEpoch,
-            equals(dto.createdAt.millisecondsSinceEpoch));
+        expect(
+          restored.createdAt.millisecondsSinceEpoch,
+          equals(dto.createdAt.millisecondsSinceEpoch),
+        );
       },
     );
   });
 
   group('Entity-DTO Mapping Properties', () {
-    Glados(any.user, _explore).test(
-      'User to UserDto to User preserves data',
-      (user) {
-        final dto = UserDto.fromEntity(user);
-        final restored = dto.toEntity();
+    Glados(any.user, _explore).test('User to UserDto to User preserves data', (
+      user,
+    ) {
+      final dto = UserDto.fromEntity(user);
+      final restored = dto.toEntity();
 
-        expect(restored.id, equals(user.id));
-        expect(restored.email, equals(user.email));
-        expect(restored.name, equals(user.name));
-        expect(restored.createdAt.millisecondsSinceEpoch,
-            equals(user.createdAt.millisecondsSinceEpoch));
-      },
-    );
+      expect(restored.id, equals(user.id));
+      expect(restored.email, equals(user.email));
+      expect(restored.name, equals(user.name));
+      expect(
+        restored.createdAt.millisecondsSinceEpoch,
+        equals(user.createdAt.millisecondsSinceEpoch),
+      );
+    });
 
     Glados(any.userDto, _explore).test(
       'UserDto to User to UserDto preserves data',

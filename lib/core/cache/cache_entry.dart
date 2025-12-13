@@ -4,11 +4,8 @@
 /// **Feature: flutter-state-of-art-code-review-2025**
 /// **Validates: Requirements TD-02 (Cache consolidation)**
 class CacheEntry<T> {
-  CacheEntry({
-    required this.value,
-    DateTime? cachedAt,
-    this.expiresAt,
-  }) : cachedAt = cachedAt ?? DateTime.now();
+  CacheEntry({required this.value, DateTime? cachedAt, this.expiresAt})
+    : cachedAt = cachedAt ?? DateTime.now();
 
   /// Factory for quick creation with TTL.
   factory CacheEntry.withTtl(T value, {Duration? ttl}) {
@@ -41,7 +38,8 @@ class CacheEntry<T> {
   int get ageMs => DateTime.now().difference(cachedAt).inMilliseconds;
 
   @override
-  String toString() => 'CacheEntry(value: $value, '
+  String toString() =>
+      'CacheEntry(value: $value, '
       'cached: $cachedAt, '
       'expires: ${expiresAt ?? 'never'}, '
       'expired: $isExpired)';

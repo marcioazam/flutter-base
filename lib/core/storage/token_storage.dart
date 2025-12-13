@@ -7,11 +7,11 @@ final tokenStorageProvider = Provider<TokenStorage>((ref) => TokenStorage());
 /// Secure storage for auth tokens only.
 /// All data persistence is handled by Python API.
 class TokenStorage {
-
-  TokenStorage() : _storage = const FlutterSecureStorage(
-    aOptions: AndroidOptions(encryptedSharedPreferences: true),
-    iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
-  );
+  TokenStorage()
+    : _storage = const FlutterSecureStorage(
+        aOptions: AndroidOptions(encryptedSharedPreferences: true),
+        iOptions: IOSOptions(accessibility: KeychainAccessibility.first_unlock),
+      );
   static const _accessTokenKey = 'access_token';
   static const _refreshTokenKey = 'refresh_token';
 

@@ -9,12 +9,11 @@ import 'package:flutter_base_2025/features/auth/domain/repositories/auth_reposit
 
 /// Implementation of AuthRepository consuming Python API.
 class AuthRepositoryImpl implements AuthRepository {
-
   AuthRepositoryImpl({
     required AuthRemoteDataSource remoteDataSource,
     required TokenStorage tokenStorage,
-  })  : _remoteDataSource = remoteDataSource,
-        _tokenStorage = tokenStorage {
+  }) : _remoteDataSource = remoteDataSource,
+       _tokenStorage = tokenStorage {
     _initAuthState();
   }
   final AuthRemoteDataSource _remoteDataSource;

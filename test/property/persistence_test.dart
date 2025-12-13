@@ -6,51 +6,49 @@ import '../helpers/glados_helpers.dart';
 /// Generator for UserPreferences.
 extension UserPreferencesGenerator on Any {
   Generator<UserPreferences> get userPreferences => combine4(
-        choose(['light', 'dark', 'system']),
-        choose(['en', 'pt', 'es', 'fr']),
-        any.bool,
-        doubleInRange(10, 24),
-        (theme, locale, notifications, fontSize) => UserPreferences(
-          theme: theme,
-          locale: locale,
-          notificationsEnabled: notifications,
-          fontSize: fontSize,
-        ),
-      );
+    choose(['light', 'dark', 'system']),
+    choose(['en', 'pt', 'es', 'fr']),
+    any.bool,
+    doubleInRange(10, 24),
+    (theme, locale, notifications, fontSize) => UserPreferences(
+      theme: theme,
+      locale: locale,
+      notificationsEnabled: notifications,
+      fontSize: fontSize,
+    ),
+  );
 }
 
 void main() {
   group('Persistence Property Tests', () {
     /// **Feature: flutter-2025-final-enhancements, Property 2: Persistence Round-Trip**
     /// **Validates: Requirements 2.3**
-    Glados(any.userPreferences).test(
-      'UserPreferences JSON round-trip preserves data',
-      (prefs) {
-        final json = prefs.toJson();
-        final restored = UserPreferences.fromJson(json);
+    Glados(
+      any.userPreferences,
+    ).test('UserPreferences JSON round-trip preserves data', (prefs) {
+      final json = prefs.toJson();
+      final restored = UserPreferences.fromJson(json);
 
-        expect(restored.theme, equals(prefs.theme));
-        expect(restored.locale, equals(prefs.locale));
-        expect(restored.notificationsEnabled, equals(prefs.notificationsEnabled));
-        expect(restored.fontSize, equals(prefs.fontSize));
-        expect(restored, equals(prefs));
-      },
-    );
+      expect(restored.theme, equals(prefs.theme));
+      expect(restored.locale, equals(prefs.locale));
+      expect(restored.notificationsEnabled, equals(prefs.notificationsEnabled));
+      expect(restored.fontSize, equals(prefs.fontSize));
+      expect(restored, equals(prefs));
+    });
 
-    Glados(any.userPreferences).test(
-      'UserPreferences equality is consistent',
-      (prefs) {
-        final copy = UserPreferences(
-          theme: prefs.theme,
-          locale: prefs.locale,
-          notificationsEnabled: prefs.notificationsEnabled,
-          fontSize: prefs.fontSize,
-        );
+    Glados(any.userPreferences).test('UserPreferences equality is consistent', (
+      prefs,
+    ) {
+      final copy = UserPreferences(
+        theme: prefs.theme,
+        locale: prefs.locale,
+        notificationsEnabled: prefs.notificationsEnabled,
+        fontSize: prefs.fontSize,
+      );
 
-        expect(prefs, equals(copy));
-        expect(prefs.hashCode, equals(copy.hashCode));
-      },
-    );
+      expect(prefs, equals(copy));
+      expect(prefs.hashCode, equals(copy.hashCode));
+    });
 
     /// **Feature: flutter-2025-final-enhancements, Property 3: Persistence Restoration**
     /// **Validates: Requirements 2.4**

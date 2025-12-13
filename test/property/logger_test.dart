@@ -1,7 +1,8 @@
 import 'package:flutter_base_2025/core/observability/app_logger.dart';
 import 'package:flutter_base_2025/core/observability/performance_monitor.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 import 'package:logger/logger.dart';
 import 'package:mocktail/mocktail.dart' hide any;
 
@@ -43,10 +44,10 @@ void main() {
         AppLogger.initialize();
         // The redaction happens internally, we verify the pattern
         final testData = {'password': 'secret123', 'username': 'john'};
-        
+
         // Simulate redaction logic
         final redacted = _redactSensitiveData(testData);
-        
+
         expect(redacted['password'], equals('[REDACTED]'));
         expect(redacted['username'], equals('john'));
       });
@@ -54,7 +55,7 @@ void main() {
       test('redacts token field', () {
         final testData = {'accessToken': 'abc123', 'name': 'test'};
         final redacted = _redactSensitiveData(testData);
-        
+
         expect(redacted['accessToken'], equals('[REDACTED]'));
         expect(redacted['name'], equals('test'));
       });
@@ -62,35 +63,34 @@ void main() {
       test('redacts apiKey field', () {
         final testData = {'apiKey': 'key-123', 'endpoint': '/api'};
         final redacted = _redactSensitiveData(testData);
-        
+
         expect(redacted['apiKey'], equals('[REDACTED]'));
         expect(redacted['endpoint'], equals('/api'));
       });
 
       test('redacts nested sensitive fields', () {
         final testData = {
-          'user': {
-            'password': 'secret',
-            'email': 'test@test.com',
-          }
+          'user': {'password': 'secret', 'email': 'test@test.com'},
         };
         final redacted = _redactSensitiveData(testData);
-        
+
         expect((redacted['user'] as Map)['password'], equals('[REDACTED]'));
         expect((redacted['user'] as Map)['email'], equals('test@test.com'));
       });
 
       test('redacts JWT-like tokens in values', () {
-        final testData = {'auth': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload'};
+        final testData = {
+          'auth': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload',
+        };
         final redacted = _redactSensitiveData(testData);
-        
+
         expect(redacted['auth'], equals('[REDACTED]'));
       });
 
       test('redacts Bearer tokens', () {
         final testData = {'header': 'Bearer abc123token'};
         final redacted = _redactSensitiveData(testData);
-        
+
         expect(redacted['header'], equals('[REDACTED]'));
       });
 
@@ -99,9 +99,9 @@ void main() {
         (value) {
           final testData = {'normalField': value};
           final redacted = _redactSensitiveData(testData);
-          
+
           // Only redact if it looks like a JWT or Bearer token
-          if (!value.startsWith('eyJ') && 
+          if (!value.startsWith('eyJ') &&
               !value.toLowerCase().startsWith('bearer ')) {
             expect(redacted['normalField'], equals(value));
           }
@@ -116,8 +116,14 @@ void main() {
       final entry = LogEntry(level: LogLevel.info, message: 'test');
       final after = DateTime.now();
 
-      expect(entry.timestamp.isAfter(before.subtract(const Duration(seconds: 1))), isTrue);
-      expect(entry.timestamp.isBefore(after.add(const Duration(seconds: 1))), isTrue);
+      expect(
+        entry.timestamp.isAfter(before.subtract(const Duration(seconds: 1))),
+        isTrue,
+      );
+      expect(
+        entry.timestamp.isBefore(after.add(const Duration(seconds: 1))),
+        isTrue,
+      );
     });
 
     test('LogEntry toJson includes all fields', () {
@@ -233,9 +239,9 @@ void main() {
     test('trace duration increases over time', () async {
       final trace = PerformanceTrace('test');
       final duration1 = trace.duration;
-      
+
       await Future<void>.delayed(const Duration(milliseconds: 20));
-      
+
       final duration2 = trace.duration;
       expect(duration2.inMilliseconds, greaterThan(duration1.inMilliseconds));
     });
@@ -243,10 +249,10 @@ void main() {
     test('stop freezes duration', () async {
       final trace = PerformanceTrace('test');
       await Future<void>.delayed(const Duration(milliseconds: 10));
-      
+
       final stoppedDuration = trace.stop();
       await Future<void>.delayed(const Duration(milliseconds: 20));
-      
+
       expect(trace.duration, equals(stoppedDuration));
       expect(trace.isRunning, isFalse);
     });
@@ -262,7 +268,7 @@ void main() {
 
     test('incrementMetric tracks counters', () {
       final trace = PerformanceTrace('test');
-      
+
       trace.incrementMetric('requests');
       trace.incrementMetric('requests');
       trace.incrementMetric('errors', 5);

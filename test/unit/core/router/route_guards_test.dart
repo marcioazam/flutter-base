@@ -1,7 +1,8 @@
 import 'package:flutter_base_2025/core/constants/app_constants.dart';
 import 'package:flutter_base_2025/core/router/route_guards.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -52,10 +53,7 @@ void main() {
         });
       }
 
-      final publicRoutes = [
-        RoutePaths.login,
-        RoutePaths.register,
-      ];
+      final publicRoutes = [RoutePaths.login, RoutePaths.register];
 
       for (final route in publicRoutes) {
         test('public route "$route" does not require authentication', () {

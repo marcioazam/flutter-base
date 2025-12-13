@@ -16,7 +16,6 @@ enum VideoPlaybackState {
 
 /// Video player configuration.
 class VideoPlayerConfig {
-
   const VideoPlayerConfig({
     this.autoPlay = false,
     this.looping = false,
@@ -33,7 +32,6 @@ class VideoPlayerConfig {
 
 /// Video player state.
 class VideoPlayerState {
-
   const VideoPlayerState({
     this.playbackState = VideoPlaybackState.idle,
     this.position = Duration.zero,
@@ -60,14 +58,14 @@ class VideoPlayerState {
     bool? isFullscreen,
     String? errorMessage,
   }) => VideoPlayerState(
-      playbackState: playbackState ?? this.playbackState,
-      position: position ?? this.position,
-      duration: duration ?? this.duration,
-      buffered: buffered ?? this.buffered,
-      volume: volume ?? this.volume,
-      isFullscreen: isFullscreen ?? this.isFullscreen,
-      errorMessage: errorMessage ?? this.errorMessage,
-    );
+    playbackState: playbackState ?? this.playbackState,
+    position: position ?? this.position,
+    duration: duration ?? this.duration,
+    buffered: buffered ?? this.buffered,
+    volume: volume ?? this.volume,
+    isFullscreen: isFullscreen ?? this.isFullscreen,
+    errorMessage: errorMessage ?? this.errorMessage,
+  );
 
   double get progress {
     if (duration.inMilliseconds == 0) return 0;
@@ -148,9 +146,9 @@ class VideoPlayerServiceImpl implements VideoPlayerService {
     VideoPlayerConfig? config,
   }) async {
     try {
-      _updateState(_currentState.copyWith(
-        playbackState: VideoPlaybackState.loading,
-      ));
+      _updateState(
+        _currentState.copyWith(playbackState: VideoPlaybackState.loading),
+      );
 
       // Placeholder - requires video_player and chewie packages
       // _controller = VideoPlayerController.networkUrl(Uri.parse(url));
@@ -169,17 +167,21 @@ class VideoPlayerServiceImpl implements VideoPlayerService {
       //
       // _controller!.addListener(_onVideoStateChanged);
 
-      _updateState(_currentState.copyWith(
-        playbackState: VideoPlaybackState.paused,
-        duration: const Duration(minutes: 5), // Placeholder
-      ));
+      _updateState(
+        _currentState.copyWith(
+          playbackState: VideoPlaybackState.paused,
+          duration: const Duration(minutes: 5), // Placeholder
+        ),
+      );
 
       return const Success(null);
     } on Exception catch (e) {
-      _updateState(_currentState.copyWith(
-        playbackState: VideoPlaybackState.error,
-        errorMessage: e.toString(),
-      ));
+      _updateState(
+        _currentState.copyWith(
+          playbackState: VideoPlaybackState.error,
+          errorMessage: e.toString(),
+        ),
+      );
       return Failure(UnexpectedFailure('Video initialization failed: $e'));
     }
   }
@@ -188,18 +190,18 @@ class VideoPlayerServiceImpl implements VideoPlayerService {
   Future<void> play() async {
     // Placeholder - requires video_player package
     // await _controller?.play();
-    _updateState(_currentState.copyWith(
-      playbackState: VideoPlaybackState.playing,
-    ));
+    _updateState(
+      _currentState.copyWith(playbackState: VideoPlaybackState.playing),
+    );
   }
 
   @override
   Future<void> pause() async {
     // Placeholder - requires video_player package
     // await _controller?.pause();
-    _updateState(_currentState.copyWith(
-      playbackState: VideoPlaybackState.paused,
-    ));
+    _updateState(
+      _currentState.copyWith(playbackState: VideoPlaybackState.paused),
+    );
   }
 
   @override

@@ -1,13 +1,12 @@
 import 'package:flutter_base_2025/core/errors/exceptions.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
-import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/base/paginated_list.dart';
 import 'package:flutter_base_2025/core/network/api_client.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Generic repository for API consumption.
 /// T = Entity type, D = DTO type, ID = Identifier type
 abstract class ApiRepository<T, D, ID> {
-
   ApiRepository(this._apiClient, this._basePath);
   final ApiClient _apiClient;
   final String _basePath;
@@ -106,14 +105,16 @@ abstract class ApiRepository<T, D, ID> {
 
   /// Maps exceptions to failures.
   AppFailure _mapExceptionToFailure(AppException e) => switch (e) {
-      NetworkException() => NetworkFailure(e.message),
-      ServerException() => ServerFailure(e.message, statusCode: e.statusCode),
-      ValidationException(:final fieldErrors) =>
-        ValidationFailure(e.message, fieldErrors: fieldErrors ?? {}),
-      UnauthorizedException() => AuthFailure(e.message),
-      ForbiddenException() => ForbiddenFailure(e.message),
-      NotFoundException() => NotFoundFailure(e.message),
-      RateLimitException() => RateLimitFailure(e.message),
-      CacheException() => CacheFailure(e.message),
-    };
+    NetworkException() => NetworkFailure(e.message),
+    ServerException() => ServerFailure(e.message, statusCode: e.statusCode),
+    ValidationException(:final fieldErrors) => ValidationFailure(
+      e.message,
+      fieldErrors: fieldErrors ?? {},
+    ),
+    UnauthorizedException() => AuthFailure(e.message),
+    ForbiddenException() => ForbiddenFailure(e.message),
+    NotFoundException() => NotFoundFailure(e.message),
+    RateLimitException() => RateLimitFailure(e.message),
+    CacheException() => CacheFailure(e.message),
+  };
 }

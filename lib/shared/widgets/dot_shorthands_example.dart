@@ -33,58 +33,52 @@ class DotShorthandsExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      // Dot shorthand for MainAxisAlignment.center
-      mainAxisAlignment: .center,
-      // Dot shorthand for CrossAxisAlignment.start
-      crossAxisAlignment: .start,
-      // Dot shorthand for MainAxisSize.min
-      mainAxisSize: .min,
-      children: [
-        // Dot shorthand for TextAlign.center
-        Text(
-          'Hello Dart 3.10!',
-          textAlign: .center,
+    // Dot shorthand for MainAxisAlignment.center
+    mainAxisAlignment: .center,
+    // Dot shorthand for CrossAxisAlignment.start
+    crossAxisAlignment: .start,
+    // Dot shorthand for MainAxisSize.min
+    mainAxisSize: .min,
+    children: [
+      // Dot shorthand for TextAlign.center
+      Text('Hello Dart 3.10!', textAlign: .center),
+      const SizedBox(height: 16),
+      // Dot shorthand for Alignment.center
+      Align(
+        child: Container(
+          width: 100,
+          height: 100,
+          // Dot shorthand for BoxFit.cover
+          decoration: const BoxDecoration(color: Colors.blue),
         ),
-        const SizedBox(height: 16),
-        // Dot shorthand for Alignment.center
-        Align(
-          child: Container(
-            width: 100,
-            height: 100,
-            // Dot shorthand for BoxFit.cover
-            decoration: const BoxDecoration(
-              color: Colors.blue,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        Row(
-          // Dot shorthand for MainAxisAlignment.spaceEvenly
-          mainAxisAlignment: .spaceEvenly,
-          children: [
-            _buildButton(context, 'Button 1'),
-            _buildButton(context, 'Button 2'),
-          ],
-        ),
-      ],
-    );
+      ),
+      const SizedBox(height: 16),
+      Row(
+        // Dot shorthand for MainAxisAlignment.spaceEvenly
+        mainAxisAlignment: .spaceEvenly,
+        children: [
+          _buildButton(context, 'Button 1'),
+          _buildButton(context, 'Button 2'),
+        ],
+      ),
+    ],
+  );
 
   Widget _buildButton(BuildContext context, String label) => ElevatedButton(
-      onPressed: () {},
-      // Dot shorthand for ButtonStyle properties
-      style: ElevatedButton.styleFrom(
-        // Dot shorthand for Size
-        minimumSize: const Size(100, 48),
-      ),
-      child: Text(label),
-    );
+    onPressed: () {},
+    // Dot shorthand for ButtonStyle properties
+    style: ElevatedButton.styleFrom(
+      // Dot shorthand for Size
+      minimumSize: const Size(100, 48),
+    ),
+    child: Text(label),
+  );
 }
 
 /// Example of dot shorthands with enums.
 enum Status { pending, active, completed, cancelled }
 
 class StatusWidget extends StatelessWidget {
-
   const StatusWidget({required this.status, super.key});
   final Status status;
 
@@ -118,24 +112,21 @@ class NamedConstructorExample extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
-      children: [
-        // Dot shorthand for EdgeInsets.all (when type is inferrable)
-        Padding(
-          padding: .all(16),
-          child: const Text('Padded text'),
-        ),
-        // Dot shorthand for EdgeInsets.symmetric
-        Padding(
-          padding: .symmetric(horizontal: 24, vertical: 12),
-          child: const Text('Symmetric padding'),
-        ),
-        // Dot shorthand for EdgeInsets.only
-        Padding(
-          padding: .only(left: 16, top: 8),
-          child: const Text('Only padding'),
-        ),
-      ],
-    );
+    children: [
+      // Dot shorthand for EdgeInsets.all (when type is inferrable)
+      Padding(padding: .all(16), child: const Text('Padded text')),
+      // Dot shorthand for EdgeInsets.symmetric
+      Padding(
+        padding: .symmetric(horizontal: 24, vertical: 12),
+        child: const Text('Symmetric padding'),
+      ),
+      // Dot shorthand for EdgeInsets.only
+      Padding(
+        padding: .only(left: 16, top: 8),
+        child: const Text('Only padding'),
+      ),
+    ],
+  );
 }
 
 /// Migration guide for existing code:

@@ -6,7 +6,6 @@ import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// File upload progress.
 class UploadProgress {
-
   const UploadProgress({
     required this.bytesSent,
     required this.totalBytes,
@@ -14,10 +13,10 @@ class UploadProgress {
   });
 
   factory UploadProgress.fromBytes(int sent, int total) => UploadProgress(
-      bytesSent: sent,
-      totalBytes: total,
-      percentage: total > 0 ? (sent / total) * 100 : 0,
-    );
+    bytesSent: sent,
+    totalBytes: total,
+    percentage: total > 0 ? (sent / total) * 100 : 0,
+  );
   final int bytesSent;
   final int totalBytes;
   final double percentage;
@@ -25,18 +24,18 @@ class UploadProgress {
 
 /// File download progress.
 class DownloadProgress {
-
   const DownloadProgress({
     required this.bytesReceived,
     required this.totalBytes,
     required this.percentage,
   });
 
-  factory DownloadProgress.fromBytes(int received, int total) => DownloadProgress(
-      bytesReceived: received,
-      totalBytes: total,
-      percentage: total > 0 ? (received / total) * 100 : 0,
-    );
+  factory DownloadProgress.fromBytes(int received, int total) =>
+      DownloadProgress(
+        bytesReceived: received,
+        totalBytes: total,
+        percentage: total > 0 ? (received / total) * 100 : 0,
+      );
   final int bytesReceived;
   final int totalBytes;
   final double percentage;
@@ -47,7 +46,6 @@ enum FileType { any, image, video, audio, document, custom }
 
 /// File picker configuration.
 class FilePickerConfig {
-
   const FilePickerConfig({
     this.type = FileType.any,
     this.allowedExtensions,
@@ -62,10 +60,10 @@ class FilePickerConfig {
 
 /// Picked file result.
 class PickedFile {
-
   const PickedFile({
     required this.name,
-    required this.size, this.path,
+    required this.size,
+    this.path,
     this.bytes,
     this.extension,
   });

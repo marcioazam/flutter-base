@@ -8,7 +8,6 @@ enum GraphQLOperationType { query, mutation, subscription }
 
 /// GraphQL request configuration.
 class GraphQLRequest {
-
   const GraphQLRequest({
     required this.document,
     this.variables,
@@ -23,12 +22,7 @@ class GraphQLRequest {
 
 /// GraphQL response wrapper.
 class GraphQLResponse<T> {
-
-  const GraphQLResponse({
-    this.data,
-    this.errors,
-    this.extensions,
-  });
+  const GraphQLResponse({this.data, this.errors, this.extensions});
   final T? data;
   final List<GraphQLError>? errors;
   final Map<String, dynamic>? extensions;
@@ -39,7 +33,6 @@ class GraphQLResponse<T> {
 
 /// GraphQL error representation.
 class GraphQLError {
-
   const GraphQLError({
     required this.message,
     this.path,
@@ -48,12 +41,12 @@ class GraphQLError {
   });
 
   factory GraphQLError.fromJson(Map<String, dynamic> json) => GraphQLError(
-      message: json['message'] as String? ?? 'Unknown error',
-      path: json['path'] as List<dynamic>?,
-      locations: (json['locations'] as List<dynamic>?)
-          ?.cast<Map<String, dynamic>>(),
-      extensions: json['extensions'] as Map<String, dynamic>?,
-    );
+    message: json['message'] as String? ?? 'Unknown error',
+    path: json['path'] as List<dynamic>?,
+    locations: (json['locations'] as List<dynamic>?)
+        ?.cast<Map<String, dynamic>>(),
+    extensions: json['extensions'] as Map<String, dynamic>?,
+  );
   final String message;
   final List<dynamic>? path;
   final List<Map<String, dynamic>>? locations;
@@ -92,7 +85,6 @@ abstract interface class GraphQLClient {
 
 /// GraphQL client configuration.
 class GraphQLClientConfig {
-
   const GraphQLClientConfig({
     required this.endpoint,
     this.wsEndpoint,
@@ -110,11 +102,7 @@ class GraphQLClientConfig {
 /// GraphQL client implementation.
 /// Note: Requires ferry package for full implementation.
 class GraphQLClientImpl implements GraphQLClient {
-
-  GraphQLClientImpl({
-    required this.config,
-    this.getToken,
-  });
+  GraphQLClientImpl({required this.config, this.getToken});
   final GraphQLClientConfig config;
   final Future<String?> Function()? getToken;
 
@@ -131,9 +119,16 @@ class GraphQLClientImpl implements GraphQLClient {
 
       return Failure(ServerFailure('GraphQL client not configured'));
     } on TimeoutException catch (e, st) {
-      return Failure(TimeoutFailure('GraphQL query timeout: $e', stackTrace: st));
+      return Failure(
+        TimeoutFailure('GraphQL query timeout: $e', stackTrace: st),
+      );
     } on FormatException catch (e, st) {
-      return Failure(ValidationFailure('Invalid GraphQL response: ${e.message}', stackTrace: st));
+      return Failure(
+        ValidationFailure(
+          'Invalid GraphQL response: ${e.message}',
+          stackTrace: st,
+        ),
+      );
     } on Exception catch (e, st) {
       return Failure(NetworkFailure(e.toString(), stackTrace: st));
     }
@@ -148,9 +143,16 @@ class GraphQLClientImpl implements GraphQLClient {
       // Placeholder - requires ferry package
       return Failure(ServerFailure('GraphQL client not configured'));
     } on TimeoutException catch (e, st) {
-      return Failure(TimeoutFailure('GraphQL mutation timeout: $e', stackTrace: st));
+      return Failure(
+        TimeoutFailure('GraphQL mutation timeout: $e', stackTrace: st),
+      );
     } on FormatException catch (e, st) {
-      return Failure(ValidationFailure('Invalid GraphQL response: ${e.message}', stackTrace: st));
+      return Failure(
+        ValidationFailure(
+          'Invalid GraphQL response: ${e.message}',
+          stackTrace: st,
+        ),
+      );
     } on Exception catch (e, st) {
       return Failure(NetworkFailure(e.toString(), stackTrace: st));
     }
@@ -178,11 +180,7 @@ class GraphQLClientImpl implements GraphQLClient {
 
 /// Generic GraphQL repository base class.
 abstract class GraphQLRepository<T> {
-
-  GraphQLRepository({
-    required this.client,
-    required this.fromJson,
-  });
+  GraphQLRepository({required this.client, required this.fromJson});
   final GraphQLClient client;
   final T Function(Map<String, dynamic>) fromJson;
 
@@ -215,13 +213,17 @@ abstract class GraphQLRepository<T> {
   }
 
   /// Subscribes and streams parsed results.
-  Stream<Result<T>> executeSubscription(GraphQLRequest request) => client.subscribe<T>(request, parser: fromJson).map((response) => response.flatMap((r) {
-        if (r.hasErrors) {
-          return Failure(ServerFailure(r.errors!.first.message));
-        }
-        if (r.data == null) {
-          return Failure(ServerFailure('No data returned'));
-        }
-        return Success(r.data as T);
-      }));
+  Stream<Result<T>> executeSubscription(GraphQLRequest request) => client
+      .subscribe<T>(request, parser: fromJson)
+      .map(
+        (response) => response.flatMap((r) {
+          if (r.hasErrors) {
+            return Failure(ServerFailure(r.errors!.first.message));
+          }
+          if (r.data == null) {
+            return Failure(ServerFailure('No data returned'));
+          }
+          return Success(r.data as T);
+        }),
+      );
 }

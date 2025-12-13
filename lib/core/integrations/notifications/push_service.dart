@@ -5,23 +5,24 @@ import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Push notification message.
 class PushNotification {
-
   const PushNotification({
-    required this.receivedAt, this.title,
+    required this.receivedAt,
+    this.title,
     this.body,
     this.data,
     this.imageUrl,
   });
 
-  factory PushNotification.fromJson(Map<String, dynamic> json) => PushNotification(
-      title: json['title'] as String?,
-      body: json['body'] as String?,
-      data: json['data'] as Map<String, dynamic>?,
-      imageUrl: json['imageUrl'] as String?,
-      receivedAt: json['receivedAt'] != null
-          ? DateTime.parse(json['receivedAt'] as String)
-          : DateTime.now(),
-    );
+  factory PushNotification.fromJson(Map<String, dynamic> json) =>
+      PushNotification(
+        title: json['title'] as String?,
+        body: json['body'] as String?,
+        data: json['data'] as Map<String, dynamic>?,
+        imageUrl: json['imageUrl'] as String?,
+        receivedAt: json['receivedAt'] != null
+            ? DateTime.parse(json['receivedAt'] as String)
+            : DateTime.now(),
+      );
   final String? title;
   final String? body;
   final Map<String, dynamic>? data;
@@ -29,21 +30,16 @@ class PushNotification {
   final DateTime receivedAt;
 
   Map<String, dynamic> toJson() => {
-        'title': title,
-        'body': body,
-        'data': data,
-        'imageUrl': imageUrl,
-        'receivedAt': receivedAt.toIso8601String(),
-      };
+    'title': title,
+    'body': body,
+    'data': data,
+    'imageUrl': imageUrl,
+    'receivedAt': receivedAt.toIso8601String(),
+  };
 }
 
 /// Push notification authorization status.
-enum PushAuthorizationStatus {
-  notDetermined,
-  denied,
-  authorized,
-  provisional,
-}
+enum PushAuthorizationStatus { notDetermined, denied, authorized, provisional }
 
 /// Abstract push notification service interface.
 abstract interface class PushNotificationService {

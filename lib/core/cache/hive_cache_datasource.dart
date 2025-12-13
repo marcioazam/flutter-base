@@ -16,10 +16,10 @@ class HiveCacheDataSource<T> {
     required T Function(Map<String, dynamic>) fromJson,
     required Map<String, dynamic> Function(T) toJson,
     HiveCacheConfig config = const HiveCacheConfig(),
-  })  : _box = box,
-        _fromJson = fromJson,
-        _toJson = toJson,
-        _config = config;
+  }) : _box = box,
+       _fromJson = fromJson,
+       _toJson = toJson,
+       _config = config;
 
   final Box<Map<dynamic, dynamic>> _box;
   final T Function(Map<String, dynamic>) _fromJson;
@@ -160,12 +160,12 @@ class HiveCacheDataSource<T> {
 
   /// Watch for changes to a specific key.
   Stream<T?> watch(String key) => _box.watch(key: key).asyncMap((event) async {
-        if (event.deleted || event.value == null) {
-          return null;
-        }
-        final entry = await get(key);
-        return entry?.data;
-      });
+    if (event.deleted || event.value == null) {
+      return null;
+    }
+    final entry = await get(key);
+    return entry?.data;
+  });
 
   /// Watch for any changes in the cache.
   Stream<BoxEvent> watchAll() => _box.watch();
@@ -204,9 +204,7 @@ class HiveCacheDataSource<T> {
   }
 
   /// Start periodic cleanup of expired entries.
-  void startPeriodicCleanup({
-    Duration interval = const Duration(hours: 1),
-  }) {
+  void startPeriodicCleanup({Duration interval = const Duration(hours: 1)}) {
     _cleanupTimer?.cancel();
     _cleanupTimer = Timer.periodic(interval, (_) => removeExpired());
   }

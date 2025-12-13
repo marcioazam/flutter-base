@@ -1,7 +1,7 @@
 import 'package:flutter_base_2025/core/errors/failures.dart';
-import 'package:flutter_base_2025/core/generics/base_repository.dart';
-import 'package:flutter_base_2025/core/generics/base_usecase.dart';
-import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/base/base_repository.dart';
+import 'package:flutter_base_2025/core/base/base_usecase.dart';
+import 'package:flutter_base_2025/core/base/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:meta/meta.dart';
@@ -13,7 +13,6 @@ import 'package:mocktail/mocktail.dart';
 // Test entities
 @immutable
 class User {
-
   const User({required this.id, required this.name, required this.email});
   final String id;
   final String name;
@@ -22,7 +21,10 @@ class User {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is User && id == other.id && name == other.name && email == other.email;
+      other is User &&
+          id == other.id &&
+          name == other.name &&
+          email == other.email;
 
   @override
   int get hashCode => id.hashCode ^ name.hashCode ^ email.hashCode;
@@ -33,7 +35,6 @@ class MockUserRepository extends Mock implements BaseRepository<User, String> {}
 
 // Use case implementation
 class GetUserUseCase implements UseCase<String, User> {
-
   GetUserUseCase(this.repository);
   final BaseRepository<User, String> repository;
 
@@ -42,7 +43,6 @@ class GetUserUseCase implements UseCase<String, User> {
 }
 
 class GetUsersUseCase implements NoParamsUseCase<PaginatedList<User>> {
-
   GetUsersUseCase(this.repository);
   final BaseRepository<User, String> repository;
 
@@ -51,7 +51,6 @@ class GetUsersUseCase implements NoParamsUseCase<PaginatedList<User>> {
 }
 
 class CreateUserUseCase implements UseCase<User, User> {
-
   CreateUserUseCase(this.repository);
   final BaseRepository<User, String> repository;
 
@@ -75,7 +74,9 @@ void main() {
 
     test('GetUserUseCase returns user from repository', () async {
       const user = User(id: '1', name: 'John', email: 'john@test.com');
-      when(() => repository.getById('1')).thenAnswer((_) async => Success(user));
+      when(
+        () => repository.getById('1'),
+      ).thenAnswer((_) async => Success(user));
 
       final result = await getUserUseCase('1');
 
@@ -85,8 +86,9 @@ void main() {
     });
 
     test('GetUserUseCase propagates NotFoundFailure', () async {
-      when(() => repository.getById('999'))
-          .thenAnswer((_) async => Failure(NotFoundFailure('User not found')));
+      when(
+        () => repository.getById('999'),
+      ).thenAnswer((_) async => Failure(NotFoundFailure('User not found')));
 
       final result = await getUserUseCase('999');
 
@@ -106,7 +108,9 @@ void main() {
         totalItems: 2,
       );
 
-      when(() => repository.getAll()).thenAnswer((_) async => Success(paginatedList));
+      when(
+        () => repository.getAll(),
+      ).thenAnswer((_) async => Success(paginatedList));
 
       final result = await getUsersUseCase();
 
@@ -116,7 +120,9 @@ void main() {
 
     test('CreateUserUseCase creates and returns user', () async {
       const newUser = User(id: '3', name: 'Bob', email: 'bob@test.com');
-      when(() => repository.create(newUser)).thenAnswer((_) async => Success(newUser));
+      when(
+        () => repository.create(newUser),
+      ).thenAnswer((_) async => Success(newUser));
 
       final result = await createUserUseCase(newUser);
 
@@ -128,10 +134,14 @@ void main() {
     test('CreateUserUseCase propagates ValidationFailure', () async {
       const invalidUser = User(id: '', name: '', email: 'invalid');
       when(() => repository.create(invalidUser)).thenAnswer(
-        (_) async => Failure(ValidationFailure(
-          'Validation failed',
-          fieldErrors: {'email': ['Invalid email format']},
-        )),
+        (_) async => Failure(
+          ValidationFailure(
+            'Validation failed',
+            fieldErrors: {
+              'email': ['Invalid email format'],
+            },
+          ),
+        ),
       );
 
       final result = await createUserUseCase(invalidUser);
@@ -151,8 +161,9 @@ void main() {
     });
 
     test('NetworkFailure propagates from repository to usecase', () async {
-      when(() => repository.getById(any()))
-          .thenAnswer((_) async => Failure(NetworkFailure('No connection')));
+      when(
+        () => repository.getById(any()),
+      ).thenAnswer((_) async => Failure(NetworkFailure('No connection')));
 
       final useCase = GetUserUseCase(repository);
       final result = await useCase('1');
@@ -176,8 +187,9 @@ void main() {
     });
 
     test('AuthFailure propagates for unauthorized access', () async {
-      when(() => repository.getById(any()))
-          .thenAnswer((_) async => Failure(AuthFailure('Session expired')));
+      when(
+        () => repository.getById(any()),
+      ).thenAnswer((_) async => Failure(AuthFailure('Session expired')));
 
       final useCase = GetUserUseCase(repository);
       final result = await useCase('1');
@@ -187,8 +199,9 @@ void main() {
     });
 
     test('CacheFailure propagates from local storage', () async {
-      when(() => repository.getById(any()))
-          .thenAnswer((_) async => Failure(CacheFailure('Database error')));
+      when(
+        () => repository.getById(any()),
+      ).thenAnswer((_) async => Failure(CacheFailure('Database error')));
 
       final useCase = GetUserUseCase(repository);
       final result = await useCase('1');
@@ -207,7 +220,9 @@ void main() {
 
     test('flatMap chains successful operations', () async {
       const user = User(id: '1', name: 'John', email: 'john@test.com');
-      when(() => repository.getById('1')).thenAnswer((_) async => Success(user));
+      when(
+        () => repository.getById('1'),
+      ).thenAnswer((_) async => Success(user));
 
       final useCase = GetUserUseCase(repository);
       final result = await useCase('1');
@@ -220,8 +235,9 @@ void main() {
     });
 
     test('flatMap short-circuits on failure', () async {
-      when(() => repository.getById('1'))
-          .thenAnswer((_) async => Failure(NotFoundFailure('Not found')));
+      when(
+        () => repository.getById('1'),
+      ).thenAnswer((_) async => Failure(NotFoundFailure('Not found')));
 
       final useCase = GetUserUseCase(repository);
       final result = await useCase('1');
@@ -240,8 +256,12 @@ void main() {
       const user1 = User(id: '1', name: 'John', email: 'john@test.com');
       const user2 = User(id: '2', name: 'Jane', email: 'jane@test.com');
 
-      when(() => repository.getById('1')).thenAnswer((_) async => Success(user1));
-      when(() => repository.getById('2')).thenAnswer((_) async => Success(user2));
+      when(
+        () => repository.getById('1'),
+      ).thenAnswer((_) async => Success(user1));
+      when(
+        () => repository.getById('2'),
+      ).thenAnswer((_) async => Success(user2));
 
       final useCase = GetUserUseCase(repository);
       final results = await Future.wait([useCase('1'), useCase('2')]);
@@ -254,9 +274,12 @@ void main() {
     test('Result.sequence fails on first failure', () async {
       const user1 = User(id: '1', name: 'John', email: 'john@test.com');
 
-      when(() => repository.getById('1')).thenAnswer((_) async => Success(user1));
-      when(() => repository.getById('2'))
-          .thenAnswer((_) async => Failure(NotFoundFailure('Not found')));
+      when(
+        () => repository.getById('1'),
+      ).thenAnswer((_) async => Success(user1));
+      when(
+        () => repository.getById('2'),
+      ).thenAnswer((_) async => Failure(NotFoundFailure('Not found')));
 
       final useCase = GetUserUseCase(repository);
       final results = await Future.wait([useCase('1'), useCase('2')]);

@@ -1,6 +1,7 @@
 import 'package:flutter_base_2025/shared/widgets/infinite_list.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -195,9 +196,15 @@ void main() {
     group('InfiniteScrollState', () {
       test('enum has all expected values', () {
         expect(InfiniteScrollState.values, contains(InfiniteScrollState.idle));
-        expect(InfiniteScrollState.values, contains(InfiniteScrollState.loading));
+        expect(
+          InfiniteScrollState.values,
+          contains(InfiniteScrollState.loading),
+        );
         expect(InfiniteScrollState.values, contains(InfiniteScrollState.error));
-        expect(InfiniteScrollState.values, contains(InfiniteScrollState.noMoreData));
+        expect(
+          InfiniteScrollState.values,
+          contains(InfiniteScrollState.noMoreData),
+        );
       });
     });
 

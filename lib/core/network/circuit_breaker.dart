@@ -3,19 +3,20 @@ import 'dart:async';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
-export 'package:flutter_base_2025/core/errors/failures.dart' show CircuitOpenFailure;
+export 'package:flutter_base_2025/core/errors/failures.dart'
+    show CircuitOpenFailure;
 
 /// Circuit breaker states for the state machine.
-/// 
+///
 /// **Feature: flutter-2025-final-enhancements**
 /// **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
 enum CircuitState {
   /// Circuit is closed - requests flow normally.
   closed,
-  
+
   /// Circuit is open - requests fail fast without execution.
   open,
-  
+
   /// Circuit is half-open - allowing test requests to check recovery.
   halfOpen,
 }
@@ -39,10 +40,10 @@ class CircuitBreakerConfig {
 }
 
 /// Generic circuit breaker implementation for resilient operations.
-/// 
+///
 /// Implements the circuit breaker pattern to prevent cascading failures
 /// by failing fast when a service is unavailable.
-/// 
+///
 /// **Feature: flutter-2025-final-enhancements, Property 6: Circuit Breaker State Machine**
 /// **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
 class CircuitBreaker<T> {
@@ -54,7 +55,8 @@ class CircuitBreaker<T> {
 
   final CircuitBreakerConfig config;
   final Future<T> Function() execute;
-  final void Function(CircuitState oldState, CircuitState newState)? onStateChange;
+  final void Function(CircuitState oldState, CircuitState newState)?
+  onStateChange;
 
   CircuitState _state = CircuitState.closed;
   int _failureCount = 0;
@@ -78,7 +80,9 @@ class CircuitBreaker<T> {
           _transitionTo(CircuitState.halfOpen);
           return _executeWithTracking();
         }
-        return const Failure(CircuitOpenFailure('Circuit is open - failing fast'));
+        return const Failure(
+          CircuitOpenFailure('Circuit is open - failing fast'),
+        );
 
       case CircuitState.halfOpen:
       case CircuitState.closed:

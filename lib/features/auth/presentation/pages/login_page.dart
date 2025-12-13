@@ -4,7 +4,6 @@ import 'package:flutter_base_2025/features/auth/presentation/providers/auth_prov
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
-
   const LoginPage({super.key, this.isRegister = false});
   final bool isRegister;
 
@@ -171,10 +170,9 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
   void _submit() {
     if (_formKey.currentState?.validate() ?? false) {
-      ref.read(loginProvider.notifier).login(
-            _emailController.text.trim(),
-            _passwordController.text,
-          );
+      ref
+          .read(loginProvider.notifier)
+          .login(_emailController.text.trim(), _passwordController.text);
     }
   }
 

@@ -8,16 +8,16 @@ import 'package:flutter_base_2025/core/observability/crash_reporter.dart';
 
 /// Error boundary widget that catches and displays errors gracefully.
 class ErrorBoundary extends StatefulWidget {
-
   const ErrorBoundary({
-    required this.child, super.key,
+    required this.child,
+    super.key,
     this.errorBuilder,
     this.onError,
     this.crashReporter,
   });
   final Widget child;
   final Widget Function(Object error, StackTrace? stack, VoidCallback retry)?
-      errorBuilder;
+  errorBuilder;
   final void Function(Object error, StackTrace? stack)? onError;
   final CrashReporter? crashReporter;
 
@@ -53,23 +53,16 @@ class _ErrorBoundaryState extends State<ErrorBoundary> {
           DefaultErrorWidget(error: _error!, onRetry: _retry);
     }
 
-    return _ErrorBoundaryInherited(
-      onError: _handleError,
-      child: widget.child,
-    );
+    return _ErrorBoundaryInherited(onError: _handleError, child: widget.child);
   }
 }
 
 class _ErrorBoundaryInherited extends InheritedWidget {
-
-  const _ErrorBoundaryInherited({
-    required this.onError,
-    required super.child,
-  });
+  const _ErrorBoundaryInherited({required this.onError, required super.child});
   final void Function(Object, StackTrace?) onError;
 
-  static _ErrorBoundaryInherited? of(BuildContext context) => context
-        .dependOnInheritedWidgetOfExactType<_ErrorBoundaryInherited>();
+  static _ErrorBoundaryInherited? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_ErrorBoundaryInherited>();
 
   @override
   bool updateShouldNotify(_ErrorBoundaryInherited oldWidget) => false;
@@ -84,9 +77,10 @@ extension ErrorBoundaryContext on BuildContext {
 
 /// Default error widget with retry button.
 class DefaultErrorWidget extends StatelessWidget {
-
   const DefaultErrorWidget({
-    required this.error, required this.onRetry, super.key,
+    required this.error,
+    required this.onRetry,
+    super.key,
   });
   final Object error;
   final VoidCallback onRetry;
@@ -101,11 +95,7 @@ class DefaultErrorWidget extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              Icons.error_outline,
-              size: 64,
-              color: theme.colorScheme.error,
-            ),
+            Icon(Icons.error_outline, size: 64, color: theme.colorScheme.error),
             const SizedBox(height: 16),
             Text(
               'Algo deu errado',
@@ -145,11 +135,7 @@ class DefaultErrorWidget extends StatelessWidget {
 
 /// Compact error widget for inline use.
 class CompactErrorWidget extends StatelessWidget {
-
-  const CompactErrorWidget({
-    required this.message, super.key,
-    this.onRetry,
-  });
+  const CompactErrorWidget({required this.message, super.key, this.onRetry});
   final String message;
   final VoidCallback? onRetry;
 
@@ -165,10 +151,7 @@ class CompactErrorWidget extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(
-            Icons.error_outline,
-            color: theme.colorScheme.onErrorContainer,
-          ),
+          Icon(Icons.error_outline, color: theme.colorScheme.onErrorContainer),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

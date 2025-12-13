@@ -1,4 +1,3 @@
-
 import 'package:flutter_base_2025/core/config/retry_config.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -7,16 +6,14 @@ import '../helpers/glados_helpers.dart';
 
 void main() {
   _jitterBoundsTests();
-  
+
   group('Retry Backoff Property Tests', () {
     /// **Feature: flutter-2025-final-enhancements, Property 4: Retry Exponential Backoff**
     /// **Validates: Requirements 3.1**
     Glados(any.intInRange(0, 10)).test(
       'Exponential backoff doubles delay with each retry',
       (retryCount) {
-        final delay = calculateExponentialBackoff(
-          retryCount: retryCount,
-        );
+        final delay = calculateExponentialBackoff(retryCount: retryCount);
 
         final expectedMs = 200 * (1 << retryCount);
         final cappedMs = expectedMs.clamp(0, 30000);
@@ -24,18 +21,17 @@ void main() {
       },
     );
 
-    Glados(any.intInRange(0, 20)).test(
-      'Exponential backoff respects maxDelay',
-      (retryCount) {
-        const maxDelay = Duration(seconds: 5);
-        final delay = calculateExponentialBackoff(
-          retryCount: retryCount,
-          maxDelay: maxDelay,
-        );
+    Glados(
+      any.intInRange(0, 20),
+    ).test('Exponential backoff respects maxDelay', (retryCount) {
+      const maxDelay = Duration(seconds: 5);
+      final delay = calculateExponentialBackoff(
+        retryCount: retryCount,
+        maxDelay: maxDelay,
+      );
 
-        expect(delay.inMilliseconds, lessThanOrEqualTo(maxDelay.inMilliseconds));
-      },
-    );
+      expect(delay.inMilliseconds, lessThanOrEqualTo(maxDelay.inMilliseconds));
+    });
 
     /// **Feature: flutter-2025-final-enhancements, Property 5: Retry State Machine**
     /// **Validates: Requirements 3.3, 3.5**
@@ -71,58 +67,58 @@ void main() {
 /// Generator for jitter test parameters.
 extension JitterGenerators on Any {
   Generator<({int attempt, double jitterFactor})> get jitterParams => combine2(
-        intInRange(0, 10),
-        doubleInRange(0, 1),
-        (attempt, jitter) => (attempt: attempt, jitterFactor: jitter),
-      );
+    intInRange(0, 10),
+    doubleInRange(0, 1),
+    (attempt, jitter) => (attempt: attempt, jitterFactor: jitter),
+  );
 }
 
 /// **Feature: flutter-2025-final-enhancements, Property 9: Backoff with Jitter Bounds**
 /// **Validates: Requirements 8.4**
 void _jitterBoundsTests() {
   group('Jitter Bounds Property Tests', () {
-    Glados(any.jitterParams).test(
-      'Backoff with jitter stays within bounds',
-      (params) {
-        const baseDelay = Duration(milliseconds: 200);
-        const maxDelay = Duration(seconds: 30);
-        
-        // Calculate expected bounds
-        final baseMs = baseDelay.inMilliseconds * (1 << params.attempt);
-        final minExpected = (baseMs * (1 - params.jitterFactor)).round();
-        final maxExpected = (baseMs * (1 + params.jitterFactor)).round();
-        
-        // Run multiple iterations to test randomness bounds
-        for (var i = 0; i < 100; i++) {
-          final delay = calculateBackoffWithJitter(
-            attempt: params.attempt,
-            jitterFactor: params.jitterFactor,
-          );
-          
-          // Delay should be within jitter bounds (capped at maxDelay)
-          final cappedMin = minExpected.clamp(0, maxDelay.inMilliseconds);
-          final cappedMax = maxExpected.clamp(0, maxDelay.inMilliseconds);
-          
-          expect(
-            delay.inMilliseconds,
-            inInclusiveRange(cappedMin, cappedMax),
-            reason: 'Delay should be within jitter bounds for attempt ${params.attempt}',
-          );
-        }
-      },
-    );
+    Glados(any.jitterParams).test('Backoff with jitter stays within bounds', (
+      params,
+    ) {
+      const baseDelay = Duration(milliseconds: 200);
+      const maxDelay = Duration(seconds: 30);
+
+      // Calculate expected bounds
+      final baseMs = baseDelay.inMilliseconds * (1 << params.attempt);
+      final minExpected = (baseMs * (1 - params.jitterFactor)).round();
+      final maxExpected = (baseMs * (1 + params.jitterFactor)).round();
+
+      // Run multiple iterations to test randomness bounds
+      for (var i = 0; i < 100; i++) {
+        final delay = calculateBackoffWithJitter(
+          attempt: params.attempt,
+          jitterFactor: params.jitterFactor,
+        );
+
+        // Delay should be within jitter bounds (capped at maxDelay)
+        final cappedMin = minExpected.clamp(0, maxDelay.inMilliseconds);
+        final cappedMax = maxExpected.clamp(0, maxDelay.inMilliseconds);
+
+        expect(
+          delay.inMilliseconds,
+          inInclusiveRange(cappedMin, cappedMax),
+          reason:
+              'Delay should be within jitter bounds for attempt ${params.attempt}',
+        );
+      }
+    });
 
     Glados(any.intInRange(0, 15)).test(
       'Backoff with jitter respects maxDelay',
       (attempt) {
         const maxDelay = Duration(seconds: 5);
-        
+
         for (var i = 0; i < 50; i++) {
           final delay = calculateBackoffWithJitter(
             attempt: attempt,
             maxDelay: maxDelay,
           );
-          
+
           expect(
             delay.inMilliseconds,
             lessThanOrEqualTo(maxDelay.inMilliseconds),
@@ -134,13 +130,13 @@ void _jitterBoundsTests() {
 
     test('Zero jitter factor produces exact exponential backoff', () {
       const baseDelay = Duration(milliseconds: 200);
-      
+
       for (var attempt = 0; attempt < 5; attempt++) {
         final delay = calculateBackoffWithJitter(
           attempt: attempt,
           jitterFactor: 0,
         );
-        
+
         final expected = baseDelay.inMilliseconds * (1 << attempt);
         expect(delay.inMilliseconds, equals(expected));
       }
@@ -149,7 +145,7 @@ void _jitterBoundsTests() {
 }
 
 /// Calculates exponential backoff with jitter for testing.
-/// 
+///
 /// **Feature: flutter-2025-final-enhancements, Property 9: Backoff with Jitter Bounds**
 /// **Validates: Requirements 8.4**
 Duration calculateBackoffWithJitter({

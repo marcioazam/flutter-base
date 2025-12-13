@@ -8,11 +8,7 @@ void main() {
   group('Error Boundary Properties', () {
     testWidgets('displays child when no error', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: ErrorBoundary(
-            child: Text('Normal content'),
-          ),
-        ),
+        const MaterialApp(home: ErrorBoundary(child: Text('Normal content'))),
       );
 
       expect(find.text('Normal content'), findsOneWidget);
@@ -56,9 +52,7 @@ void main() {
     testWidgets('CompactErrorWidget displays message', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: CompactErrorWidget(message: 'Compact error'),
-          ),
+          home: Scaffold(body: CompactErrorWidget(message: 'Compact error')),
         ),
       );
 
@@ -88,13 +82,12 @@ void main() {
       expect(retryPressed, isTrue);
     });
 
-    testWidgets('CompactErrorWidget hides retry when not provided',
-        (tester) async {
+    testWidgets('CompactErrorWidget hides retry when not provided', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: CompactErrorWidget(message: 'Error'),
-          ),
+          home: Scaffold(body: CompactErrorWidget(message: 'Error')),
         ),
       );
 

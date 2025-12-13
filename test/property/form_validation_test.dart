@@ -2,7 +2,8 @@ import 'package:flutter_base_2025/core/constants/validation_patterns.dart';
 import 'package:flutter_base_2025/core/utils/form_controller.dart';
 import 'package:flutter_base_2025/core/utils/validation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();

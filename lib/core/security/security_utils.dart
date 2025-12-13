@@ -10,8 +10,9 @@ import 'package:flutter_base_2025/core/security/certificate_pinning_service.dart
 /// This class is kept for backward compatibility only.
 @Deprecated('Use CertificatePinningService for production certificate pinning')
 class CertificatePinConfig {
-
-  @Deprecated('Use CertificatePinningService for production certificate pinning')
+  @Deprecated(
+    'Use CertificatePinningService for production certificate pinning',
+  )
   const CertificatePinConfig({
     required this.pinnedCertificates,
     this.allowBadCertificates = false,
@@ -61,12 +62,12 @@ HttpClient createPinnedHttpClient(CertificatePinConfig config) {
 abstract final class InputSanitizer {
   /// Sanitizes string input to prevent XSS.
   static String sanitizeHtml(String input) => input
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#x27;')
-        .replaceAll('/', '&#x2F;');
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#x27;')
+      .replaceAll('/', '&#x2F;');
 
   /// ⚠️ DEPRECATED: Do NOT use this method. It promotes insecure SQL practices.
   ///
@@ -75,27 +76,31 @@ abstract final class InputSanitizer {
   ///
   /// This method will be removed in a future version.
   /// See: VUL-2025-FLUTTER-005, OWASP A05 Injection
-  @Deprecated('Use parameterized queries with Drift instead. This method promotes insecure SQL practices.')
+  @Deprecated(
+    'Use parameterized queries with Drift instead. This method promotes insecure SQL practices.',
+  )
   static String sanitizeSql(String input) => throw UnsupportedError(
-        'sanitizeSql is deprecated and disabled for security reasons. '
-        'Use Drift parameterized queries instead: '
-        'db.select(table)..where((t) => t.column.equals(value))',
-      );
+    'sanitizeSql is deprecated and disabled for security reasons. '
+    'Use Drift parameterized queries instead: '
+    'db.select(table)..where((t) => t.column.equals(value))',
+  );
 
   /// Sanitizes input for JSON.
-  static String sanitizeJson(String input) => jsonEncode(input).replaceAll(RegExp(r'^"|"$'), '');
+  static String sanitizeJson(String input) =>
+      jsonEncode(input).replaceAll(RegExp(r'^"|"$'), '');
 
   /// Sanitizes URL parameter.
   static String sanitizeUrlParam(String input) => Uri.encodeComponent(input);
 
   /// Removes control characters.
-  static String removeControlChars(String input) => input.replaceAll(RegExp(r'[\x00-\x1F\x7F]'), '');
+  static String removeControlChars(String input) =>
+      input.replaceAll(RegExp(r'[\x00-\x1F\x7F]'), '');
 
   /// Sanitizes filename.
   static String sanitizeFilename(String input) => input
-        .replaceAll(RegExp(r'[<>:"/\\|?*]'), '_')
-        .replaceAll(RegExp(r'\.{2,}'), '.')
-        .replaceAll(RegExp(r'^\.+|\.+$'), '');
+      .replaceAll(RegExp(r'[<>:"/\\|?*]'), '_')
+      .replaceAll(RegExp(r'\.{2,}'), '.')
+      .replaceAll(RegExp(r'^\.+|\.+$'), '');
 
   /// Validates and sanitizes email.
   static String? sanitizeEmail(String input) {
@@ -113,7 +118,8 @@ abstract final class InputSanitizer {
   }
 
   /// Strips all HTML tags.
-  static String stripHtmlTags(String input) => input.replaceAll(RegExp('<[^>]*>'), '');
+  static String stripHtmlTags(String input) =>
+      input.replaceAll(RegExp('<[^>]*>'), '');
 
   /// Limits string length.
   static String limitLength(String input, int maxLength) {
@@ -122,10 +128,12 @@ abstract final class InputSanitizer {
   }
 
   /// Validates input against whitelist pattern.
-  static bool matchesWhitelist(String input, RegExp pattern) => pattern.hasMatch(input);
+  static bool matchesWhitelist(String input, RegExp pattern) =>
+      pattern.hasMatch(input);
 
   /// Alphanumeric only.
-  static String alphanumericOnly(String input) => input.replaceAll(RegExp('[^a-zA-Z0-9]'), '');
+  static String alphanumericOnly(String input) =>
+      input.replaceAll(RegExp('[^a-zA-Z0-9]'), '');
 }
 
 /// Deep link validator.

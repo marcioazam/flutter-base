@@ -10,7 +10,6 @@ enum ImageQuality { low, medium, high, original }
 
 /// Image compression configuration.
 class ImageCompressionConfig {
-
   const ImageCompressionConfig({
     this.quality = 85,
     this.maxWidth,
@@ -18,25 +17,24 @@ class ImageCompressionConfig {
     this.keepExif = false,
   });
 
-  factory ImageCompressionConfig.fromQuality(ImageQuality quality) => switch (quality) {
-      ImageQuality.low => const ImageCompressionConfig(
+  factory ImageCompressionConfig.fromQuality(ImageQuality quality) =>
+      switch (quality) {
+        ImageQuality.low => const ImageCompressionConfig(
           quality: 50,
           maxWidth: 800,
           maxHeight: 800,
         ),
-      ImageQuality.medium => const ImageCompressionConfig(
+        ImageQuality.medium => const ImageCompressionConfig(
           quality: 70,
           maxWidth: 1200,
           maxHeight: 1200,
         ),
-      ImageQuality.high => const ImageCompressionConfig(
+        ImageQuality.high => const ImageCompressionConfig(
           maxWidth: 1920,
           maxHeight: 1920,
         ),
-      ImageQuality.original => const ImageCompressionConfig(
-          quality: 100,
-        ),
-    };
+        ImageQuality.original => const ImageCompressionConfig(quality: 100),
+      };
   final int quality;
   final int? maxWidth;
   final int? maxHeight;
@@ -45,7 +43,6 @@ class ImageCompressionConfig {
 
 /// Image cache configuration.
 class ImageCacheConfig {
-
   const ImageCacheConfig({
     this.maxMemoryCacheSize = 100 * 1024 * 1024, // 100 MB
     this.maxDiskCacheSize = 500 * 1024 * 1024, // 500 MB
@@ -86,10 +83,7 @@ abstract interface class ImageService {
 /// Image service implementation.
 /// Note: Requires cached_network_image and flutter_image_compress packages.
 class ImageServiceImpl implements ImageService {
-
-  ImageServiceImpl({
-    this.cacheConfig = const ImageCacheConfig(),
-  });
+  ImageServiceImpl({this.cacheConfig = const ImageCacheConfig()});
   final ImageCacheConfig cacheConfig;
 
   @override
@@ -126,7 +120,8 @@ class ImageServiceImpl implements ImageService {
         if (loadingProgress == null) return child;
         return placeholder ?? const Center(child: CircularProgressIndicator());
       },
-      errorBuilder: (context, error, stackTrace) => errorWidget ?? const Icon(Icons.error),
+      errorBuilder: (context, error, stackTrace) =>
+          errorWidget ?? const Icon(Icons.error),
     );
   }
 

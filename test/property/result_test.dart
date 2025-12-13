@@ -1,7 +1,8 @@
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -17,10 +18,7 @@ void main() {
         var failureCalled = false;
 
         final result = Success(value);
-        result.fold(
-          (_) => failureCalled = true,
-          (_) => successCalled = true,
-        );
+        result.fold((_) => failureCalled = true, (_) => successCalled = true);
 
         expect(successCalled, isTrue);
         expect(failureCalled, isFalse);
@@ -34,10 +32,7 @@ void main() {
         var failureCalled = false;
 
         final Result<int> result = Failure(NetworkFailure(message));
-        result.fold(
-          (_) => failureCalled = true,
-          (_) => successCalled = true,
-        );
+        result.fold((_) => failureCalled = true, (_) => successCalled = true);
 
         expect(successCalled, isFalse);
         expect(failureCalled, isTrue);
@@ -55,74 +50,67 @@ void main() {
       },
     );
 
-    Glados<int>(any.int, _explore).test(
-      'Failure.map preserves failure',
-      (value) {
-        final failure = NetworkFailure('error');
-        final Result<int> result = Failure(failure);
-        final mapped = result.map((v) => v * 2);
+    Glados<int>(any.int, _explore).test('Failure.map preserves failure', (
+      value,
+    ) {
+      final failure = NetworkFailure('error');
+      final Result<int> result = Failure(failure);
+      final mapped = result.map((v) => v * 2);
 
-        expect(mapped.isFailure, isTrue);
-        expect(mapped.failureOrNull, equals(failure));
-      },
-    );
+      expect(mapped.isFailure, isTrue);
+      expect(mapped.failureOrNull, equals(failure));
+    });
 
-    Glados<int>(any.int, _explore).test(
-      'Success.flatMap chains correctly',
-      (value) {
-        final result = Success(value);
-        final chained = result.flatMap((v) => Success(v.toString()));
+    Glados<int>(any.int, _explore).test('Success.flatMap chains correctly', (
+      value,
+    ) {
+      final result = Success(value);
+      final chained = result.flatMap((v) => Success(v.toString()));
 
-        expect(chained.isSuccess, isTrue);
-        expect(chained.valueOrNull, equals(value.toString()));
-      },
-    );
+      expect(chained.isSuccess, isTrue);
+      expect(chained.valueOrNull, equals(value.toString()));
+    });
 
-    Glados<int>(any.int, _explore).test(
-      'Success.getOrElse returns value',
-      (value) {
-        final result = Success(value);
-        expect(result.getOrElse(() => -1), equals(value));
-      },
-    );
+    Glados<int>(any.int, _explore).test('Success.getOrElse returns value', (
+      value,
+    ) {
+      final result = Success(value);
+      expect(result.getOrElse(() => -1), equals(value));
+    });
 
-    Glados<int>(any.int, _explore).test(
-      'Failure.getOrElse returns default',
-      (defaultValue) {
-        final Result<int> result = Failure(NetworkFailure('error'));
-        expect(result.getOrElse(() => defaultValue), equals(defaultValue));
-      },
-    );
+    Glados<int>(any.int, _explore).test('Failure.getOrElse returns default', (
+      defaultValue,
+    ) {
+      final Result<int> result = Failure(NetworkFailure('error'));
+      expect(result.getOrElse(() => defaultValue), equals(defaultValue));
+    });
 
-    Glados<int>(any.int, _explore).test(
-      'Success.orElse returns original',
-      (value) {
-        final result = Success(value);
-        final alternative = result.orElse(() => Success(-1));
+    Glados<int>(any.int, _explore).test('Success.orElse returns original', (
+      value,
+    ) {
+      final result = Success(value);
+      final alternative = result.orElse(() => Success(-1));
 
-        expect(alternative.valueOrNull, equals(value));
-      },
-    );
+      expect(alternative.valueOrNull, equals(value));
+    });
 
-    Glados<int>(any.int, _explore).test(
-      'Failure.orElse returns alternative',
-      (alternativeValue) {
-        final Result<int> result = Failure(NetworkFailure('error'));
-        final alternative = result.orElse(() => Success(alternativeValue));
+    Glados<int>(any.int, _explore).test('Failure.orElse returns alternative', (
+      alternativeValue,
+    ) {
+      final Result<int> result = Failure(NetworkFailure('error'));
+      final alternative = result.orElse(() => Success(alternativeValue));
 
-        expect(alternative.valueOrNull, equals(alternativeValue));
-      },
-    );
+      expect(alternative.valueOrNull, equals(alternativeValue));
+    });
 
-    Glados<int>(any.int, _explore).test(
-      'Success.recover returns original',
-      (value) {
-        final result = Success(value);
-        final recovered = result.recover((_) => -1);
+    Glados<int>(any.int, _explore).test('Success.recover returns original', (
+      value,
+    ) {
+      final result = Success(value);
+      final recovered = result.recover((_) => -1);
 
-        expect(recovered.valueOrNull, equals(value));
-      },
-    );
+      expect(recovered.valueOrNull, equals(value));
+    });
 
     Glados<int>(any.int, _explore).test(
       'Failure.recover returns recovered value',
@@ -206,30 +194,36 @@ void main() {
         final m = Success(value);
 
         // Left side: (m.flatMap(f)).flatMap(g)
-        final leftSide = m.flatMap(intToStringResult).flatMap(stringToIntResult);
+        final leftSide = m
+            .flatMap(intToStringResult)
+            .flatMap(stringToIntResult);
 
         // Right side: m.flatMap((x) => f(x).flatMap(g))
-        final rightSide = m.flatMap((x) => intToStringResult(x).flatMap(stringToIntResult));
+        final rightSide = m.flatMap(
+          (x) => intToStringResult(x).flatMap(stringToIntResult),
+        );
 
         expect(leftSide.isSuccess, equals(rightSide.isSuccess));
         expect(leftSide.valueOrNull, equals(rightSide.valueOrNull));
       },
     );
 
-    Glados<String>(any.nonEmptyLetters, _explore).test(
-      'Associativity for Failure propagates correctly',
-      (message) {
-        final failure = NetworkFailure(message);
-        final Result<int> m = Failure(failure);
+    Glados<String>(
+      any.nonEmptyLetters,
+      _explore,
+    ).test('Associativity for Failure propagates correctly', (message) {
+      final failure = NetworkFailure(message);
+      final Result<int> m = Failure(failure);
 
-        final leftSide = m.flatMap(intToStringResult).flatMap(stringToIntResult);
-        final rightSide = m.flatMap((x) => intToStringResult(x).flatMap(stringToIntResult));
+      final leftSide = m.flatMap(intToStringResult).flatMap(stringToIntResult);
+      final rightSide = m.flatMap(
+        (x) => intToStringResult(x).flatMap(stringToIntResult),
+      );
 
-        expect(leftSide.isFailure, isTrue);
-        expect(rightSide.isFailure, isTrue);
-        expect(leftSide.failureOrNull, equals(rightSide.failureOrNull));
-      },
-    );
+      expect(leftSide.isFailure, isTrue);
+      expect(rightSide.isFailure, isTrue);
+      expect(leftSide.failureOrNull, equals(rightSide.failureOrNull));
+    });
   });
 
   /// **Feature: flutter-state-of-art-2025-final, Property 4: Failure Propagation**
@@ -304,7 +298,10 @@ void main() {
     Glados<int>(any.int, _explore).test(
       'Result.fromCondition returns Success when condition is true',
       (value) {
-        final result = Result.fromCondition(condition: true, value: () => value);
+        final result = Result.fromCondition(
+          condition: true,
+          value: () => value,
+        );
         expect(result.isSuccess, isTrue);
         expect(result.valueOrNull, equals(value));
       },
@@ -313,7 +310,10 @@ void main() {
     Glados<int>(any.int, _explore).test(
       'Result.fromCondition returns Failure when condition is false',
       (value) {
-        final result = Result.fromCondition(condition: false, value: () => value);
+        final result = Result.fromCondition(
+          condition: false,
+          value: () => value,
+        );
         expect(result.isFailure, isTrue);
         expect(result.failureOrNull, isA<ValidationFailure>());
       },
@@ -329,11 +329,7 @@ void main() {
 
     test('Result.combine returns first Failure when any result is Failure', () {
       final failure = NetworkFailure('error');
-      final results = [
-        Success(1),
-        Failure<int>(failure),
-        Success(3),
-      ];
+      final results = [Success(1), Failure<int>(failure), Success(3)];
       final combined = Result.combine(results);
 
       expect(combined.isFailure, isTrue);

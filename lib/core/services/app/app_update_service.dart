@@ -6,19 +6,13 @@ import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Update availability status.
-enum UpdateAvailability {
-  unknown,
-  notAvailable,
-  available,
-  inProgress,
-}
+enum UpdateAvailability { unknown, notAvailable, available, inProgress }
 
 /// Update type.
 enum UpdateType { optional, mandatory }
 
 /// App version info.
 class AppVersionInfo {
-
   const AppVersionInfo({
     required this.currentVersion,
     required this.latestVersion,
@@ -53,7 +47,6 @@ abstract interface class AppUpdateService {
 /// App update service implementation.
 /// Note: Requires in_app_update package for Android in-app updates.
 class AppUpdateServiceImpl implements AppUpdateService {
-
   AppUpdateServiceImpl({
     required this.currentVersion,
     this.checkVersionApi,
@@ -86,15 +79,21 @@ class AppUpdateServiceImpl implements AppUpdateService {
       //       : UpdateType.optional,
       // ));
 
-      return Success(AppVersionInfo(
-        currentVersion: currentVersion,
-        latestVersion: currentVersion,
-        availability: UpdateAvailability.notAvailable,
-      ));
+      return Success(
+        AppVersionInfo(
+          currentVersion: currentVersion,
+          latestVersion: currentVersion,
+          availability: UpdateAvailability.notAvailable,
+        ),
+      );
     } on PlatformException catch (e) {
-      return Failure(UnexpectedFailure('Platform update check error: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Platform update check error: ${e.message}'),
+      );
     } on SocketException catch (e) {
-      return Failure(NetworkFailure('Network error checking updates: ${e.message}'));
+      return Failure(
+        NetworkFailure('Network error checking updates: ${e.message}'),
+      );
     } on TimeoutException catch (_) {
       return Failure(NetworkFailure('Timeout checking for updates'));
     } on Object catch (e) {
@@ -128,7 +127,9 @@ class AppUpdateServiceImpl implements AppUpdateService {
       // await launchUrl(Uri.parse(url));
       return const Success(null);
     } on PlatformException catch (e) {
-      return Failure(UnexpectedFailure('Platform error opening store: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Platform error opening store: ${e.message}'),
+      );
     } on FormatException catch (e) {
       return Failure(ValidationFailure('Invalid store URL: ${e.message}'));
     } on Object catch (e) {
@@ -144,8 +145,8 @@ AppUpdateService createAppUpdateService({
   String? androidPackageName,
   String? iosAppId,
 }) => AppUpdateServiceImpl(
-    currentVersion: currentVersion,
-    checkVersionApi: checkVersionApi,
-    androidPackageName: androidPackageName,
-    iosAppId: iosAppId,
-  );
+  currentVersion: currentVersion,
+  checkVersionApi: checkVersionApi,
+  androidPackageName: androidPackageName,
+  iosAppId: iosAppId,
+);

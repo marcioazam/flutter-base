@@ -26,11 +26,10 @@ final class NoParams {
 }
 
 /// Composite use case for chaining multiple operations.
-/// 
+///
 /// **Feature: flutter-2025-state-of-art-review**
 /// **Validates: Requirements 2.4**
 class CompositeUseCase<Params, R> implements UseCase<Params, R> {
-
   CompositeUseCase(this._useCases, this._finalMapper);
   final List<UseCase<dynamic, dynamic>> _useCases;
   final R Function(dynamic) _finalMapper;
@@ -41,11 +40,11 @@ class CompositeUseCase<Params, R> implements UseCase<Params, R> {
 
     for (final useCase in _useCases) {
       final result = await useCase.call(current);
-      
+
       if (result.isFailure) {
         return Failure(result.failureOrNull!);
       }
-      
+
       current = result.valueOrNull;
     }
 

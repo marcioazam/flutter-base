@@ -1,4 +1,4 @@
-import 'package:flutter_base_2025/core/generics/paginated_response.dart';
+import 'package:flutter_base_2025/core/base/paginated_response.dart';
 
 /// Generic interface for remote data sources.
 /// Frontend only - all data persistence is handled by Python API.

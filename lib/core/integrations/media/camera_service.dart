@@ -5,15 +5,15 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_base_2025/core/observability/app_logger.dart';
 
 /// Result of a scan operation.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 29.2, 29.3**
 class ScanResult {
-
   const ScanResult({
     required this.data,
     required this.format,
-    required this.scannedAt, this.rawBytes,
+    required this.scannedAt,
+    this.rawBytes,
   });
   final String data;
   final BarcodeFormat format;
@@ -21,10 +21,10 @@ class ScanResult {
   final DateTime scannedAt;
 
   Map<String, dynamic> toMap() => {
-        'data': data,
-        'format': format.name,
-        'scannedAt': scannedAt.toIso8601String(),
-      };
+    'data': data,
+    'format': format.name,
+    'scannedAt': scannedAt.toIso8601String(),
+  };
 }
 
 /// Supported barcode formats.
@@ -46,32 +46,21 @@ enum BarcodeFormat {
 }
 
 /// Camera capture mode.
-enum CaptureMode {
-  photo,
-  video,
-}
+enum CaptureMode { photo, video }
 
 /// Camera facing direction.
-enum CameraFacing {
-  front,
-  back,
-}
+enum CameraFacing { front, back }
 
 /// Flash mode.
-enum FlashMode {
-  off,
-  on,
-  auto,
-  torch,
-}
+enum FlashMode { off, on, auto, torch }
 
 /// Camera capture result.
 class CaptureResult {
-
   const CaptureResult({
     required this.path,
     required this.mode,
-    required this.capturedAt, this.width,
+    required this.capturedAt,
+    this.width,
     this.height,
     this.durationMs,
   });
@@ -88,7 +77,6 @@ class CaptureResult {
 
 /// Camera configuration.
 class CameraConfig {
-
   const CameraConfig({
     this.facing = CameraFacing.back,
     this.flashMode = FlashMode.auto,
@@ -109,17 +97,16 @@ class CameraConfig {
     bool? enableAudio,
     int? maxDurationSeconds,
   }) => CameraConfig(
-      facing: facing ?? this.facing,
-      flashMode: flashMode ?? this.flashMode,
-      zoom: zoom ?? this.zoom,
-      enableAudio: enableAudio ?? this.enableAudio,
-      maxDurationSeconds: maxDurationSeconds ?? this.maxDurationSeconds,
-    );
+    facing: facing ?? this.facing,
+    flashMode: flashMode ?? this.flashMode,
+    zoom: zoom ?? this.zoom,
+    enableAudio: enableAudio ?? this.enableAudio,
+    maxDurationSeconds: maxDurationSeconds ?? this.maxDurationSeconds,
+  );
 }
 
 /// Scanner configuration.
 class ScannerConfig {
-
   const ScannerConfig({
     this.formats = const [BarcodeFormat.qrCode],
     this.beepOnScan = true,
@@ -136,7 +123,6 @@ class ScannerConfig {
 
 /// Camera service error.
 class CameraError implements Exception {
-
   const CameraError({
     required this.message,
     required this.type,
@@ -160,7 +146,7 @@ enum CameraErrorType {
 }
 
 /// Abstract interface for camera and scanner service.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 29.1, 29.2, 29.3, 29.5**
 abstract interface class CameraService {
@@ -435,7 +421,6 @@ class _MockStreamController<T> {
 }
 
 class _MockStream<T> extends Stream<T> {
-
   _MockStream(this._controller);
   final _MockStreamController<T> _controller;
 

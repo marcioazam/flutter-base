@@ -19,8 +19,7 @@ sealed class PaginatedResponse<T> with _$PaginatedResponse<T> {
   factory PaginatedResponse.fromJson(
     Map<String, dynamic> json,
     T Function(Object?) fromJsonT,
-  ) =>
-      _$PaginatedResponseFromJson(json, fromJsonT);
+  ) => _$PaginatedResponseFromJson(json, fromJsonT);
 }
 
 /// Generic API response wrapper.
@@ -37,6 +36,5 @@ sealed class ApiResponse<T> with _$ApiResponse<T> {
   factory ApiResponse.fromJson(
     Map<String, dynamic> json,
     T Function(Object?) fromJsonT,
-  ) =>
-      _$ApiResponseFromJson(json, fromJsonT);
+  ) => _$ApiResponseFromJson(json, fromJsonT);
 }

@@ -1,4 +1,4 @@
-import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/base/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Filter specification for repository queries.

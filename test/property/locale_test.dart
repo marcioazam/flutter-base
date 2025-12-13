@@ -18,9 +18,7 @@ void main() {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
       container = ProviderContainer(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
       );
     });
 
@@ -37,9 +35,7 @@ void main() {
       SharedPreferences.setMockInitialValues({'locale': 'pt'});
       final savedPrefs = await SharedPreferences.getInstance();
       final testContainer = ProviderContainer(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(savedPrefs),
-        ],
+        overrides: [sharedPreferencesProvider.overrideWithValue(savedPrefs)],
       );
       addTearDown(testContainer.dispose);
 
@@ -77,10 +73,7 @@ void main() {
       final states = <Locale>[];
 
       // Track state changes using listen
-      container.listen(
-        localeProvider,
-        (_, next) => states.add(next),
-      );
+      container.listen(localeProvider, (_, next) => states.add(next));
 
       await notifier.setLocale(const Locale('pt'));
       await notifier.setLocale(const Locale('en'));

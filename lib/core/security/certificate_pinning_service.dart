@@ -7,11 +7,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 
 /// Provider for CertificatePinningService.
-final certificatePinningServiceProvider =
-    Provider<CertificatePinningService>((ref) => CertificatePinningService(
+final certificatePinningServiceProvider = Provider<CertificatePinningService>(
+  (ref) => CertificatePinningService(
     config: CertificatePinningConfig.fromEnvironment(),
     logger: ref.watch(loggerProvider),
-  ));
+  ),
+);
 
 /// Logger provider.
 final loggerProvider = Provider<Logger>((ref) => Logger());
@@ -20,7 +21,6 @@ final loggerProvider = Provider<Logger>((ref) => Logger());
 ///
 /// OWASP MASVS MSTG-NETWORK-4: Certificate pinning with backup pins.
 class CertificatePinningConfig {
-
   /// Create config from environment variables.
   ///
   /// Required env vars:
@@ -37,9 +37,7 @@ class CertificatePinningConfig {
       'CERT_PIN_ENABLED',
       defaultValue: true,
     );
-    final allowBad = const bool.fromEnvironment(
-      'CERT_PIN_ALLOW_BAD',
-    );
+    final allowBad = const bool.fromEnvironment('CERT_PIN_ALLOW_BAD');
 
     final pins = <String>[];
     if (primaryPin.isNotEmpty) pins.add(primaryPin);
@@ -156,7 +154,9 @@ class CertificateValidationResult {
 
   bool get hasExpirationWarning {
     if (expirationDate == null) return false;
-    final daysUntilExpiration = expirationDate!.difference(DateTime.now()).inDays;
+    final daysUntilExpiration = expirationDate!
+        .difference(DateTime.now())
+        .inDays;
     return daysUntilExpiration <= 30 && daysUntilExpiration > 0;
   }
 
@@ -181,10 +181,7 @@ class CertificateValidationResult {
 /// - Log all validation failures for monitoring
 /// - Support graceful certificate rotation
 class CertificatePinningService {
-  CertificatePinningService({
-    required this.config,
-    required this.logger,
-  }) {
+  CertificatePinningService({required this.config, required this.logger}) {
     config.validate();
   }
 
@@ -248,7 +245,8 @@ class CertificatePinningService {
       }
 
       if (!matched) {
-        final error = 'Certificate pin validation FAILED for $host:$port. '
+        final error =
+            'Certificate pin validation FAILED for $host:$port. '
             'Certificate hash: $hashString. '
             'This could indicate a MITM attack or certificate rotation. '
             'Expected one of: ${config.pinnedHashes.join(", ")}';
@@ -264,8 +262,9 @@ class CertificatePinningService {
       }
 
       // Check expiration warning
-      final daysUntilExpiration =
-          certificate.endValidity.difference(DateTime.now()).inDays;
+      final daysUntilExpiration = certificate.endValidity
+          .difference(DateTime.now())
+          .inDays;
 
       if (daysUntilExpiration <= config.expirationWarningDays &&
           daysUntilExpiration > 0) {
@@ -277,7 +276,8 @@ class CertificatePinningService {
       }
 
       if (daysUntilExpiration <= 0) {
-        final error = 'Certificate EXPIRED for $host:$port. '
+        final error =
+            'Certificate EXPIRED for $host:$port. '
             'Expired on: ${certificate.endValidity}';
 
         logger.e(error);
@@ -306,10 +306,7 @@ class CertificatePinningService {
       final error = 'Certificate validation error for $host:$port: $e';
       logger.e(error, error: e, stackTrace: stack);
 
-      return CertificateValidationResult(
-        isValid: false,
-        errorMessage: error,
-      );
+      return CertificateValidationResult(isValid: false, errorMessage: error);
     }
   }
 

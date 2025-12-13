@@ -1,6 +1,7 @@
 import 'package:flutter_base_2025/core/utils/validation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -16,7 +17,8 @@ void main() {
       'compose returns invalid if any validator fails',
       (value) {
         // Create a validator that always fails
-        ValidationResult<Object?> alwaysFails(Object? _) => Invalid.single('test', 'Always fails');
+        ValidationResult<Object?> alwaysFails(Object? _) =>
+            Invalid.single('test', 'Always fails');
 
         // Create a validator that always passes
         ValidationResult<Object?> alwaysPasses(Object? v) => Valid(v);
@@ -45,8 +47,10 @@ void main() {
     Glados<String>(any.nonEmptyLetters, _explore).test(
       'compose collects all errors from failing validators',
       (value) {
-        ValidationResult<Object?> validator1(Object? _) => Invalid.single('field1', 'Error 1');
-        ValidationResult<Object?> validator2(Object? _) => Invalid.single('field2', 'Error 2');
+        ValidationResult<Object?> validator1(Object? _) =>
+            Invalid.single('field1', 'Error 1');
+        ValidationResult<Object?> validator2(Object? _) =>
+            Invalid.single('field2', 'Error 2');
 
         final composite = TypedValidators.compose([validator1, validator2]);
         final result = composite(value);
@@ -84,11 +88,7 @@ void main() {
       'user+tag@example.co.uk',
     ];
 
-    final invalidEmails = [
-      'invalid',
-      'missing@domain',
-      '@nodomain.com',
-    ];
+    final invalidEmails = ['invalid', 'missing@domain', '@nodomain.com'];
 
     for (final email in validEmails) {
       test('email passes for valid email: $email', () {

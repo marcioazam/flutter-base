@@ -4,17 +4,10 @@ import 'dart:ui' as ui;
 import 'package:flutter/widgets.dart';
 
 /// App lifecycle state.
-enum AppLifecycleState {
-  resumed,
-  inactive,
-  paused,
-  detached,
-  hidden,
-}
+enum AppLifecycleState { resumed, inactive, paused, detached, hidden }
 
 /// App lifecycle configuration.
 class AppLifecycleConfig {
-
   const AppLifecycleConfig({
     this.staleDataThreshold = const Duration(minutes: 5),
     this.refreshOnResume = true,
@@ -62,10 +55,7 @@ abstract interface class AppLifecycleService {
 class AppLifecycleServiceImpl
     with WidgetsBindingObserver
     implements AppLifecycleService {
-
-  AppLifecycleServiceImpl({
-    this.config = const AppLifecycleConfig(),
-  }) {
+  AppLifecycleServiceImpl({this.config = const AppLifecycleConfig()}) {
     WidgetsBinding.instance.addObserver(this);
   }
   final AppLifecycleConfig config;
@@ -138,12 +128,12 @@ class AppLifecycleServiceImpl
   }
 
   AppLifecycleState _mapState(ui.AppLifecycleState state) => switch (state) {
-      ui.AppLifecycleState.resumed => AppLifecycleState.resumed,
-      ui.AppLifecycleState.inactive => AppLifecycleState.inactive,
-      ui.AppLifecycleState.paused => AppLifecycleState.paused,
-      ui.AppLifecycleState.detached => AppLifecycleState.detached,
-      ui.AppLifecycleState.hidden => AppLifecycleState.hidden,
-    };
+    ui.AppLifecycleState.resumed => AppLifecycleState.resumed,
+    ui.AppLifecycleState.inactive => AppLifecycleState.inactive,
+    ui.AppLifecycleState.paused => AppLifecycleState.paused,
+    ui.AppLifecycleState.detached => AppLifecycleState.detached,
+    ui.AppLifecycleState.hidden => AppLifecycleState.hidden,
+  };
 
   @override
   void onResume(VoidCallback callback) {

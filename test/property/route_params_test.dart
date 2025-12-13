@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 import 'package:meta/meta.dart';
 
 // Configure Glados for 100 iterations
@@ -11,23 +12,21 @@ final _explore = ExploreConfig();
 /// Helper class to simulate route parameters
 @immutable
 class RouteParams {
-
   /// Creates from query parameters map
-  factory RouteParams.fromQueryParams(Map<String, String> params) => RouteParams(
-      id: params['id'],
-      name: params['name'] != null ? Uri.decodeComponent(params['name']!) : null,
-      page: params['page'] != null ? int.tryParse(params['page']!) : null,
-      enabled: params['enabled'] != null ? params['enabled'] == 'true' : null,
-    );
+  factory RouteParams.fromQueryParams(Map<String, String> params) =>
+      RouteParams(
+        id: params['id'],
+        name: params['name'] != null
+            ? Uri.decodeComponent(params['name']!)
+            : null,
+        page: params['page'] != null ? int.tryParse(params['page']!) : null,
+        enabled: params['enabled'] != null ? params['enabled'] == 'true' : null,
+      );
 
   /// Creates from URI
-  factory RouteParams.fromUri(Uri uri) => RouteParams.fromQueryParams(uri.queryParameters);
-  const RouteParams({
-    this.id,
-    this.name,
-    this.page,
-    this.enabled,
-  });
+  factory RouteParams.fromUri(Uri uri) =>
+      RouteParams.fromQueryParams(uri.queryParameters);
+  const RouteParams({this.id, this.name, this.page, this.enabled});
 
   final String? id;
   final String? name;
@@ -46,9 +45,9 @@ class RouteParams {
 
   /// Converts to URI
   Uri toUri(String basePath) => Uri(
-      path: basePath,
-      queryParameters: toQueryParams().isNotEmpty ? toQueryParams() : null,
-    );
+    path: basePath,
+    queryParameters: toQueryParams().isNotEmpty ? toQueryParams() : null,
+  );
 
   @override
   bool operator ==(Object other) =>
@@ -63,7 +62,8 @@ class RouteParams {
   int get hashCode => Object.hash(id, name, page, enabled);
 
   @override
-  String toString() => 'RouteParams(id: $id, name: $name, page: $page, enabled: $enabled)';
+  String toString() =>
+      'RouteParams(id: $id, name: $name, page: $page, enabled: $enabled)';
 }
 
 void main() {
@@ -108,8 +108,13 @@ void main() {
     );
 
     test('Special characters are properly encoded/decoded', () {
-      final specialChars = ['hello world', 'test&value', 'name=john', 'path/to/resource'];
-      
+      final specialChars = [
+        'hello world',
+        'test&value',
+        'name=john',
+        'path/to/resource',
+      ];
+
       for (final value in specialChars) {
         final params = RouteParams(name: value);
         final uri = params.toUri('/test');

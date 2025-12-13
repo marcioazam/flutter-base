@@ -10,14 +10,11 @@ Future<Result<T>> getWithFallback<T>({
   required Future<T?> Function() getCached,
 }) async {
   final result = await fetchFromNetwork();
-  return result.fold(
-    (failure) async {
-      final cached = await getCached();
-      if (cached != null) return Success(cached);
-      return Failure(failure);
-    },
-    Success.new,
-  );
+  return result.fold((failure) async {
+    final cached = await getCached();
+    if (cached != null) return Success(cached);
+    return Failure(failure);
+  }, Success.new);
 }
 
 void main() {
@@ -28,7 +25,8 @@ void main() {
       'Returns cached data when network fails and cache exists',
       (cachedValue) async {
         final result = await getWithFallback<String>(
-          fetchFromNetwork: () async => const Failure(NetworkFailure('Network error')),
+          fetchFromNetwork: () async =>
+              const Failure(NetworkFailure('Network error')),
           getCached: () async => cachedValue,
         );
 
@@ -52,7 +50,8 @@ void main() {
 
     test('Returns failure when network fails and no cache exists', () async {
       final result = await getWithFallback<String>(
-        fetchFromNetwork: () async => const Failure(NetworkFailure('Network error')),
+        fetchFromNetwork: () async =>
+            const Failure(NetworkFailure('Network error')),
         getCached: () async => null,
       );
 

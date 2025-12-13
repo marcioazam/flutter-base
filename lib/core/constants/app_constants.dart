@@ -1,16 +1,16 @@
 abstract final class AppConstants {
   static const String appName = 'Flutter Base 2025';
-  
+
   // Note: Use AppConfig.apiBaseUrl for environment-specific URLs
   // static const String apiBaseUrl - REMOVED (use AppConfig instead)
-  
+
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
-  
+
   // Note: Use RetryConfig for retry settings
   // static const int maxRetryAttempts - REMOVED (use RetryConfig instead)
   // static const Duration retryDelay - REMOVED (use RetryConfig instead)
-  
+
   static const String defaultLocale = 'en';
   static const List<String> supportedLocales = ['en', 'pt'];
 }

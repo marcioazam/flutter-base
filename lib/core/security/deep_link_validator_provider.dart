@@ -21,11 +21,8 @@ part 'deep_link_validator_provider.g.dart';
 /// )
 /// ```
 @riverpod
-DeepLinkValidatorConfig deepLinkValidatorConfig(
-  Ref ref,
-) => const DeepLinkValidatorConfig(
-    
-  );
+DeepLinkValidatorConfig deepLinkValidatorConfig(Ref ref) =>
+    const DeepLinkValidatorConfig();
 
 /// Provides DeepLinkValidator instance for dependency injection.
 ///
@@ -62,8 +59,5 @@ DeepLinkValidator deepLinkValidator(Ref ref) {
   final config = ref.watch(deepLinkValidatorConfigProvider);
   final sanitizer = ref.watch(inputSanitizerProvider);
 
-  return DefaultDeepLinkValidator(
-    config: config,
-    inputSanitizer: sanitizer,
-  );
+  return DefaultDeepLinkValidator(config: config, inputSanitizer: sanitizer);
 }

@@ -1,6 +1,7 @@
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -50,7 +51,9 @@ void main() {
       test('hasErrorFor returns correct value', () {
         const failure = ValidationFailure(
           'Validation failed',
-          fieldErrors: {'email': ['Invalid']},
+          fieldErrors: {
+            'email': ['Invalid'],
+          },
         );
 
         expect(failure.hasErrorFor('email'), isTrue);
@@ -115,19 +118,25 @@ void main() {
     group('Property Tests', () {
       /// **Property 22: Validation Failure Detail**
       /// For any validation failure, the ValidationFailure SHALL contain field-specific error messages.
-      Glados2<String, String>(any.nonEmptyLetters, any.nonEmptyLetters, _explore).test(
-        'ValidationFailure preserves all field errors',
-        (fieldName, errorMessage) {
-          final failure = ValidationFailure(
-            'Validation failed',
-            fieldErrors: {fieldName: [errorMessage]},
-          );
+      Glados2<String, String>(
+        any.nonEmptyLetters,
+        any.nonEmptyLetters,
+        _explore,
+      ).test('ValidationFailure preserves all field errors', (
+        fieldName,
+        errorMessage,
+      ) {
+        final failure = ValidationFailure(
+          'Validation failed',
+          fieldErrors: {
+            fieldName: [errorMessage],
+          },
+        );
 
-          expect(failure.hasErrorFor(fieldName), isTrue);
-          expect(failure.errorsFor(fieldName), contains(errorMessage));
-          expect(failure.firstErrorFor(fieldName), equals(errorMessage));
-        },
-      );
+        expect(failure.hasErrorFor(fieldName), isTrue);
+        expect(failure.errorsFor(fieldName), contains(errorMessage));
+        expect(failure.firstErrorFor(fieldName), equals(errorMessage));
+      });
 
       Glados<List<String>>(any.list(any.nonEmptyLetters), _explore).test(
         'ValidationFailure preserves multiple errors per field',
@@ -188,16 +197,17 @@ void main() {
         },
       );
 
-      Glados2<String, String>(any.nonEmptyLetters, any.nonEmptyLetters, _explore).test(
-        'Failures with same message and code are equal',
-        (message, code) {
-          final failure1 = NetworkFailure(message, code: code);
-          final failure2 = NetworkFailure(message, code: code);
+      Glados2<String, String>(
+        any.nonEmptyLetters,
+        any.nonEmptyLetters,
+        _explore,
+      ).test('Failures with same message and code are equal', (message, code) {
+        final failure1 = NetworkFailure(message, code: code);
+        final failure2 = NetworkFailure(message, code: code);
 
-          expect(failure1, equals(failure2));
-          expect(failure1.hashCode, equals(failure2.hashCode));
-        },
-      );
+        expect(failure1, equals(failure2));
+        expect(failure1.hashCode, equals(failure2.hashCode));
+      });
     });
   });
 }

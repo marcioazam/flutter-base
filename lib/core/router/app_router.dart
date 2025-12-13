@@ -44,16 +44,14 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: RoutePaths.home,
             name: RouteNames.home,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: HomePage(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: HomePage()),
           ),
           GoRoute(
             path: RoutePaths.settings,
             name: RouteNames.settings,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: SettingsPage(),
-            ),
+            pageBuilder: (context, state) =>
+                const NoTransitionPage(child: SettingsPage()),
           ),
           GoRoute(
             path: RoutePaths.profile,
@@ -65,11 +63,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         ],
       ),
     ],
-    errorBuilder: (context, state) => Scaffold(
-      body: Center(
-        child: Text('Page not found: ${state.uri}'),
-      ),
-    ),
+    errorBuilder: (context, state) =>
+        Scaffold(body: Center(child: Text('Page not found: ${state.uri}'))),
   );
 });
 
@@ -83,11 +78,8 @@ abstract final class DeepLinks {
   static const String scheme = 'flutterbase';
   static const String host = 'app';
 
-  static Uri buildUri(String path) => Uri(
-        scheme: scheme,
-        host: host,
-        path: path,
-      );
+  static Uri buildUri(String path) =>
+      Uri(scheme: scheme, host: host, path: path);
 
   static String? parseDeepLink(Uri uri) {
     if (uri.scheme == scheme && uri.host == host) {

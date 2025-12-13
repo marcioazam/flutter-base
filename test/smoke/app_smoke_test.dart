@@ -92,9 +92,7 @@ void main() {
       await tester.pumpWidget(
         const ProviderScope(
           child: MaterialApp(
-            home: Scaffold(
-              body: Center(child: Text('Smoke Test')),
-            ),
+            home: Scaffold(body: Center(child: Text('Smoke Test'))),
           ),
         ),
       );
@@ -109,9 +107,7 @@ void main() {
             colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
             useMaterial3: true,
           ),
-          home: const Scaffold(
-            body: Center(child: Text('Theme Test')),
-          ),
+          home: const Scaffold(body: Center(child: Text('Theme Test'))),
         ),
       );
 
@@ -129,9 +125,7 @@ void main() {
             useMaterial3: true,
           ),
           themeMode: ThemeMode.dark,
-          home: const Scaffold(
-            body: Center(child: Text('Dark Theme Test')),
-          ),
+          home: const Scaffold(body: Center(child: Text('Dark Theme Test'))),
         ),
       );
 
@@ -178,25 +172,34 @@ void main() {
               builder: (context) {
                 const AsyncValue<int> loading = AsyncLoading();
                 const AsyncValue<int> data = AsyncData(42);
-                final AsyncValue<int> error = AsyncError('error', StackTrace.empty);
+                final AsyncValue<int> error = AsyncError(
+                  'error',
+                  StackTrace.empty,
+                );
 
                 return Column(
                   children: [
-                    Text(loading.when(
-                      data: (v) => 'Data: $v',
-                      loading: () => 'Loading',
-                      error: (e, s) => 'Error: $e',
-                    )),
-                    Text(data.when(
-                      data: (v) => 'Data: $v',
-                      loading: () => 'Loading',
-                      error: (e, s) => 'Error: $e',
-                    )),
-                    Text(error.when(
-                      data: (v) => 'Data: $v',
-                      loading: () => 'Loading',
-                      error: (e, s) => 'Error: $e',
-                    )),
+                    Text(
+                      loading.when(
+                        data: (v) => 'Data: $v',
+                        loading: () => 'Loading',
+                        error: (e, s) => 'Error: $e',
+                      ),
+                    ),
+                    Text(
+                      data.when(
+                        data: (v) => 'Data: $v',
+                        loading: () => 'Loading',
+                        error: (e, s) => 'Error: $e',
+                      ),
+                    ),
+                    Text(
+                      error.when(
+                        data: (v) => 'Data: $v',
+                        loading: () => 'Loading',
+                        error: (e, s) => 'Error: $e',
+                      ),
+                    ),
                   ],
                 );
               },

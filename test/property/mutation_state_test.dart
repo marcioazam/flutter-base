@@ -26,7 +26,7 @@ void main() {
 
       // First state should be loading
       expect(states.first, isA<MutationLoading<String>>());
-      
+
       await future;
     });
 
@@ -42,14 +42,17 @@ void main() {
       },
     );
 
-    test('MutationController transitions to error on failed mutation', () async {
-      final controller = MutationController<String>();
-      await controller.mutate(() async => throw Exception('Test error'));
+    test(
+      'MutationController transitions to error on failed mutation',
+      () async {
+        final controller = MutationController<String>();
+        await controller.mutate(() async => throw Exception('Test error'));
 
-      expect(controller.state, isA<MutationError<String>>());
-      expect(controller.isError, isTrue);
-      expect(controller.error, isA<Exception>());
-    });
+        expect(controller.state, isA<MutationError<String>>());
+        expect(controller.isError, isTrue);
+        expect(controller.error, isA<Exception>());
+      },
+    );
 
     test('MutationController reset returns to idle', () async {
       final controller = MutationController<String>();
@@ -66,10 +69,42 @@ void main() {
       const success = MutationSuccess<String>('data');
       const error = MutationError<String>('error', StackTrace.empty);
 
-      expect(idle.when(idle: () => 'idle', loading: (_) => 'loading', success: (_) => 'success', error: (_, __) => 'error'), 'idle');
-      expect(loading.when(idle: () => 'idle', loading: (_) => 'loading', success: (_) => 'success', error: (_, __) => 'error'), 'loading');
-      expect(success.when(idle: () => 'idle', loading: (_) => 'loading', success: (_) => 'success', error: (_, __) => 'error'), 'success');
-      expect(error.when(idle: () => 'idle', loading: (_) => 'loading', success: (_) => 'success', error: (_, __) => 'error'), 'error');
+      expect(
+        idle.when(
+          idle: () => 'idle',
+          loading: (_) => 'loading',
+          success: (_) => 'success',
+          error: (_, __) => 'error',
+        ),
+        'idle',
+      );
+      expect(
+        loading.when(
+          idle: () => 'idle',
+          loading: (_) => 'loading',
+          success: (_) => 'success',
+          error: (_, __) => 'error',
+        ),
+        'loading',
+      );
+      expect(
+        success.when(
+          idle: () => 'idle',
+          loading: (_) => 'loading',
+          success: (_) => 'success',
+          error: (_, __) => 'error',
+        ),
+        'success',
+      );
+      expect(
+        error.when(
+          idle: () => 'idle',
+          loading: (_) => 'loading',
+          success: (_) => 'success',
+          error: (_, __) => 'error',
+        ),
+        'error',
+      );
     });
   });
 }

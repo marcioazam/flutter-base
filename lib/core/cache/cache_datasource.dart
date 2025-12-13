@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_base_2025/core/cache/cache_entry.dart';
 
 /// Generic cache data source with TTL support.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 3.4**
 abstract interface class CacheDataSource<T> {
@@ -25,7 +25,6 @@ abstract interface class CacheDataSource<T> {
 
 /// In-memory cache implementation with TTL support.
 class MemoryCacheDataSource<T> implements CacheDataSource<T> {
-
   MemoryCacheDataSource({
     Duration? defaultTtl,
     Duration cleanupInterval = const Duration(minutes: 5),
@@ -107,7 +106,6 @@ class MemoryCacheDataSource<T> implements CacheDataSource<T> {
 
 /// LRU cache implementation with TTL and max size.
 class LruCacheDataSource<T> implements CacheDataSource<T> {
-
   LruCacheDataSource({
     this.maxSize = 100,
     Duration? defaultTtl,

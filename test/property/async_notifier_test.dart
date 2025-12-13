@@ -28,8 +28,9 @@ class TestAsyncNotifier extends AsyncNotifier<int> {
   }
 }
 
-final testNotifierProvider =
-    AsyncNotifierProvider<TestAsyncNotifier, int>(TestAsyncNotifier.new);
+final testNotifierProvider = AsyncNotifierProvider<TestAsyncNotifier, int>(
+  TestAsyncNotifier.new,
+);
 
 void main() {
   group('AsyncNotifier State Preservation Properties', () {
@@ -105,18 +106,12 @@ void main() {
       const loading = AsyncLoading<int>();
 
       expect(
-        data.maybeWhen(
-          data: (v) => 'data:$v',
-          orElse: () => 'other',
-        ),
+        data.maybeWhen(data: (v) => 'data:$v', orElse: () => 'other'),
         equals('data:42'),
       );
 
       expect(
-        loading.maybeWhen(
-          data: (v) => 'data:$v',
-          orElse: () => 'other',
-        ),
+        loading.maybeWhen(data: (v) => 'data:$v', orElse: () => 'other'),
         equals('other'),
       );
     });

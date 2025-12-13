@@ -42,9 +42,9 @@ import 'package:flutter/material.dart';
 
 /// Preview wrapper widget for testing widget previews.
 class PreviewWrapper extends StatelessWidget {
-
   const PreviewWrapper({
-    required this.child, super.key,
+    required this.child,
+    super.key,
     this.width = 400,
     this.height = 300,
     this.themeMode = ThemeMode.light,
@@ -56,29 +56,21 @@ class PreviewWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-      debugShowCheckedModeBanner: false,
-      themeMode: themeMode,
-      theme: ThemeData.light(useMaterial3: true),
-      darkTheme: ThemeData.dark(useMaterial3: true),
-      home: Scaffold(
-        body: Center(
-          child: SizedBox(
-            width: width,
-            height: height,
-            child: child,
-          ),
-        ),
+    debugShowCheckedModeBanner: false,
+    themeMode: themeMode,
+    theme: ThemeData.light(useMaterial3: true),
+    darkTheme: ThemeData.dark(useMaterial3: true),
+    home: Scaffold(
+      body: Center(
+        child: SizedBox(width: width, height: height, child: child),
       ),
-    );
+    ),
+  );
 }
 
 /// Preview configurations for AccessibleButton
 class AccessibleButtonPreviews {
-  static const defaultPreview = (
-    name: 'Default',
-    width: 200.0,
-    height: 100.0,
-  );
+  static const defaultPreview = (name: 'Default', width: 200.0, height: 100.0);
 
   static const darkPreview = (
     name: 'Dark Theme',
@@ -87,20 +79,12 @@ class AccessibleButtonPreviews {
     theme: ThemeMode.dark,
   );
 
-  static const largePreview = (
-    name: 'Large',
-    width: 300.0,
-    height: 150.0,
-  );
+  static const largePreview = (name: 'Large', width: 300.0, height: 150.0);
 }
 
 /// Preview configurations for ErrorBoundary
 class ErrorBoundaryPreviews {
-  static const errorState = (
-    name: 'Error State',
-    width: 400.0,
-    height: 300.0,
-  );
+  static const errorState = (name: 'Error State', width: 400.0, height: 300.0);
 
   static const compactError = (
     name: 'Compact Error',
@@ -118,11 +102,7 @@ class ErrorBoundaryPreviews {
 
 /// Preview configurations for PredictivePopScope
 class PredictivePopScopePreviews {
-  static const defaultPreview = (
-    name: 'Default',
-    width: 400.0,
-    height: 300.0,
-  );
+  static const defaultPreview = (name: 'Default', width: 400.0, height: 300.0);
 
   static const withDialog = (
     name: 'With Confirmation Dialog',

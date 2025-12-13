@@ -71,8 +71,9 @@ void main() {
       expect(retryCount, equals(5));
     });
 
-    testWidgets('ErrorView shows correct icon for NetworkFailure',
-        (tester) async {
+    testWidgets('ErrorView shows correct icon for NetworkFailure', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -102,8 +103,9 @@ void main() {
       expect(find.byIcon(Icons.lock_outline), findsOneWidget);
     });
 
-    testWidgets('ErrorView shows correct icon for ServerFailure',
-        (tester) async {
+    testWidgets('ErrorView shows correct icon for ServerFailure', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -118,8 +120,9 @@ void main() {
       expect(find.byIcon(Icons.cloud_off), findsOneWidget);
     });
 
-    testWidgets('ErrorView shows correct icon for NotFoundFailure',
-        (tester) async {
+    testWidgets('ErrorView shows correct icon for NotFoundFailure', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -134,8 +137,9 @@ void main() {
       expect(find.byIcon(Icons.search_off), findsOneWidget);
     });
 
-    testWidgets('ErrorView shows correct icon for ValidationFailure',
-        (tester) async {
+    testWidgets('ErrorView shows correct icon for ValidationFailure', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           home: Scaffold(
@@ -190,11 +194,7 @@ void main() {
 
     testWidgets('LoadingView displays correctly', (tester) async {
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: LoadingView(),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: LoadingView())),
       );
 
       expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -203,9 +203,7 @@ void main() {
     testWidgets('LoadingView shows message when provided', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: LoadingView(message: 'Loading data...'),
-          ),
+          home: Scaffold(body: LoadingView(message: 'Loading data...')),
         ),
       );
 
@@ -215,9 +213,7 @@ void main() {
     testWidgets('EmptyView displays message', (tester) async {
       await tester.pumpWidget(
         const MaterialApp(
-          home: Scaffold(
-            body: EmptyView(message: 'No items found'),
-          ),
+          home: Scaffold(body: EmptyView(message: 'No items found')),
         ),
       );
 

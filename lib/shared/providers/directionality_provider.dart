@@ -31,20 +31,14 @@ extension LocaleRtlExtension on Locale {
 
 /// Widget that provides directionality based on locale.
 class LocaleDirectionality extends ConsumerWidget {
-  const LocaleDirectionality({
-    required this.child,
-    super.key,
-  });
+  const LocaleDirectionality({required this.child, super.key});
 
   final Widget child;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final direction = ref.watch(textDirectionProvider);
-    return Directionality(
-      textDirection: direction,
-      child: child,
-    );
+    return Directionality(textDirection: direction, child: child);
   }
 }
 
@@ -53,24 +47,24 @@ mixin RtlAwareMixin {
   /// Returns start alignment based on text direction.
   AlignmentGeometry startAlignment(TextDirection direction) =>
       direction == TextDirection.rtl
-          ? Alignment.centerRight
-          : Alignment.centerLeft;
+      ? Alignment.centerRight
+      : Alignment.centerLeft;
 
   /// Returns end alignment based on text direction.
   AlignmentGeometry endAlignment(TextDirection direction) =>
       direction == TextDirection.rtl
-          ? Alignment.centerLeft
-          : Alignment.centerRight;
+      ? Alignment.centerLeft
+      : Alignment.centerRight;
 
   /// Returns start padding based on text direction.
   EdgeInsetsGeometry startPadding(TextDirection direction, double value) =>
       direction == TextDirection.rtl
-          ? EdgeInsets.only(right: value)
-          : EdgeInsets.only(left: value);
+      ? EdgeInsets.only(right: value)
+      : EdgeInsets.only(left: value);
 
   /// Returns end padding based on text direction.
   EdgeInsetsGeometry endPadding(TextDirection direction, double value) =>
       direction == TextDirection.rtl
-          ? EdgeInsets.only(left: value)
-          : EdgeInsets.only(right: value);
+      ? EdgeInsets.only(left: value)
+      : EdgeInsets.only(right: value);
 }

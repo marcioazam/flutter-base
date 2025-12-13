@@ -1,10 +1,9 @@
-import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/base/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// State for pagination operations.
 class PaginationState<T> {
-
   const PaginationState({
     this.items = const [],
     this.currentPage = 0,
@@ -35,15 +34,15 @@ class PaginationState<T> {
     Object? error,
     bool clearError = false,
   }) => PaginationState(
-      items: items ?? this.items,
-      currentPage: currentPage ?? this.currentPage,
-      pageSize: pageSize ?? this.pageSize,
-      totalItems: totalItems ?? this.totalItems,
-      isLoading: isLoading ?? this.isLoading,
-      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
-      hasMore: hasMore ?? this.hasMore,
-      error: clearError ? null : (error ?? this.error),
-    );
+    items: items ?? this.items,
+    currentPage: currentPage ?? this.currentPage,
+    pageSize: pageSize ?? this.pageSize,
+    totalItems: totalItems ?? this.totalItems,
+    isLoading: isLoading ?? this.isLoading,
+    isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    hasMore: hasMore ?? this.hasMore,
+    error: clearError ? null : (error ?? this.error),
+  );
 
   bool get isEmpty => items.isEmpty && !isLoading;
   bool get hasError => error != null;
@@ -51,7 +50,7 @@ class PaginationState<T> {
 }
 
 /// Generic pagination notifier for infinite scroll.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 5.2, 5.4, 5.5**
 abstract class PaginationNotifier<T> extends Notifier<PaginationState<T>> {
@@ -71,10 +70,7 @@ abstract class PaginationNotifier<T> extends Notifier<PaginationState<T>> {
 
     result.fold(
       (failure) {
-        state = state.copyWith(
-          isLoading: false,
-          error: failure,
-        );
+        state = state.copyWith(isLoading: false, error: failure);
       },
       (paginatedList) {
         state = state.copyWith(
@@ -99,10 +95,7 @@ abstract class PaginationNotifier<T> extends Notifier<PaginationState<T>> {
 
     result.fold(
       (failure) {
-        state = state.copyWith(
-          isLoadingMore: false,
-          error: failure,
-        );
+        state = state.copyWith(isLoadingMore: false, error: failure);
       },
       (paginatedList) {
         state = state.copyWith(
@@ -169,19 +162,20 @@ abstract class AsyncPaginationNotifier<T>
 
     result.fold(
       (failure) {
-        state = AsyncData(currentState.copyWith(
-          isLoading: false,
-          error: failure,
-        ));
+        state = AsyncData(
+          currentState.copyWith(isLoading: false, error: failure),
+        );
       },
       (paginatedList) {
-        state = AsyncData(currentState.copyWith(
-          items: paginatedList.items,
-          currentPage: paginatedList.page,
-          totalItems: paginatedList.totalItems,
-          hasMore: paginatedList.hasMore,
-          isLoading: false,
-        ));
+        state = AsyncData(
+          currentState.copyWith(
+            items: paginatedList.items,
+            currentPage: paginatedList.page,
+            totalItems: paginatedList.totalItems,
+            hasMore: paginatedList.hasMore,
+            isLoading: false,
+          ),
+        );
       },
     );
   }
@@ -195,27 +189,29 @@ abstract class AsyncPaginationNotifier<T>
       return;
     }
 
-    state =
-        AsyncData(currentState.copyWith(isLoadingMore: true, clearError: true));
+    state = AsyncData(
+      currentState.copyWith(isLoadingMore: true, clearError: true),
+    );
 
     final nextPage = currentState.currentPage + 1;
     final result = await fetchPage(nextPage, currentState.pageSize);
 
     result.fold(
       (failure) {
-        state = AsyncData(currentState.copyWith(
-          isLoadingMore: false,
-          error: failure,
-        ));
+        state = AsyncData(
+          currentState.copyWith(isLoadingMore: false, error: failure),
+        );
       },
       (paginatedList) {
-        state = AsyncData(currentState.copyWith(
-          items: [...currentState.items, ...paginatedList.items],
-          currentPage: paginatedList.page,
-          totalItems: paginatedList.totalItems,
-          hasMore: paginatedList.hasMore,
-          isLoadingMore: false,
-        ));
+        state = AsyncData(
+          currentState.copyWith(
+            items: [...currentState.items, ...paginatedList.items],
+            currentPage: paginatedList.page,
+            totalItems: paginatedList.totalItems,
+            hasMore: paginatedList.hasMore,
+            isLoadingMore: false,
+          ),
+        );
       },
     );
   }

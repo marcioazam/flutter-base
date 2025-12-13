@@ -5,13 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'background_task_service.g.dart';
 
 /// Background task execution status
-enum BackgroundTaskStatus {
-  idle,
-  running,
-  completed,
-  failed,
-  cancelled,
-}
+enum BackgroundTaskStatus { idle, running, completed, failed, cancelled }
 
 /// Background task result
 sealed class BackgroundTaskResult<T> {
@@ -61,10 +55,10 @@ class BackgroundTask<T> {
   final String id;
   final Future<T> Function() execute;
   final BackgroundTaskConfig config;
-  
+
   int _retryCount = 0;
   BackgroundTaskStatus _status = BackgroundTaskStatus.idle;
-  
+
   BackgroundTaskStatus get status => _status;
   int get retryCount => _retryCount;
   bool get canRetry => _retryCount < config.maxRetries;
@@ -75,25 +69,25 @@ class BackgroundTask<T> {
 abstract interface class BackgroundTaskService {
   /// Register a one-time background task
   Future<void> registerOneTimeTask<T>(BackgroundTask<T> task);
-  
+
   /// Register a periodic background task
   Future<void> registerPeriodicTask<T>(
     BackgroundTask<T> task,
     Duration frequency,
   );
-  
+
   /// Cancel a specific task
   Future<void> cancelTask(String taskId);
-  
+
   /// Cancel all registered tasks
   Future<void> cancelAllTasks();
-  
+
   /// Check if a task is registered
   Future<bool> isTaskRegistered(String taskId);
-  
+
   /// Get task status
   BackgroundTaskStatus getTaskStatus(String taskId);
-  
+
   /// Stream of task completion events
   Stream<BackgroundTaskResult<dynamic>> get taskCompletionStream;
 }
@@ -102,13 +96,13 @@ abstract interface class BackgroundTaskService {
 class InMemoryBackgroundTaskService implements BackgroundTaskService {
   final Map<String, BackgroundTask<dynamic>> _tasks = {};
   final Map<String, Timer> _timers = {};
-  final _completionController = 
+  final _completionController =
       StreamController<BackgroundTaskResult<dynamic>>.broadcast();
 
   @override
   Future<void> registerOneTimeTask<T>(BackgroundTask<T> task) async {
     _tasks[task.id] = task;
-    
+
     if (task.config.initialDelay > Duration.zero) {
       _timers[task.id] = Timer(task.config.initialDelay, () {
         _executeTask(task);
@@ -124,7 +118,7 @@ class InMemoryBackgroundTaskService implements BackgroundTaskService {
     Duration frequency,
   ) async {
     _tasks[task.id] = task;
-    
+
     _timers[task.id] = Timer.periodic(frequency, (_) {
       _executeTask(task);
     });
@@ -132,14 +126,14 @@ class InMemoryBackgroundTaskService implements BackgroundTaskService {
 
   Future<void> _executeTask<T>(BackgroundTask<T> task) async {
     task._status = BackgroundTaskStatus.running;
-    
+
     try {
       final result = await task.execute();
       task._status = BackgroundTaskStatus.completed;
       _completionController.add(BackgroundTaskSuccess<T>(result));
     } on Exception catch (e, st) {
       task._retryCount++;
-      
+
       if (task.canRetry) {
         await Future<void>.delayed(task.config.retryDelay);
         await _executeTask(task);
@@ -154,7 +148,7 @@ class InMemoryBackgroundTaskService implements BackgroundTaskService {
   Future<void> cancelTask(String taskId) async {
     _timers[taskId]?.cancel();
     _timers.remove(taskId);
-    
+
     final task = _tasks[taskId];
     if (task != null) {
       task._status = BackgroundTaskStatus.cancelled;
@@ -168,7 +162,7 @@ class InMemoryBackgroundTaskService implements BackgroundTaskService {
       timer.cancel();
     }
     _timers.clear();
-    
+
     for (final task in _tasks.values) {
       task._status = BackgroundTaskStatus.cancelled;
     }
@@ -176,10 +170,12 @@ class InMemoryBackgroundTaskService implements BackgroundTaskService {
   }
 
   @override
-  Future<bool> isTaskRegistered(String taskId) async => _tasks.containsKey(taskId);
+  Future<bool> isTaskRegistered(String taskId) async =>
+      _tasks.containsKey(taskId);
 
   @override
-  BackgroundTaskStatus getTaskStatus(String taskId) => _tasks[taskId]?.status ?? BackgroundTaskStatus.idle;
+  BackgroundTaskStatus getTaskStatus(String taskId) =>
+      _tasks[taskId]?.status ?? BackgroundTaskStatus.idle;
 
   @override
   Stream<BackgroundTaskResult<dynamic>> get taskCompletionStream =>

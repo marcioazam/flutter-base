@@ -6,31 +6,30 @@ import '../helpers/glados_helpers.dart';
 /// Generators for circuit breaker testing.
 extension CircuitBreakerGenerators on Any {
   Generator<CircuitBreakerConfig> get circuitConfig => combine3(
-        intInRange(1, 10),
-        intInRange(1, 5),
-        intInRange(1000, 60000),
-        (failures, successes, timeout) => CircuitBreakerConfig(
-          failureThreshold: failures,
-          successThreshold: successes,
-          timeout: Duration(milliseconds: timeout),
-        ),
-      );
+    intInRange(1, 10),
+    intInRange(1, 5),
+    intInRange(1000, 60000),
+    (failures, successes, timeout) => CircuitBreakerConfig(
+      failureThreshold: failures,
+      successThreshold: successes,
+      timeout: Duration(milliseconds: timeout),
+    ),
+  );
 }
 
 void main() {
   group('Circuit Breaker Property Tests', () {
     /// **Feature: flutter-2025-final-enhancements, Property 6: Circuit Breaker State Machine**
     /// **Validates: Requirements 5.1, 5.2, 5.3, 5.4, 5.5**
-    Glados(any.circuitConfig).test(
-      'Circuit breaker starts in closed state',
-      (config) {
-        final cb = CircuitBreaker<String>(
-          config: config,
-          execute: () async => 'success',
-        );
-        expect(cb.state, equals(CircuitState.closed));
-      },
-    );
+    Glados(any.circuitConfig).test('Circuit breaker starts in closed state', (
+      config,
+    ) {
+      final cb = CircuitBreaker<String>(
+        config: config,
+        execute: () async => 'success',
+      );
+      expect(cb.state, equals(CircuitState.closed));
+    });
 
     Glados(any.circuitConfig).test(
       'Circuit opens after failureThreshold consecutive failures',
@@ -51,7 +50,6 @@ void main() {
         expect(cb.failureCount, equals(config.failureThreshold));
       },
     );
-
 
     Glados(any.circuitConfig).test(
       'Success resets failure count in closed state',

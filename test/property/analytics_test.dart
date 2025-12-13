@@ -1,7 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_base_2025/core/observability/analytics_service.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -104,19 +105,16 @@ class TestRoute extends PageRoute<void> {
     BuildContext context,
     Animation<double> animation,
     Animation<double> secondaryAnimation,
-  ) =>
-      const SizedBox();
+  ) => const SizedBox();
 }
 
 void main() {
   group('Analytics Screen View Logging Properties', () {
     late RecordingAnalyticsService analytics;
-    // ignore: unused_local_variable
-    late AnalyticsNavigatorObserver observer; // Kept for future navigation tests
 
     setUp(() {
       analytics = RecordingAnalyticsService();
-      observer = AnalyticsNavigatorObserver(analytics);
+      // AnalyticsNavigatorObserver can be instantiated when needed for navigation tests
     });
 
     Glados<String>(any.nonEmptyLetters, _explore).test(
@@ -131,23 +129,27 @@ void main() {
       },
     );
 
-    Glados2<String, String>(any.lowercaseLetters, any.lowercaseLetters, _explore).test(
-      'logScreenView records screen name and class',
-      (screenName, screenClass) async {
-        analytics.clear(); // Clear state for each iteration
-        final validName = '/${screenName.replaceAll(RegExp(r'[^\w]'), '_')}';
-        final validClass = screenClass.replaceAll(RegExp(r'[^\w]'), '');
+    Glados2<String, String>(
+      any.lowercaseLetters,
+      any.lowercaseLetters,
+      _explore,
+    ).test('logScreenView records screen name and class', (
+      screenName,
+      screenClass,
+    ) async {
+      analytics.clear(); // Clear state for each iteration
+      final validName = '/${screenName.replaceAll(RegExp(r'[^\w]'), '_')}';
+      final validClass = screenClass.replaceAll(RegExp(r'[^\w]'), '');
 
-        await analytics.logScreenView(
-          screenName: validName,
-          screenClass: validClass,
-        );
+      await analytics.logScreenView(
+        screenName: validName,
+        screenClass: validClass,
+      );
 
-        expect(analytics.screenViews.length, equals(1));
-        expect(analytics.screenViews.first['screenName'], equals(validName));
-        expect(analytics.screenViews.first['screenClass'], equals(validClass));
-      },
-    );
+      expect(analytics.screenViews.length, equals(1));
+      expect(analytics.screenViews.first['screenName'], equals(validName));
+      expect(analytics.screenViews.first['screenClass'], equals(validClass));
+    });
 
     test('screen view includes timestamp', () async {
       final before = DateTime.now();
@@ -155,12 +157,14 @@ void main() {
       final after = DateTime.now();
 
       expect(analytics.screenViews.first['timestamp'], isNotNull);
-      final timestamp =
-          DateTime.parse(analytics.screenViews.first['timestamp'] as String);
-      expect(timestamp.isAfter(before.subtract(const Duration(seconds: 1))),
-          isTrue);
+      final timestamp = DateTime.parse(
+        analytics.screenViews.first['timestamp'] as String,
+      );
       expect(
-          timestamp.isBefore(after.add(const Duration(seconds: 1))), isTrue);
+        timestamp.isAfter(before.subtract(const Duration(seconds: 1))),
+        isTrue,
+      );
+      expect(timestamp.isBefore(after.add(const Duration(seconds: 1))), isTrue);
     });
 
     test('disabled analytics does not log screen views', () async {
@@ -202,10 +206,7 @@ void main() {
       expect(analytics.events.first['parameters'], isNotNull);
       final parameters =
           analytics.events.first['parameters'] as Map<String, dynamic>;
-      expect(
-        parameters['button_id'],
-        equals('submit'),
-      );
+      expect(parameters['button_id'], equals('submit'));
     });
 
     test('setUserId and clearUserId work correctly', () async {

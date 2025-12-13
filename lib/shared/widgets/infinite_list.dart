@@ -7,7 +7,6 @@ enum InfiniteScrollState { idle, loading, error, noMoreData }
 
 /// Infinite scroll controller.
 class InfiniteScrollController<T> extends ChangeNotifier {
-
   InfiniteScrollController({
     required this.fetchPage,
     this.pageSize = 20,
@@ -125,9 +124,10 @@ class InfiniteScrollController<T> extends ChangeNotifier {
 
 /// Infinite list view widget.
 class InfiniteListView<T> extends StatefulWidget {
-
   const InfiniteListView({
-    required this.controller, required this.itemBuilder, super.key,
+    required this.controller,
+    required this.itemBuilder,
+    super.key,
     this.loadingWidget,
     this.errorWidget,
     this.emptyWidget,
@@ -177,7 +177,8 @@ class _InfiniteListViewState<T> extends State<InfiniteListView<T>> {
     final controller = widget.controller;
 
     if (controller.isEmpty && controller.state == InfiniteScrollState.loading) {
-      return widget.loadingWidget ?? const Center(child: CircularProgressIndicator());
+      return widget.loadingWidget ??
+          const Center(child: CircularProgressIndicator());
     }
 
     if (controller.isEmpty && controller.state == InfiniteScrollState.error) {

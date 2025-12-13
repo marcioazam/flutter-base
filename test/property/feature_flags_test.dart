@@ -1,6 +1,7 @@
 import 'package:flutter_base_2025/core/config/feature_flags.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -22,7 +23,10 @@ void main() {
       featureFlags.setFlag(flagName, true);
 
       // Call multiple times
-      final results = List.generate(100, (_) => featureFlags.isEnabled(flagName));
+      final results = List.generate(
+        100,
+        (_) => featureFlags.isEnabled(flagName),
+      );
 
       // All results should be the same
       expect(results.every((r) => r == true), isTrue);
@@ -46,15 +50,14 @@ void main() {
       },
     );
 
-    Glados<int>(any.int, _explore).test(
-      'getValue returns correct int value',
-      (value) {
-        const flagName = 'int_flag';
-        featureFlags.setFlag(flagName, value);
+    Glados<int>(any.int, _explore).test('getValue returns correct int value', (
+      value,
+    ) {
+      const flagName = 'int_flag';
+      featureFlags.setFlag(flagName, value);
 
-        expect(featureFlags.getValue<int>(flagName, 0), equals(value));
-      },
-    );
+      expect(featureFlags.getValue<int>(flagName, 0), equals(value));
+    });
 
     Glados<String>(any.nonEmptyLetters, _explore).test(
       'getValue returns correct string value',
@@ -70,7 +73,7 @@ void main() {
       'getValue returns correct double value',
       (value) {
         if (value.isNaN || value.isInfinite) return;
-        
+
         const flagName = 'double_flag';
         featureFlags.setFlag(flagName, value);
 
@@ -90,7 +93,10 @@ void main() {
       const flagName = 'undefined_flag';
 
       expect(featureFlags.getValue<int>(flagName, 99), equals(99));
-      expect(featureFlags.getValue<String>(flagName, 'default'), equals('default'));
+      expect(
+        featureFlags.getValue<String>(flagName, 'default'),
+        equals('default'),
+      );
       expect(featureFlags.getValue<bool>(flagName, true), isTrue);
     });
 

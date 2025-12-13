@@ -4,7 +4,6 @@ import 'package:flutter_base_2025/features/auth/domain/repositories/auth_reposit
 /// Use case for user logout.
 /// Pure Dart - no external dependencies.
 class LogoutUseCase {
-
   LogoutUseCase(this._repository);
   final AuthRepository _repository;
 

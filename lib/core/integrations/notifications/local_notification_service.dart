@@ -8,7 +8,6 @@ enum NotificationImportance { min, low, normal, high, max }
 
 /// Notification channel configuration.
 class NotificationChannel {
-
   const NotificationChannel({
     required this.id,
     required this.name,
@@ -29,7 +28,6 @@ class NotificationChannel {
 
 /// Local notification configuration.
 class LocalNotification {
-
   const LocalNotification({
     required this.id,
     required this.title,
@@ -52,7 +50,6 @@ class LocalNotification {
 
 /// Scheduled notification configuration.
 class ScheduledNotification extends LocalNotification {
-
   const ScheduledNotification({
     required super.id,
     required super.title,
@@ -70,7 +67,6 @@ class ScheduledNotification extends LocalNotification {
 
 /// Recurring notification configuration.
 class RecurringNotification extends LocalNotification {
-
   const RecurringNotification({
     required super.id,
     required super.title,

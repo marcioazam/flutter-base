@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:flutter_base_2025/core/errors/failures.dart';
-import 'package:flutter_base_2025/core/generics/drift_repository.dart' as generics;
+import 'package:flutter_base_2025/core/base/drift_repository.dart' as generics;
 import 'package:flutter_base_2025/core/network/api_client.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
@@ -36,9 +36,12 @@ enum SyncStatus {
 
 /// Repository with offline sync support and conflict resolution.
 /// T = Entity type, D = Drift DataClass, C = Companion class
-abstract class SyncRepository<T, D extends DataClass, C extends UpdateCompanion<D>>
+abstract class SyncRepository<
+  T,
+  D extends DataClass,
+  C extends UpdateCompanion<D>
+>
     extends generics.DriftRepository<T, D, C> {
-
   SyncRepository({
     required this.apiClient,
     this.conflictResolution = ConflictResolution.serverWins,
@@ -70,40 +73,41 @@ abstract class SyncRepository<T, D extends DataClass, C extends UpdateCompanion<
 
     for (final item in pending) {
       final result = await pushToServer(item);
-      result.fold(
-        (failure) {
-          failed++;
-          errors.add(failure.message);
-        },
-        (_) => synced++,
-      );
+      result.fold((failure) {
+        failed++;
+        errors.add(failure.message);
+      }, (_) => synced++);
     }
 
-    return Success(SyncResult(
-      totalItems: pending.length,
-      syncedItems: synced,
-      failedItems: failed,
-      errors: errors,
-    ));
+    return Success(
+      SyncResult(
+        totalItems: pending.length,
+        syncedItems: synced,
+        failedItems: failed,
+        errors: errors,
+      ),
+    );
   }
 
   /// Resolve conflict between local and remote versions.
-  Future<Result<T>> resolveConflict(T local, T remote) async => switch (conflictResolution) {
-      ConflictResolution.serverWins => Success(remote),
-      ConflictResolution.clientWins => Success(local),
-      ConflictResolution.merge => mergeEntities(local, remote),
-      ConflictResolution.keepBoth => Success(local),
-    };
+  Future<Result<T>> resolveConflict(T local, T remote) async =>
+      switch (conflictResolution) {
+        ConflictResolution.serverWins => Success(remote),
+        ConflictResolution.clientWins => Success(local),
+        ConflictResolution.merge => mergeEntities(local, remote),
+        ConflictResolution.keepBoth => Success(local),
+      };
 
   /// Merge two entity versions. Override for custom merge logic.
-  Future<Result<T>> mergeEntities(T local, T remote) async => Failure(const UnexpectedFailure(
+  Future<Result<T>> mergeEntities(T local, T remote) async => Failure(
+    const UnexpectedFailure(
       'Merge not implemented. Override mergeEntities() for custom merge logic.',
-    ));
+    ),
+  );
 }
 
 /// Result of a sync operation.
 class SyncResult {
-
   const SyncResult({
     required this.totalItems,
     required this.syncedItems,

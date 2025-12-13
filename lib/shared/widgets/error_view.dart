@@ -26,11 +26,7 @@ class ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              _getIcon(failure),
-              size: 64,
-              color: theme.colorScheme.error,
-            ),
+            Icon(_getIcon(failure), size: 64, color: theme.colorScheme.error),
             const SizedBox(height: 16),
             Text(
               title ?? _getTitle(failure),
@@ -58,22 +54,22 @@ class ErrorView extends StatelessWidget {
   }
 
   IconData _getIcon(AppFailure? failure) => switch (failure) {
-        NetworkFailure() => Icons.wifi_off,
-        AuthFailure() => Icons.lock_outline,
-        NotFoundFailure() => Icons.search_off,
-        ServerFailure() => Icons.cloud_off,
-        ValidationFailure() => Icons.error_outline,
-        _ => Icons.error_outline,
-      };
+    NetworkFailure() => Icons.wifi_off,
+    AuthFailure() => Icons.lock_outline,
+    NotFoundFailure() => Icons.search_off,
+    ServerFailure() => Icons.cloud_off,
+    ValidationFailure() => Icons.error_outline,
+    _ => Icons.error_outline,
+  };
 
   String _getTitle(AppFailure? failure) => switch (failure) {
-        NetworkFailure() => 'Sem conexão',
-        AuthFailure() => 'Sessão expirada',
-        NotFoundFailure() => 'Não encontrado',
-        ServerFailure() => 'Erro no servidor',
-        ValidationFailure() => 'Dados inválidos',
-        _ => 'Algo deu errado',
-      };
+    NetworkFailure() => 'Sem conexão',
+    AuthFailure() => 'Sessão expirada',
+    NotFoundFailure() => 'Não encontrado',
+    ServerFailure() => 'Erro no servidor',
+    ValidationFailure() => 'Dados inválidos',
+    _ => 'Algo deu errado',
+  };
 
   String _getMessage(AppFailure? failure) =>
       failure?.userMessage ?? 'Ocorreu um erro inesperado.';
@@ -93,10 +89,8 @@ class AsyncErrorView extends StatelessWidget {
   final VoidCallback onRetry;
 
   @override
-  Widget build(BuildContext context) => ErrorView(
-        error: error,
-        onRetry: onRetry,
-      );
+  Widget build(BuildContext context) =>
+      ErrorView(error: error, onRetry: onRetry);
 }
 
 /// Loading view with optional message.
@@ -154,11 +148,7 @@ class EmptyView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 64,
-              color: theme.colorScheme.outline,
-            ),
+            Icon(icon, size: 64, color: theme.colorScheme.outline),
             const SizedBox(height: 16),
             Text(
               message,
@@ -169,10 +159,7 @@ class EmptyView extends StatelessWidget {
             ),
             if (action != null && actionLabel != null) ...[
               const SizedBox(height: 24),
-              OutlinedButton(
-                onPressed: action,
-                child: Text(actionLabel!),
-              ),
+              OutlinedButton(onPressed: action, child: Text(actionLabel!)),
             ],
           ],
         ),
@@ -183,29 +170,29 @@ class EmptyView extends StatelessWidget {
 
 /// Custom error widget builder for Flutter errors.
 Widget buildErrorWidget(FlutterErrorDetails details) => Material(
-      child: Container(
-        color: Colors.red.shade50,
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisAlignment: .center,
-          children: [
-            const Icon(Icons.error, color: Colors.red, size: 48),
-            const SizedBox(height: 16),
-            const Text(
-              'Ocorreu um erro',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              details.exceptionAsString(),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: Colors.red),
-            ),
-          ],
+  child: Container(
+    color: Colors.red.shade50,
+    padding: const EdgeInsets.all(16),
+    child: Column(
+      mainAxisAlignment: .center,
+      children: [
+        const Icon(Icons.error, color: Colors.red, size: 48),
+        const SizedBox(height: 16),
+        const Text(
+          'Ocorreu um erro',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.red,
+          ),
         ),
-      ),
-    );
+        const SizedBox(height: 8),
+        Text(
+          details.exceptionAsString(),
+          textAlign: TextAlign.center,
+          style: const TextStyle(color: Colors.red),
+        ),
+      ],
+    ),
+  ),
+);

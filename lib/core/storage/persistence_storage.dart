@@ -6,18 +6,22 @@ import 'package:meta/meta.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Storage interface for offline persistence.
-/// 
+///
 /// **Feature: flutter-2025-final-enhancements**
 /// **Validates: Requirements 2.1, 2.2**
 abstract interface class PersistenceStorage {
-  Future<Result<void>> save<T>(String key, T value, {required String Function(T) encode});
+  Future<Result<void>> save<T>(
+    String key,
+    T value, {
+    required String Function(T) encode,
+  });
   Future<Result<T?>> load<T>(String key, {required T Function(String) decode});
   Future<Result<void>> delete(String key);
   Future<Result<void>> clear();
 }
 
 /// SharedPreferences-based persistence storage.
-/// 
+///
 /// Note: For production, consider using riverpod_sqflite when stable.
 /// This implementation provides a simpler alternative using SharedPreferences.
 class SharedPreferencesPersistence implements PersistenceStorage {
@@ -31,31 +35,41 @@ class SharedPreferencesPersistence implements PersistenceStorage {
   }
 
   @override
-  Future<Result<void>> save<T>(String key, T value, {required String Function(T) encode}) async {
+  Future<Result<void>> save<T>(
+    String key,
+    T value, {
+    required String Function(T) encode,
+  }) async {
     try {
       final encoded = encode(value);
       await _prefs.setString(key, encoded);
       return const Success(null);
     } on FormatException catch (e, st) {
-      return Failure(CacheFailure('Encoding error: ${e.message}', stackTrace: st));
+      return Failure(
+        CacheFailure('Encoding error: ${e.message}', stackTrace: st),
+      );
     } on Exception catch (e, st) {
       return Failure(CacheFailure('Failed to save: $e', stackTrace: st));
     }
   }
 
   @override
-  Future<Result<T?>> load<T>(String key, {required T Function(String) decode}) async {
+  Future<Result<T?>> load<T>(
+    String key, {
+    required T Function(String) decode,
+  }) async {
     try {
       final encoded = _prefs.getString(key);
       if (encoded == null) return const Success(null);
       return Success(decode(encoded));
     } on FormatException catch (e, st) {
-      return Failure(CacheFailure('Decoding error: ${e.message}', stackTrace: st));
+      return Failure(
+        CacheFailure('Decoding error: ${e.message}', stackTrace: st),
+      );
     } on Exception catch (e, st) {
       return Failure(CacheFailure('Failed to load: $e', stackTrace: st));
     }
   }
-
 
   @override
   Future<Result<void>> delete(String key) async {
@@ -79,7 +93,7 @@ class SharedPreferencesPersistence implements PersistenceStorage {
 }
 
 /// JSON-based persistence helper.
-/// 
+///
 /// **Feature: flutter-2025-final-enhancements, Property 2: Persistence Round-Trip**
 /// **Validates: Requirements 2.3**
 class JsonPersistence<T> {
@@ -95,11 +109,8 @@ class JsonPersistence<T> {
   final Map<String, dynamic> Function(T) toJson;
   final T Function(Map<String, dynamic>) fromJson;
 
-  Future<Result<void>> save(T value) => storage.save<T>(
-    key,
-    value,
-    encode: (v) => jsonEncode(toJson(v)),
-  );
+  Future<Result<void>> save(T value) =>
+      storage.save<T>(key, value, encode: (v) => jsonEncode(toJson(v)));
 
   Future<Result<T?>> load() => storage.load<T>(
     key,
@@ -129,18 +140,18 @@ class JsonPersistence<T> {
 }
 
 /// User preferences model for persistence example.
-/// 
+///
 /// **Feature: flutter-2025-final-enhancements**
 /// **Validates: Requirements 2.2, 2.3**
 @immutable
 class UserPreferences {
-
-  factory UserPreferences.fromJson(Map<String, dynamic> json) => UserPreferences(
-    theme: json['theme'] as String? ?? 'system',
-    locale: json['locale'] as String? ?? 'en',
-    notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
-    fontSize: (json['fontSize'] as num?)?.toDouble() ?? 14.0,
-  );
+  factory UserPreferences.fromJson(Map<String, dynamic> json) =>
+      UserPreferences(
+        theme: json['theme'] as String? ?? 'system',
+        locale: json['locale'] as String? ?? 'en',
+        notificationsEnabled: json['notificationsEnabled'] as bool? ?? true,
+        fontSize: (json['fontSize'] as num?)?.toDouble() ?? 14.0,
+      );
   const UserPreferences({
     this.theme = 'system',
     this.locale = 'en',
@@ -170,5 +181,6 @@ class UserPreferences {
           fontSize == other.fontSize;
 
   @override
-  int get hashCode => Object.hash(theme, locale, notificationsEnabled, fontSize);
+  int get hashCode =>
+      Object.hash(theme, locale, notificationsEnabled, fontSize);
 }

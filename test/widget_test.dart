@@ -18,18 +18,14 @@ void main() {
     // Build a simple test widget with theme provider
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [
-          sharedPreferencesProvider.overrideWithValue(prefs),
-        ],
+        overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
         child: Consumer(
           builder: (context, ref, _) {
             final themeMode = ref.watch(themeModeProvider);
             return MaterialApp(
               themeMode: themeMode,
               home: Scaffold(
-                body: Center(
-                  child: Text('Theme: ${themeMode.name}'),
-                ),
+                body: Center(child: Text('Theme: ${themeMode.name}')),
               ),
             );
           },

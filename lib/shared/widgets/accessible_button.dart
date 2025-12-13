@@ -31,10 +31,7 @@ class AccessibleButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget button = ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: minWidth,
-        minHeight: minHeight,
-      ),
+      constraints: BoxConstraints(minWidth: minWidth, minHeight: minHeight),
       child: child,
     );
 
@@ -74,19 +71,19 @@ class AccessibleIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-      label: tooltip,
-      button: true,
-      enabled: onPressed != null,
-      child: IconButton(
-        icon: Icon(icon, size: size, color: color),
-        onPressed: onPressed,
-        tooltip: tooltip,
-        constraints: const BoxConstraints(
-          minWidth: kMinTouchTargetSize,
-          minHeight: kMinTouchTargetSize,
-        ),
+    label: tooltip,
+    button: true,
+    enabled: onPressed != null,
+    child: IconButton(
+      icon: Icon(icon, size: size, color: color),
+      onPressed: onPressed,
+      tooltip: tooltip,
+      constraints: const BoxConstraints(
+        minWidth: kMinTouchTargetSize,
+        minHeight: kMinTouchTargetSize,
       ),
-    );
+    ),
+  );
 }
 
 /// Accessible image with semantic label.
@@ -110,17 +107,17 @@ class AccessibleImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-      label: semanticLabel,
-      image: true,
-      excludeSemantics: excludeFromSemantics,
-      child: Image(
-        image: image,
-        width: width,
-        height: height,
-        fit: fit,
-        semanticLabel: excludeFromSemantics ? null : semanticLabel,
-      ),
-    );
+    label: semanticLabel,
+    image: true,
+    excludeSemantics: excludeFromSemantics,
+    child: Image(
+      image: image,
+      width: width,
+      height: height,
+      fit: fit,
+      semanticLabel: excludeFromSemantics ? null : semanticLabel,
+    ),
+  );
 }
 
 /// Accessible text field with proper labels.
@@ -150,23 +147,23 @@ class AccessibleTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Semantics(
-      label: labelText,
-      textField: true,
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: labelText,
-          hintText: hintText,
-          errorText: errorText,
-          errorMaxLines: 2,
-        ),
-        obscureText: obscureText,
-        keyboardType: keyboardType,
-        textInputAction: textInputAction,
-        onSubmitted: onSubmitted,
-        autofocus: autofocus,
+    label: labelText,
+    textField: true,
+    child: TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: labelText,
+        hintText: hintText,
+        errorText: errorText,
+        errorMaxLines: 2,
       ),
-    );
+      obscureText: obscureText,
+      keyboardType: keyboardType,
+      textInputAction: textInputAction,
+      onSubmitted: onSubmitted,
+      autofocus: autofocus,
+    ),
+  );
 }
 
 /// Extension for checking contrast ratio.

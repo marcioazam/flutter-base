@@ -6,7 +6,7 @@ import 'package:flutter_base_2025/core/observability/app_logger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 /// Remote configuration service.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 43.1, 43.2, 43.4, 43.5**
 abstract interface class RemoteConfigService {
@@ -48,22 +48,15 @@ abstract interface class RemoteConfigService {
 }
 
 /// Remote config fetch status.
-enum RemoteConfigStatus {
-  notFetched,
-  fetching,
-  success,
-  failure,
-  throttled,
-}
+enum RemoteConfigStatus { notFetched, fetching, success, failure, throttled }
 
 /// Local remote config service implementation.
 class LocalRemoteConfigService implements RemoteConfigService {
-
   LocalRemoteConfigService({
     Duration minFetchInterval = const Duration(hours: 1),
     Duration cacheTtl = const Duration(hours: 12),
-  })  : _minFetchInterval = minFetchInterval,
-        _cacheTtl = cacheTtl;
+  }) : _minFetchInterval = minFetchInterval,
+       _cacheTtl = cacheTtl;
   final Map<String, dynamic> _defaults = {};
   final Map<String, dynamic> _fetched = {};
   final Map<String, dynamic> _active = {};
@@ -123,7 +116,9 @@ class LocalRemoteConfigService implements RemoteConfigService {
           );
         }
       } on FormatException catch (e) {
-        AppLogger.instance.warning('Invalid JSON in cached config: ${e.message}');
+        AppLogger.instance.warning(
+          'Invalid JSON in cached config: ${e.message}',
+        );
       } on Exception catch (e) {
         AppLogger.instance.warning('Failed to load cached config: $e');
       }
@@ -137,8 +132,7 @@ class LocalRemoteConfigService implements RemoteConfigService {
 
   Future<void> _saveCache() async {
     await _prefs?.setString(_cacheKey, jsonEncode(_active));
-    await _prefs?.setInt(
-        _lastFetchKey, DateTime.now().millisecondsSinceEpoch);
+    await _prefs?.setInt(_lastFetchKey, DateTime.now().millisecondsSinceEpoch);
   }
 
   @override

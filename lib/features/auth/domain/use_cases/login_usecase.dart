@@ -26,31 +26,47 @@ class LoginUseCase {
 
   Result<User>? _validateInput(String email, String password) {
     if (email.isEmpty) {
-      return const Failure(ValidationFailure(
-        'Email is required',
-        fieldErrors: {'email': ['Email is required']},
-      ));
+      return const Failure(
+        ValidationFailure(
+          'Email is required',
+          fieldErrors: {
+            'email': ['Email is required'],
+          },
+        ),
+      );
     }
 
     if (!_isValidEmail(email)) {
-      return const Failure(ValidationFailure(
-        'Invalid email format',
-        fieldErrors: {'email': ['Invalid email format']},
-      ));
+      return const Failure(
+        ValidationFailure(
+          'Invalid email format',
+          fieldErrors: {
+            'email': ['Invalid email format'],
+          },
+        ),
+      );
     }
 
     if (password.isEmpty) {
-      return const Failure(ValidationFailure(
-        'Password is required',
-        fieldErrors: {'password': ['Password is required']},
-      ));
+      return const Failure(
+        ValidationFailure(
+          'Password is required',
+          fieldErrors: {
+            'password': ['Password is required'],
+          },
+        ),
+      );
     }
 
     if (password.length < 6) {
-      return const Failure(ValidationFailure(
-        'Password too short',
-        fieldErrors: {'password': ['Password must be at least 6 characters']},
-      ));
+      return const Failure(
+        ValidationFailure(
+          'Password too short',
+          fieldErrors: {
+            'password': ['Password must be at least 6 characters'],
+          },
+        ),
+      );
     }
 
     return null;

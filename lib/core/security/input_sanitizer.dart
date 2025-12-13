@@ -129,8 +129,7 @@ class DefaultInputSanitizer implements InputSanitizer {
   }
 
   @override
-  String stripHtmlTags(String input) =>
-      input.replaceAll(RegExp('<[^>]*>'), '');
+  String stripHtmlTags(String input) => input.replaceAll(RegExp('<[^>]*>'), '');
 
   @override
   String limitLength(String input, int maxLength) {
@@ -139,7 +138,8 @@ class DefaultInputSanitizer implements InputSanitizer {
   }
 
   @override
-  bool matchesWhitelist(String input, RegExp pattern) => pattern.hasMatch(input);
+  bool matchesWhitelist(String input, RegExp pattern) =>
+      pattern.hasMatch(input);
 
   @override
   String alphanumericOnly(String input) =>

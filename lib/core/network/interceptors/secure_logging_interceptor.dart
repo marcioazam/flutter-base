@@ -16,12 +16,12 @@ class SecureLoggingInterceptor extends Interceptor {
     required this.enableLogging,
     this.maxBodyLength = 500,
   }) : _logger = Logger(
-          printer: PrettyPrinter(
-            methodCount: 0,
-            errorMethodCount: 5,
-            lineLength: 80,
-          ),
-        );
+         printer: PrettyPrinter(
+           methodCount: 0,
+           errorMethodCount: 5,
+           lineLength: 80,
+         ),
+       );
 
   final bool enableLogging;
   final int maxBodyLength;
@@ -71,13 +71,17 @@ class SecureLoggingInterceptor extends Interceptor {
   }
 
   @override
-  void onResponse(Response<dynamic> response, ResponseInterceptorHandler handler) {
+  void onResponse(
+    Response<dynamic> response,
+    ResponseInterceptorHandler handler,
+  ) {
     if (!enableLogging) {
       handler.next(response);
       return;
     }
 
-    final correlationId = response.requestOptions.headers['X-Correlation-ID'] ?? 'N/A';
+    final correlationId =
+        response.requestOptions.headers['X-Correlation-ID'] ?? 'N/A';
 
     _logger.d(
       '← [${response.statusCode}] ${response.requestOptions.uri}\n'
@@ -95,7 +99,8 @@ class SecureLoggingInterceptor extends Interceptor {
       return;
     }
 
-    final correlationId = err.requestOptions.headers['X-Correlation-ID'] ?? 'N/A';
+    final correlationId =
+        err.requestOptions.headers['X-Correlation-ID'] ?? 'N/A';
 
     _logger.e(
       '✖ [${err.response?.statusCode ?? 'N/A'}] ${err.requestOptions.uri}\n'
@@ -109,13 +114,14 @@ class SecureLoggingInterceptor extends Interceptor {
   }
 
   /// Sanitizes headers by redacting sensitive ones.
-  Map<String, dynamic> _sanitizeHeaders(Map<String, dynamic> headers) => headers.map((key, value) {
-      final lowerKey = key.toLowerCase();
-      if (_sensitiveHeaders.contains(lowerKey)) {
-        return MapEntry(key, '***REDACTED***');
-      }
-      return MapEntry(key, value);
-    });
+  Map<String, dynamic> _sanitizeHeaders(Map<String, dynamic> headers) =>
+      headers.map((key, value) {
+        final lowerKey = key.toLowerCase();
+        if (_sensitiveHeaders.contains(lowerKey)) {
+          return MapEntry(key, '***REDACTED***');
+        }
+        return MapEntry(key, value);
+      });
 
   /// Sanitizes request/response body by masking sensitive fields.
   String _sanitizeBody(dynamic data) {

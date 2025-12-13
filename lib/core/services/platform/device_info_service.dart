@@ -4,11 +4,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
 /// Device information.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 35.1**
 class DeviceInfo {
-
   const DeviceInfo({
     required this.model,
     required this.osVersion,
@@ -25,21 +24,20 @@ class DeviceInfo {
   final String? manufacturer;
 
   Map<String, dynamic> toMap() => {
-        'model': model,
-        'osVersion': osVersion,
-        'platform': platform,
-        'uniqueId': uniqueId,
-        'isPhysicalDevice': isPhysicalDevice,
-        if (manufacturer != null) 'manufacturer': manufacturer,
-      };
+    'model': model,
+    'osVersion': osVersion,
+    'platform': platform,
+    'uniqueId': uniqueId,
+    'isPhysicalDevice': isPhysicalDevice,
+    if (manufacturer != null) 'manufacturer': manufacturer,
+  };
 }
 
 /// App information.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 35.2**
 class AppInfo {
-
   const AppInfo({
     required this.version,
     required this.buildNumber,
@@ -54,20 +52,19 @@ class AppInfo {
   String get fullVersion => '$version+$buildNumber';
 
   Map<String, dynamic> toMap() => {
-        'version': version,
-        'buildNumber': buildNumber,
-        'packageName': packageName,
-        'appName': appName,
-        'fullVersion': fullVersion,
-      };
+    'version': version,
+    'buildNumber': buildNumber,
+    'packageName': packageName,
+    'appName': appName,
+    'fullVersion': fullVersion,
+  };
 }
 
 /// Screen information.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 35.3**
 class ScreenInfo {
-
   const ScreenInfo({
     required this.width,
     required this.height,
@@ -89,25 +86,21 @@ class ScreenInfo {
   bool get isLandscape => width > height;
 
   Map<String, dynamic> toMap() => {
-        'width': width,
-        'height': height,
-        'pixelRatio': pixelRatio,
-        'physicalWidth': physicalWidth,
-        'physicalHeight': physicalHeight,
-        'aspectRatio': aspectRatio,
-        'isTablet': isTablet,
-        'isLandscape': isLandscape,
-        'brightness': brightness.name,
-      };
+    'width': width,
+    'height': height,
+    'pixelRatio': pixelRatio,
+    'physicalWidth': physicalWidth,
+    'physicalHeight': physicalHeight,
+    'aspectRatio': aspectRatio,
+    'isTablet': isTablet,
+    'isLandscape': isLandscape,
+    'brightness': brightness.name,
+  };
 }
 
 /// Battery information.
 class BatteryInfo {
-
-  const BatteryInfo({
-    required this.level,
-    required this.state,
-  });
+  const BatteryInfo({required this.level, required this.state});
   final int level;
   final BatteryState state;
 
@@ -116,24 +109,17 @@ class BatteryInfo {
   bool get isLow => level < 20;
 
   Map<String, dynamic> toMap() => {
-        'level': level,
-        'state': state.name,
-        'isCharging': isCharging,
-        'isLow': isLow,
-      };
+    'level': level,
+    'state': state.name,
+    'isCharging': isCharging,
+    'isLow': isLow,
+  };
 }
 
-enum BatteryState {
-  unknown,
-  charging,
-  discharging,
-  full,
-  notCharging,
-}
+enum BatteryState { unknown, charging, discharging, full, notCharging }
 
 /// Device capabilities.
 class DeviceCapabilities {
-
   const DeviceCapabilities({
     this.hasNfc = false,
     this.hasBiometrics = false,
@@ -152,18 +138,18 @@ class DeviceCapabilities {
   final bool hasGyroscope;
 
   Map<String, dynamic> toMap() => {
-        'hasNfc': hasNfc,
-        'hasBiometrics': hasBiometrics,
-        'hasCamera': hasCamera,
-        'hasFrontCamera': hasFrontCamera,
-        'hasGps': hasGps,
-        'hasAccelerometer': hasAccelerometer,
-        'hasGyroscope': hasGyroscope,
-      };
+    'hasNfc': hasNfc,
+    'hasBiometrics': hasBiometrics,
+    'hasCamera': hasCamera,
+    'hasFrontCamera': hasFrontCamera,
+    'hasGps': hasGps,
+    'hasAccelerometer': hasAccelerometer,
+    'hasGyroscope': hasGyroscope,
+  };
 }
 
 /// Abstract interface for device info service.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 35.1, 35.2, 35.3**
 abstract interface class DeviceInfoService {
@@ -219,11 +205,11 @@ class MockDeviceInfoService implements DeviceInfoService {
 
   @override
   Future<AppInfo> getAppInfo() async => const AppInfo(
-      version: '1.0.0',
-      buildNumber: '1',
-      packageName: 'com.example.flutter_base_2025',
-      appName: 'Flutter Base 2025',
-    );
+    version: '1.0.0',
+    buildNumber: '1',
+    packageName: 'com.example.flutter_base_2025',
+    appName: 'Flutter Base 2025',
+  );
 
   @override
   ScreenInfo getScreenInfo() {
@@ -241,21 +227,20 @@ class MockDeviceInfoService implements DeviceInfoService {
   }
 
   @override
-  Future<BatteryInfo> getBatteryInfo() async => const BatteryInfo(
-      level: 85,
-      state: BatteryState.discharging,
-    );
+  Future<BatteryInfo> getBatteryInfo() async =>
+      const BatteryInfo(level: 85, state: BatteryState.discharging);
 
   @override
-  Future<DeviceCapabilities> getCapabilities() async => const DeviceCapabilities(
-      hasNfc: true,
-      hasBiometrics: true,
-      hasCamera: true,
-      hasFrontCamera: true,
-      hasGps: true,
-      hasAccelerometer: true,
-      hasGyroscope: true,
-    );
+  Future<DeviceCapabilities> getCapabilities() async =>
+      const DeviceCapabilities(
+        hasNfc: true,
+        hasBiometrics: true,
+        hasCamera: true,
+        hasFrontCamera: true,
+        hasGps: true,
+        hasAccelerometer: true,
+        hasGyroscope: true,
+      );
 
   @override
   Future<String> getDeviceId() async => 'mock-device-id-12345';

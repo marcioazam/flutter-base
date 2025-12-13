@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 /// Enhanced PopScope for predictive back gesture support (Android 15+).
 /// Provides async confirmation dialogs and custom back handling.
 class PredictivePopScope extends StatelessWidget {
-
   const PredictivePopScope({
-    required this.child, super.key,
+    required this.child,
+    super.key,
     this.canPop = true,
     this.onPopInvoked,
     this.confirmationDialog,
@@ -17,25 +17,27 @@ class PredictivePopScope extends StatelessWidget {
 
   /// Creates a PredictivePopScope with unsaved changes confirmation.
   factory PredictivePopScope.unsavedChanges({
-    required Widget child, required bool hasUnsavedChanges, Key? key,
+    required Widget child,
+    required bool hasUnsavedChanges,
+    Key? key,
     String title = 'Descartar alterações?',
     String message = 'Você tem alterações não salvas. Deseja descartá-las?',
     String confirmText = 'Descartar',
     String cancelText = 'Continuar editando',
   }) => PredictivePopScope(
-      key: key,
-      canPop: !hasUnsavedChanges,
-      confirmationDialog: hasUnsavedChanges
-          ? (context) => _showDiscardDialog(
-                context,
-                title: title,
-                message: message,
-                confirmText: confirmText,
-                cancelText: cancelText,
-              )
-          : null,
-      child: child,
-    );
+    key: key,
+    canPop: !hasUnsavedChanges,
+    confirmationDialog: hasUnsavedChanges
+        ? (context) => _showDiscardDialog(
+            context,
+            title: title,
+            message: message,
+            confirmText: confirmText,
+            cancelText: cancelText,
+          )
+        : null,
+    child: child,
+  );
   final Widget child;
 
   /// Whether the route can be popped.
@@ -49,27 +51,27 @@ class PredictivePopScope extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => PopScope(
-      canPop: canPop && onPopInvoked == null && confirmationDialog == null,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
+    canPop: canPop && onPopInvoked == null && confirmationDialog == null,
+    onPopInvokedWithResult: (didPop, result) async {
+      if (didPop) return;
 
-        var shouldPop = true;
+      var shouldPop = true;
 
-        // Show confirmation dialog if provided
-        if (confirmationDialog != null) {
-          shouldPop = await confirmationDialog!(context);
-        }
-        // Or call custom handler
-        else if (onPopInvoked != null) {
-          shouldPop = await onPopInvoked!();
-        }
+      // Show confirmation dialog if provided
+      if (confirmationDialog != null) {
+        shouldPop = await confirmationDialog!(context);
+      }
+      // Or call custom handler
+      else if (onPopInvoked != null) {
+        shouldPop = await onPopInvoked!();
+      }
 
-        if (shouldPop && context.mounted) {
-          Navigator.of(context).pop();
-        }
-      },
-      child: child,
-    );
+      if (shouldPop && context.mounted) {
+        Navigator.of(context).pop();
+      }
+    },
+    child: child,
+  );
 
   static Future<bool> _showDiscardDialog(
     BuildContext context, {
@@ -118,8 +120,9 @@ mixin UnsavedChangesMixin<T extends StatefulWidget> on State<T> {
   }
 
   /// Wrap your form with this to get automatic unsaved changes protection.
-  Widget buildWithUnsavedChangesProtection({required Widget child}) => PredictivePopScope.unsavedChanges(
-      hasUnsavedChanges: _hasUnsavedChanges,
-      child: child,
-    );
+  Widget buildWithUnsavedChangesProtection({required Widget child}) =>
+      PredictivePopScope.unsavedChanges(
+        hasUnsavedChanges: _hasUnsavedChanges,
+        child: child,
+      );
 }

@@ -2,7 +2,6 @@ import 'package:flutter/foundation.dart';
 
 /// Breadcrumb for crash reporting.
 class Breadcrumb {
-
   Breadcrumb({
     required this.message,
     required this.category,
@@ -47,11 +46,7 @@ abstract interface class CrashReporter {
 /// Stub implementation for Sentry crash reporter.
 /// Uncomment sentry_flutter in pubspec.yaml to use.
 class SentryCrashReporter implements CrashReporter {
-
-  SentryCrashReporter({
-    required this.dsn,
-    this.environment = 'development',
-  });
+  SentryCrashReporter({required this.dsn, this.environment = 'development'});
   final String dsn;
   final String environment;
   final List<Breadcrumb> _breadcrumbs = [];

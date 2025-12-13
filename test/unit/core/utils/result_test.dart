@@ -1,7 +1,8 @@
 import 'package:flutter_base_2025/core/errors/failures.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -29,10 +30,7 @@ void main() {
 
       test('fold calls onSuccess', () {
         const result = Success(42);
-        final folded = result.fold(
-          (f) => 'failure',
-          (v) => 'success: $v',
-        );
+        final folded = result.fold((f) => 'failure', (v) => 'success: $v');
         expect(folded, equals('success: 42'));
       });
 
@@ -119,10 +117,7 @@ void main() {
           var successCalled = false;
           var failureCalled = false;
 
-          result.fold(
-            (_) => failureCalled = true,
-            (_) => successCalled = true,
-          );
+          result.fold((_) => failureCalled = true, (_) => successCalled = true);
 
           expect(successCalled, isTrue);
           expect(failureCalled, isFalse);
@@ -136,10 +131,7 @@ void main() {
           var successCalled = false;
           var failureCalled = false;
 
-          result.fold(
-            (_) => failureCalled = true,
-            (_) => successCalled = true,
-          );
+          result.fold((_) => failureCalled = true, (_) => successCalled = true);
 
           expect(failureCalled, isTrue);
           expect(successCalled, isFalse);

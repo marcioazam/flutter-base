@@ -54,10 +54,7 @@ void main() {
     });
 
     test('cancelAuthentication completes without error', () async {
-      await expectLater(
-        service.cancelAuthentication(),
-        completes,
-      );
+      await expectLater(service.cancelAuthentication(), completes);
     });
 
     /// Property 3: Biometric Fallback
@@ -65,9 +62,7 @@ void main() {
     /// the system SHALL offer PIN/password fallback.
     test('fallback is offered when biometrics unavailable', () async {
       // When biometrics not available and biometricOnly is false
-      final result = await service.authenticate(
-        reason: 'Test fallback',
-      );
+      final result = await service.authenticate(reason: 'Test fallback');
 
       // Should succeed with fallback (simulated)
       expect(result.isSuccess, isTrue);

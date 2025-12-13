@@ -1,6 +1,5 @@
 /// Performance trace for timing operations.
 class PerformanceTrace {
-
   PerformanceTrace(this.name) : startTime = DateTime.now();
   final String name;
   final DateTime startTime;
@@ -43,9 +42,8 @@ class PerformanceTrace {
 
 /// Performance monitor for tracking operation timing.
 class PerformanceMonitor {
-
   PerformanceMonitor._({int maxCompletedTraces = 100})
-      : _maxCompletedTraces = maxCompletedTraces;
+    : _maxCompletedTraces = maxCompletedTraces;
   final Map<String, PerformanceTrace> _activeTraces = {};
   final List<PerformanceTrace> _completedTraces = [];
   final int _maxCompletedTraces;
@@ -85,10 +83,7 @@ class PerformanceMonitor {
   PerformanceTrace? getTrace(String name) => _activeTraces[name];
 
   /// Measures an async operation.
-  Future<T> measureAsync<T>(
-    String name,
-    Future<T> Function() operation,
-  ) async {
+  Future<T> measureAsync<T>(String name, Future<T> Function() operation) async {
     final trace = startTrace(name);
     try {
       return await operation();
@@ -117,8 +112,7 @@ class PerformanceMonitor {
 
   /// Gets average duration for a trace name.
   Duration? averageDuration(String name) {
-    final traces =
-        _completedTraces.where((t) => t.name == name).toList();
+    final traces = _completedTraces.where((t) => t.name == name).toList();
     if (traces.isEmpty) return null;
 
     final totalMs = traces.fold<int>(

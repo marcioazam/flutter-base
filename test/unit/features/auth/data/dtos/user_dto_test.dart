@@ -1,43 +1,44 @@
 import 'package:flutter_base_2025/features/auth/data/dtos/user_dto.dart';
 import 'package:flutter_base_2025/features/auth/domain/entities/user.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
 
 /// Custom generator for UserDto
 Generator<UserDto> userDtoGenerator() => any.combine5(
-      any.nonEmptyLetters,
-      any.nonEmptyLetters.map((s) => '$s@test.com'),
-      any.nonEmptyLetters,
-      any.dateTime,
-      any.bool,
-      (id, email, name, createdAt, hasAvatar) => UserDto(
-        id: id,
-        email: email,
-        name: name,
-        avatarUrl: hasAvatar ? 'https://example.com/avatar.png' : null,
-        createdAt: createdAt,
-      ),
-    );
+  any.nonEmptyLetters,
+  any.nonEmptyLetters.map((s) => '$s@test.com'),
+  any.nonEmptyLetters,
+  any.dateTime,
+  any.bool,
+  (id, email, name, createdAt, hasAvatar) => UserDto(
+    id: id,
+    email: email,
+    name: name,
+    avatarUrl: hasAvatar ? 'https://example.com/avatar.png' : null,
+    createdAt: createdAt,
+  ),
+);
 
 /// Custom generator for UserDto with nullable fields
 Generator<UserDto> userDtoWithNullablesGenerator() => any.combine5(
-      any.nonEmptyLetters,
-      any.nonEmptyLetters.map((s) => '$s@test.com'),
-      any.nonEmptyLetters,
-      any.dateTime,
-      any.bool,
-      (id, email, name, createdAt, hasNullables) => UserDto(
-        id: id,
-        email: email,
-        name: name,
-        avatarUrl: hasNullables ? null : 'https://example.com/avatar.png',
-        createdAt: createdAt,
-        updatedAt: hasNullables ? null : DateTime.now(),
-      ),
-    );
+  any.nonEmptyLetters,
+  any.nonEmptyLetters.map((s) => '$s@test.com'),
+  any.nonEmptyLetters,
+  any.dateTime,
+  any.bool,
+  (id, email, name, createdAt, hasNullables) => UserDto(
+    id: id,
+    email: email,
+    name: name,
+    avatarUrl: hasNullables ? null : 'https://example.com/avatar.png',
+    createdAt: createdAt,
+    updatedAt: hasNullables ? null : DateTime.now(),
+  ),
+);
 
 void main() {
   group('UserDto Serialization', () {

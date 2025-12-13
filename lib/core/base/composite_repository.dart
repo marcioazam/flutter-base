@@ -1,15 +1,14 @@
 import 'package:flutter_base_2025/core/cache/cache_datasource.dart';
-import 'package:flutter_base_2025/core/generics/base_repository.dart';
-import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/base/base_repository.dart';
+import 'package:flutter_base_2025/core/base/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 
 /// Composite repository that orchestrates cache, local, and remote sources.
 /// Strategy: Cache -> Local -> Remote with automatic cache population.
-/// 
+///
 /// **Feature: flutter-2025-state-of-art-review**
 /// **Validates: Requirements 1.5**
 class CompositeRepository<T, ID> implements BaseRepository<T, ID> {
-
   CompositeRepository({
     required this.remote,
     this.local,
@@ -41,7 +40,11 @@ class CompositeRepository<T, ID> implements BaseRepository<T, ID> {
       if (localResult.isSuccess) {
         // Populate cache
         if (cache != null && localResult.valueOrNull != null) {
-          await cache!.set(cacheKey, localResult.valueOrNull as T, ttl: cacheTtl);
+          await cache!.set(
+            cacheKey,
+            localResult.valueOrNull as T,
+            ttl: cacheTtl,
+          );
         }
         return localResult;
       }
@@ -49,15 +52,15 @@ class CompositeRepository<T, ID> implements BaseRepository<T, ID> {
 
     // 3. Fetch from remote
     final remoteResult = await remote.getById(id);
-    
+
     if (remoteResult.isSuccess && remoteResult.valueOrNull != null) {
       final value = remoteResult.valueOrNull as T;
-      
+
       // Populate cache
       if (cache != null) {
         await cache!.set(cacheKey, value, ttl: cacheTtl);
       }
-      
+
       // Persist to local
       if (local != null) {
         await local!.create(value);
@@ -112,7 +115,7 @@ class CompositeRepository<T, ID> implements BaseRepository<T, ID> {
 
     if (remoteResult.isSuccess && remoteResult.valueOrNull != null) {
       final created = remoteResult.valueOrNull as T;
-      
+
       // Sync to local
       if (local != null) {
         await local!.create(created);
@@ -129,12 +132,12 @@ class CompositeRepository<T, ID> implements BaseRepository<T, ID> {
 
     if (remoteResult.isSuccess && remoteResult.valueOrNull != null) {
       final updated = remoteResult.valueOrNull as T;
-      
+
       // Sync to local
       if (local != null) {
         await local!.update(updated);
       }
-      
+
       // Invalidate cache (will be repopulated on next read)
       // Note: We'd need ID extraction here for proper cache invalidation
     }
@@ -154,7 +157,7 @@ class CompositeRepository<T, ID> implements BaseRepository<T, ID> {
       if (local != null) {
         await local!.delete(id);
       }
-      
+
       // Invalidate cache
       if (cache != null) {
         await cache!.invalidate(cacheKey);
@@ -183,7 +186,7 @@ class CompositeRepository<T, ID> implements BaseRepository<T, ID> {
       if (local != null) {
         await local!.deleteMany(ids);
       }
-      
+
       if (cache != null) {
         for (final id in ids) {
           await cache!.invalidate(cacheKeyBuilder(id));
@@ -228,11 +231,11 @@ class CompositeRepository<T, ID> implements BaseRepository<T, ID> {
   Future<Result<int>> count({Filter<T>? filter}) async {
     // Prefer remote for accurate count
     final remoteResult = await remote.count(filter: filter);
-    
+
     if (remoteResult.isFailure && local != null) {
       return local!.count(filter: filter);
     }
-    
+
     return remoteResult;
   }
 
@@ -271,12 +274,12 @@ class CompositeRepository<T, ID> implements BaseRepository<T, ID> {
 
     if (remoteResult.isSuccess && remoteResult.valueOrNull != null) {
       final value = remoteResult.valueOrNull as T;
-      
+
       // Update cache
       if (cache != null) {
         await cache!.set(cacheKey, value, ttl: cacheTtl);
       }
-      
+
       // Update local
       if (local != null) {
         await local!.update(value);

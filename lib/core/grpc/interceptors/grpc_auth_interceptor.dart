@@ -65,9 +65,7 @@ class GrpcAuthInterceptor extends ClientInterceptor {
     }
 
     return options.mergedWith(
-      CallOptions(
-        metadata: {_authorizationKey: '$_bearerPrefix$token'},
-      ),
+      CallOptions(metadata: {_authorizationKey: '$_bearerPrefix$token'}),
     );
   }
 

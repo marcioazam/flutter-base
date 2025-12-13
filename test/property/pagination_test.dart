@@ -1,6 +1,7 @@
-import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/base/paginated_list.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -20,23 +21,20 @@ void main() {
         (page, pageSize, totalItems) => (page, pageSize, totalItems),
       ),
       _explore,
-    ).test(
-      'hasMore is true iff page < totalPages',
-      (params) {
-        final (page, pageSize, totalItems) = params;
-        final totalPages = pageSize > 0 ? (totalItems / pageSize).ceil() : 0;
+    ).test('hasMore is true iff page < totalPages', (params) {
+      final (page, pageSize, totalItems) = params;
+      final totalPages = pageSize > 0 ? (totalItems / pageSize).ceil() : 0;
 
-        final list = PaginatedList.fromItems(
-          List.generate(pageSize.clamp(0, totalItems), (i) => i),
-          page: page.clamp(1, totalPages.clamp(1, 100)),
-          pageSize: pageSize,
-          totalItems: totalItems,
-        );
+      final list = PaginatedList.fromItems(
+        List.generate(pageSize.clamp(0, totalItems), (i) => i),
+        page: page.clamp(1, totalPages.clamp(1, 100)),
+        pageSize: pageSize,
+        totalItems: totalItems,
+      );
 
-        final expectedHasMore = list.page < list.totalPages;
-        expect(list.hasMore, equals(expectedHasMore));
-      },
-    );
+      final expectedHasMore = list.page < list.totalPages;
+      expect(list.hasMore, equals(expectedHasMore));
+    });
 
     test('hasMore is false when on last page', () {
       final list = PaginatedList.fromItems(

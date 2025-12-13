@@ -12,9 +12,7 @@ class SettingsPage extends ConsumerWidget {
     final locale = ref.watch(localeProvider);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
           ListTile(
@@ -44,18 +42,22 @@ class SettingsPage extends ConsumerWidget {
   }
 
   String _themeModeLabel(ThemeMode mode) => switch (mode) {
-      ThemeMode.system => 'System',
-      ThemeMode.light => 'Light',
-      ThemeMode.dark => 'Dark',
-    };
+    ThemeMode.system => 'System',
+    ThemeMode.light => 'Light',
+    ThemeMode.dark => 'Dark',
+  };
 
   String _localeLabel(Locale locale) => switch (locale.languageCode) {
-      'en' => 'English',
-      'pt' => 'Português',
-      _ => locale.languageCode,
-    };
+    'en' => 'English',
+    'pt' => 'Português',
+    _ => locale.languageCode,
+  };
 
-  void _showThemeDialog(BuildContext context, WidgetRef ref, ThemeMode current) {
+  void _showThemeDialog(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeMode current,
+  ) {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
@@ -84,11 +86,12 @@ class SettingsPage extends ConsumerWidget {
     );
   }
 
-  void _showLanguageDialog(BuildContext context, WidgetRef ref, Locale current) {
-    final locales = [
-      const Locale('en'),
-      const Locale('pt'),
-    ];
+  void _showLanguageDialog(
+    BuildContext context,
+    WidgetRef ref,
+    Locale current,
+  ) {
+    final locales = [const Locale('en'), const Locale('pt')];
 
     showDialog<void>(
       context: context,

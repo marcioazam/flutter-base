@@ -4,7 +4,7 @@ import 'package:flutter_base_2025/core/theme/app_colors.dart';
 import 'package:flutter_base_2025/core/theme/app_typography.dart';
 
 /// App theme configuration with Material 3.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 32.1, 32.2, 32.4, 32.5**
 abstract final class AppTheme {
@@ -54,8 +54,11 @@ abstract final class AppTheme {
             brightness: brightness,
           );
 
-    return _buildThemeWithScheme(colorScheme, brightness,
-        highContrast: highContrast);
+    return _buildThemeWithScheme(
+      colorScheme,
+      brightness,
+      highContrast: highContrast,
+    );
   }
 
   static ColorScheme _buildHighContrastScheme(Brightness brightness) {
@@ -104,9 +107,7 @@ abstract final class AppTheme {
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
-          side: BorderSide(
-            color: colorScheme.outlineVariant,
-          ),
+          side: BorderSide(color: colorScheme.outlineVariant),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(
@@ -167,14 +168,10 @@ abstract final class AppTheme {
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
       dialogTheme: DialogThemeData(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
       bottomSheetTheme: const BottomSheetThemeData(
         showDragHandle: true,
@@ -196,13 +193,14 @@ abstract final class AppTheme {
 }
 
 /// Animated theme wrapper for smooth transitions.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 32.4**
 class AnimatedAppTheme extends StatelessWidget {
-
   const AnimatedAppTheme({
-    required this.theme, required this.child, super.key,
+    required this.theme,
+    required this.child,
+    super.key,
     this.duration = const Duration(milliseconds: 300),
     this.curve = Curves.easeInOut,
   });
@@ -213,19 +211,21 @@ class AnimatedAppTheme extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedTheme(
-      data: theme,
-      duration: duration,
-      curve: curve,
-      child: child,
-    );
+    data: theme,
+    duration: duration,
+    curve: curve,
+    child: child,
+  );
 }
 
 /// Custom theme extension for additional colors.
 class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
-
   AppThemeExtension({
     required this.isDark,
-    required this.success, required this.warning, required this.info, this.isHighContrast = false,
+    required this.success,
+    required this.warning,
+    required this.info,
+    this.isHighContrast = false,
   });
   final bool isDark;
   final bool isHighContrast;
@@ -241,12 +241,12 @@ class AppThemeExtension extends ThemeExtension<AppThemeExtension> {
     Color? warning,
     Color? info,
   }) => AppThemeExtension(
-      isDark: isDark ?? this.isDark,
-      isHighContrast: isHighContrast ?? this.isHighContrast,
-      success: success ?? this.success,
-      warning: warning ?? this.warning,
-      info: info ?? this.info,
-    );
+    isDark: isDark ?? this.isDark,
+    isHighContrast: isHighContrast ?? this.isHighContrast,
+    success: success ?? this.success,
+    warning: warning ?? this.warning,
+    info: info ?? this.info,
+  );
 
   @override
   ThemeExtension<AppThemeExtension> lerp(

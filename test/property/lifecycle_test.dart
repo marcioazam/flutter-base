@@ -43,9 +43,7 @@ void main() {
       test('isDataStale returns false when no background time', () {
         // Cannot test directly without mocking WidgetsBinding
         // This tests the config logic
-        const config = AppLifecycleConfig(
-          
-        );
+        const config = AppLifecycleConfig();
 
         expect(config.staleDataThreshold.inMinutes, equals(5));
       });

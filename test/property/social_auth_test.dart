@@ -65,10 +65,7 @@ void main() {
     });
 
     test('signOut completes without error', () async {
-      await expectLater(
-        service.signOut(),
-        completes,
-      );
+      await expectLater(service.signOut(), completes);
     });
 
     test('isSignedIn returns boolean for each provider', () async {

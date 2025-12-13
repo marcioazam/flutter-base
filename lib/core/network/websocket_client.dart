@@ -22,7 +22,9 @@ class ReconnectStrategy {
 
   /// Calculates delay for attempt n (0-indexed).
   Duration getDelay(int attempt) {
-    final multiplier = backoffMultiplier == 1.0 ? 1 : (1 << attempt).clamp(1, 1000);
+    final multiplier = backoffMultiplier == 1.0
+        ? 1
+        : (1 << attempt).clamp(1, 1000);
     final delayMs = initialDelay.inMilliseconds * multiplier;
     return Duration(
       milliseconds: delayMs.clamp(
@@ -36,7 +38,6 @@ class ReconnectStrategy {
 /// Generic WebSocket client with auto-reconnect.
 /// T = Message type
 class WebSocketClient<T> {
-
   WebSocketClient({
     required this.url,
     required this.fromJson,
@@ -201,7 +202,8 @@ class WebSocketClient<T> {
     });
   }
 
-  Duration _calculateBackoff() => _reconnectStrategy.getDelay(_reconnectAttempts);
+  Duration _calculateBackoff() =>
+      _reconnectStrategy.getDelay(_reconnectAttempts);
 
   /// Sets a new reconnect strategy.
   void setReconnectStrategy(ReconnectStrategy strategy) {
@@ -246,8 +248,5 @@ class StringWebSocketClient extends WebSocketClient<String> {
     required super.url,
     super.reconnectDelay,
     super.maxReconnectAttempts,
-  }) : super(
-          fromJson: jsonEncode,
-          toJson: (message) => {'message': message},
-        );
+  }) : super(fromJson: jsonEncode, toJson: (message) => {'message': message});
 }

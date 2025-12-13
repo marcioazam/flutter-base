@@ -201,10 +201,7 @@ sealed class AuthorizationState {
 /// Authorization data loaded and available.
 @immutable
 final class AuthorizationLoaded extends AuthorizationState {
-  const AuthorizationLoaded({
-    required this.roles,
-    required this.permissions,
-  });
+  const AuthorizationLoaded({required this.roles, required this.permissions});
 
   final List<UserRole> roles;
   final List<Permission> permissions;
@@ -256,12 +253,12 @@ extension AuthorizationStateExtension on AuthorizationState {
   bool get hasError => this is AuthorizationError;
 
   List<UserRole>? get roles => switch (this) {
-        AuthorizationLoaded(roles: final r) => r,
-        _ => null,
-      };
+    AuthorizationLoaded(roles: final r) => r,
+    _ => null,
+  };
 
   List<Permission>? get permissions => switch (this) {
-        AuthorizationLoaded(permissions: final p) => p,
-        _ => null,
-      };
+    AuthorizationLoaded(permissions: final p) => p,
+    _ => null,
+  };
 }

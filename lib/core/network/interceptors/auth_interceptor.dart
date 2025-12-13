@@ -6,7 +6,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Interceptor for handling authentication tokens.
 /// Automatically adds auth header and handles token refresh on 401.
 class AuthInterceptor extends QueuedInterceptor {
-
   AuthInterceptor(this._ref);
   final Ref _ref;
   bool _isRefreshing = false;
@@ -31,7 +30,10 @@ class AuthInterceptor extends QueuedInterceptor {
   }
 
   @override
-  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     if (err.response?.statusCode == 401 && !_isRefreshing) {
       _isRefreshing = true;
       final refreshed = await _refreshToken();
@@ -93,10 +95,7 @@ class AuthInterceptor extends QueuedInterceptor {
       queryParameters: requestOptions.queryParameters,
       options: Options(
         method: requestOptions.method,
-        headers: {
-          ...requestOptions.headers,
-          'Authorization': 'Bearer $token',
-        },
+        headers: {...requestOptions.headers, 'Authorization': 'Bearer $token'},
       ),
     );
   }

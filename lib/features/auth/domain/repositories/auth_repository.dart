@@ -34,10 +34,7 @@ abstract interface class AuthRepository {
 }
 
 /// OAuth provider types.
-enum OAuthProvider {
-  google,
-  apple,
-}
+enum OAuthProvider { google, apple }
 
 /// Authentication state.
 sealed class AuthState {
@@ -67,7 +64,7 @@ extension AuthStateExtension on AuthState {
   bool get isAuthenticated => this is AuthStateAuthenticated;
   bool get isLoading => this is AuthStateLoading;
   User? get user => switch (this) {
-        AuthStateAuthenticated(user: final u) => u,
-        _ => null,
-      };
+    AuthStateAuthenticated(user: final u) => u,
+    _ => null,
+  };
 }

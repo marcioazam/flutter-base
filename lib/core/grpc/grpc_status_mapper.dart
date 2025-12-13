@@ -29,10 +29,10 @@ class GrpcStatusMapper {
 
   /// Convert GrpcError to appropriate AppFailure
   static AppFailure mapGrpcError(GrpcError error) => fromStatusCode(
-        error.code,
-        error.message ?? 'Unknown gRPC error',
-        details: error.details,
-      );
+    error.code,
+    error.message ?? 'Unknown gRPC error',
+    details: error.details,
+  );
 
   /// Convert status code to failure type
   ///
@@ -48,147 +48,147 @@ class GrpcStatusMapper {
     return switch (code) {
       // Success - should not be called, but handle gracefully
       StatusCode.ok => UnexpectedFailure(
-          'Unexpected OK status treated as error: $message',
-          code: 'GRPC_OK',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Unexpected OK status treated as error: $message',
+        code: 'GRPC_OK',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Cancelled
       StatusCode.cancelled => NetworkFailure(
-          'Request cancelled: $message',
-          code: 'GRPC_CANCELLED',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Request cancelled: $message',
+        code: 'GRPC_CANCELLED',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Unknown
       StatusCode.unknown => UnexpectedFailure(
-          'Unknown error: $message',
-          code: 'GRPC_UNKNOWN',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Unknown error: $message',
+        code: 'GRPC_UNKNOWN',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Invalid argument
       StatusCode.invalidArgument => ValidationFailure(
-          'Invalid argument: $message',
-          code: 'GRPC_INVALID_ARGUMENT',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Invalid argument: $message',
+        code: 'GRPC_INVALID_ARGUMENT',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Deadline exceeded (timeout)
       StatusCode.deadlineExceeded => TimeoutFailure(
-          'Request timeout: $message',
-          code: 'GRPC_DEADLINE_EXCEEDED',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Request timeout: $message',
+        code: 'GRPC_DEADLINE_EXCEEDED',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Not found
       StatusCode.notFound => NotFoundFailure(
-          'Resource not found: $message',
-          code: 'GRPC_NOT_FOUND',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Resource not found: $message',
+        code: 'GRPC_NOT_FOUND',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Already exists
       StatusCode.alreadyExists => ConflictFailure(
-          'Resource already exists: $message',
-          code: 'GRPC_ALREADY_EXISTS',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Resource already exists: $message',
+        code: 'GRPC_ALREADY_EXISTS',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Permission denied
       StatusCode.permissionDenied => ForbiddenFailure(
-          'Permission denied: $message',
-          code: 'GRPC_PERMISSION_DENIED',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Permission denied: $message',
+        code: 'GRPC_PERMISSION_DENIED',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Resource exhausted (rate limit)
       StatusCode.resourceExhausted => RateLimitFailure(
-          'Rate limit exceeded: $message',
-          code: 'GRPC_RESOURCE_EXHAUSTED',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Rate limit exceeded: $message',
+        code: 'GRPC_RESOURCE_EXHAUSTED',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Failed precondition
       StatusCode.failedPrecondition => ValidationFailure(
-          'Precondition failed: $message',
-          code: 'GRPC_FAILED_PRECONDITION',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Precondition failed: $message',
+        code: 'GRPC_FAILED_PRECONDITION',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Aborted
       StatusCode.aborted => ConflictFailure(
-          'Operation aborted: $message',
-          code: 'GRPC_ABORTED',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Operation aborted: $message',
+        code: 'GRPC_ABORTED',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Out of range
       StatusCode.outOfRange => ValidationFailure(
-          'Out of range: $message',
-          code: 'GRPC_OUT_OF_RANGE',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Out of range: $message',
+        code: 'GRPC_OUT_OF_RANGE',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Unimplemented
       StatusCode.unimplemented => ServerFailure(
-          'Not implemented: $message',
-          code: 'GRPC_UNIMPLEMENTED',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Not implemented: $message',
+        code: 'GRPC_UNIMPLEMENTED',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Internal error
       StatusCode.internal => ServerFailure(
-          'Internal server error: $message',
-          code: 'GRPC_INTERNAL',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Internal server error: $message',
+        code: 'GRPC_INTERNAL',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Unavailable
       StatusCode.unavailable => NetworkFailure(
-          'Service unavailable: $message',
-          code: 'GRPC_UNAVAILABLE',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Service unavailable: $message',
+        code: 'GRPC_UNAVAILABLE',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Data loss
       StatusCode.dataLoss => ServerFailure(
-          'Data loss: $message',
-          code: 'GRPC_DATA_LOSS',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Data loss: $message',
+        code: 'GRPC_DATA_LOSS',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Unauthenticated
       StatusCode.unauthenticated => UnauthorizedFailure(
-          'Not authenticated: $message',
-          code: 'GRPC_UNAUTHENTICATED',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Not authenticated: $message',
+        code: 'GRPC_UNAUTHENTICATED',
+        stackTrace: stackTrace,
+        context: context,
+      ),
 
       // Default for unknown codes
       _ => UnexpectedFailure(
-          'Unknown gRPC status code $code: $message',
-          code: 'GRPC_UNKNOWN_CODE',
-          stackTrace: stackTrace,
-          context: context,
-        ),
+        'Unknown gRPC status code $code: $message',
+        code: 'GRPC_UNKNOWN_CODE',
+        stackTrace: stackTrace,
+        context: context,
+      ),
     };
   }
 

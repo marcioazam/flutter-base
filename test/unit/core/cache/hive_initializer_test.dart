@@ -94,8 +94,14 @@ void main() {
 
       expect(restored.data, original.data);
       expect(restored.key, original.key);
-      expect(restored.cachedAt.toIso8601String(), original.cachedAt.toIso8601String());
-      expect(restored.expiresAt.toIso8601String(), original.expiresAt.toIso8601String());
+      expect(
+        restored.cachedAt.toIso8601String(),
+        original.cachedAt.toIso8601String(),
+      );
+      expect(
+        restored.expiresAt.toIso8601String(),
+        original.expiresAt.toIso8601String(),
+      );
     });
 
     test('toString returns readable representation', () {

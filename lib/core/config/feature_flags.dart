@@ -1,11 +1,10 @@
 import 'package:flutter_base_2025/core/observability/app_logger.dart';
 
 /// User context for feature flag segmentation.
-/// 
+///
 /// **Feature: flutter-state-of-art-2025**
 /// **Validates: Requirements 21.5**
 class UserSegment {
-
   const UserSegment({
     this.userId,
     this.deviceType,
@@ -20,17 +19,16 @@ class UserSegment {
   final Map<String, dynamic> customAttributes;
 
   Map<String, dynamic> toMap() => {
-        if (userId != null) 'userId': userId,
-        if (deviceType != null) 'deviceType': deviceType,
-        if (appVersion != null) 'appVersion': appVersion,
-        if (platform != null) 'platform': platform,
-        ...customAttributes,
-      };
+    if (userId != null) 'userId': userId,
+    if (deviceType != null) 'deviceType': deviceType,
+    if (appVersion != null) 'appVersion': appVersion,
+    if (platform != null) 'platform': platform,
+    ...customAttributes,
+  };
 }
 
 /// Rule for targeting specific user segments.
 class TargetingRule {
-
   const TargetingRule({
     required this.attribute,
     required this.operator,
@@ -68,9 +66,11 @@ class TargetingRule {
         if (ruleValue is List) return !ruleValue.contains(contextValue);
         return true;
       case TargetingOperator.versionGreaterThan:
-        return _compareVersions(contextValue.toString(), ruleValue.toString()) > 0;
+        return _compareVersions(contextValue.toString(), ruleValue.toString()) >
+            0;
       case TargetingOperator.versionLessThan:
-        return _compareVersions(contextValue.toString(), ruleValue.toString()) < 0;
+        return _compareVersions(contextValue.toString(), ruleValue.toString()) <
+            0;
     }
   }
 
@@ -83,8 +83,9 @@ class TargetingRule {
   int _compareVersions(String a, String b) {
     final partsA = a.split('.').map((e) => int.tryParse(e) ?? 0).toList();
     final partsB = b.split('.').map((e) => int.tryParse(e) ?? 0).toList();
-    final maxLength =
-        partsA.length > partsB.length ? partsA.length : partsB.length;
+    final maxLength = partsA.length > partsB.length
+        ? partsA.length
+        : partsB.length;
 
     for (var i = 0; i < maxLength; i++) {
       final partA = i < partsA.length ? partsA[i] : 0;
@@ -111,7 +112,6 @@ enum TargetingOperator {
 
 /// Feature flag configuration with targeting rules.
 class FeatureFlagConfig {
-
   const FeatureFlagConfig({
     required this.name,
     required this.defaultValue,
@@ -182,17 +182,22 @@ class LocalFeatureFlags implements FeatureFlags {
 
   @override
   Future<void> fetch() async {
-    AppLogger.instance.debug('FeatureFlags: fetch called (no-op in local mode)');
+    AppLogger.instance.debug(
+      'FeatureFlags: fetch called (no-op in local mode)',
+    );
   }
 
   @override
   void setUserSegment(UserSegment segment) {
     _currentSegment = segment;
-    AppLogger.instance.debug('FeatureFlags: segment updated - ${segment.toMap()}');
+    AppLogger.instance.debug(
+      'FeatureFlags: segment updated - ${segment.toMap()}',
+    );
   }
 
   @override
-  bool isEnabled(String flagName) => isEnabledForSegment(flagName, _currentSegment);
+  bool isEnabled(String flagName) =>
+      isEnabledForSegment(flagName, _currentSegment);
 
   @override
   bool isEnabledForSegment(String flagName, UserSegment segment) {
@@ -208,11 +213,15 @@ class LocalFeatureFlags implements FeatureFlags {
   }
 
   @override
-  T getValue<T>(String flagName, T defaultValue) => getValueForSegment(flagName, defaultValue, _currentSegment);
+  T getValue<T>(String flagName, T defaultValue) =>
+      getValueForSegment(flagName, defaultValue, _currentSegment);
 
   @override
   T getValueForSegment<T>(
-      String flagName, T defaultValue, UserSegment segment) {
+    String flagName,
+    T defaultValue,
+    UserSegment segment,
+  ) {
     final config = _configs[flagName];
     if (config != null) {
       final value = config.evaluate(segment.toMap());

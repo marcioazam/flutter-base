@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Widget that shows connectivity status indicator.
 class ConnectivityIndicator extends ConsumerWidget {
-
   const ConnectivityIndicator({required this.child, super.key});
   final Widget child;
 
@@ -42,7 +41,6 @@ class ConnectivityIndicator extends ConsumerWidget {
 
 /// Snackbar-based connectivity indicator.
 class ConnectivitySnackbar extends ConsumerStatefulWidget {
-
   const ConnectivitySnackbar({required this.child, super.key});
   final Widget child;
 
@@ -72,10 +70,7 @@ class _ConnectivitySnackbarState extends ConsumerState<ConnectivitySnackbar> {
       SnackBar(
         content: Row(
           children: [
-            Icon(
-              isOnline ? Icons.wifi : Icons.wifi_off,
-              color: Colors.white,
-            ),
+            Icon(isOnline ? Icons.wifi : Icons.wifi_off, color: Colors.white),
             const SizedBox(width: 8),
             Text(isOnline ? 'Back online' : 'No internet connection'),
           ],

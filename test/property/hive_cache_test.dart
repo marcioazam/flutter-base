@@ -2,7 +2,8 @@ import 'package:flutter_base_2025/core/cache/hive_cache_config.dart';
 import 'package:flutter_base_2025/core/cache/hive_cache_datasource.dart';
 import 'package:flutter_base_2025/core/cache/hive_cache_entry.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:meta/meta.dart';
 
@@ -12,12 +13,11 @@ final _explore = ExploreConfig();
 // Simple test entity
 @immutable
 class TestEntity {
-
   factory TestEntity.fromJson(Map<String, dynamic> json) => TestEntity(
-        id: json['id'] as String,
-        name: json['name'] as String,
-        value: json['value'] as int,
-      );
+    id: json['id'] as String,
+    name: json['name'] as String,
+    value: json['value'] as int,
+  );
   const TestEntity({required this.id, required this.name, required this.value});
 
   final String id;
@@ -53,7 +53,9 @@ void main() {
   });
 
   setUp(() async {
-    box = await Hive.openBox<Map<dynamic, dynamic>>('test_cache_${DateTime.now().millisecondsSinceEpoch}');
+    box = await Hive.openBox<Map<dynamic, dynamic>>(
+      'test_cache_${DateTime.now().millisecondsSinceEpoch}',
+    );
     dataSource = HiveCacheDataSource<TestEntity>(
       box: box,
       fromJson: TestEntity.fromJson,
@@ -71,23 +73,25 @@ void main() {
 
   group('HiveCacheEntry Property Tests', () {
     // **Feature: architecture-alignment-2025, Property 7: Hive Entity Storage Round-Trip**
-    Glados3<String, String, int>(any.nonEmptyLetters, any.nonEmptyLetters, any.int, _explore).test(
-      'HiveCacheEntry JSON round-trip preserves data',
-      (id, name, value) {
-        final entity = TestEntity(id: id, name: name, value: value);
-        final entry = HiveCacheEntry.withTtl(
-          data: entity,
-          ttl: const Duration(hours: 1),
-          key: id,
-        );
+    Glados3<String, String, int>(
+      any.nonEmptyLetters,
+      any.nonEmptyLetters,
+      any.int,
+      _explore,
+    ).test('HiveCacheEntry JSON round-trip preserves data', (id, name, value) {
+      final entity = TestEntity(id: id, name: name, value: value);
+      final entry = HiveCacheEntry.withTtl(
+        data: entity,
+        ttl: const Duration(hours: 1),
+        key: id,
+      );
 
-        final json = entry.toJson((e) => e.toJson());
-        final restored = HiveCacheEntry.fromJson(json, TestEntity.fromJson);
+      final json = entry.toJson((e) => e.toJson());
+      final restored = HiveCacheEntry.fromJson(json, TestEntity.fromJson);
 
-        expect(restored.data, entity);
-        expect(restored.key, entry.key);
-      },
-    );
+      expect(restored.data, entity);
+      expect(restored.key, entry.key);
+    });
 
     // **Feature: architecture-alignment-2025, Property 6: Cache TTL Expiration**
     test('isExpired returns true after TTL', () async {
@@ -114,18 +118,20 @@ void main() {
 
   group('HiveCacheDataSource Property Tests', () {
     // **Feature: architecture-alignment-2025, Property 7: Hive Entity Storage Round-Trip**
-    Glados3<String, String, int>(any.nonEmptyLetters, any.nonEmptyLetters, any.int, _explore).test(
-      'put then get returns equivalent entity',
-      (id, name, value) async {
-        final entity = TestEntity(id: id, name: name, value: value);
-        final key = 'test_$id';
+    Glados3<String, String, int>(
+      any.nonEmptyLetters,
+      any.nonEmptyLetters,
+      any.int,
+      _explore,
+    ).test('put then get returns equivalent entity', (id, name, value) async {
+      final entity = TestEntity(id: id, name: name, value: value);
+      final key = 'test_$id';
 
-        await dataSource.put(key, entity);
-        final retrieved = await dataSource.getData(key);
+      await dataSource.put(key, entity);
+      final retrieved = await dataSource.getData(key);
 
-        expect(retrieved, entity);
-      },
-    );
+      expect(retrieved, entity);
+    });
 
     // **Feature: architecture-alignment-2025, Property 6: Cache TTL Expiration**
     test('expired entries are not returned by default', () async {
@@ -159,7 +165,10 @@ void main() {
       await shortTtlDataSource.put('key', entity);
       await Future<void>.delayed(const Duration(milliseconds: 10));
 
-      final retrieved = await shortTtlDataSource.getData('key', allowStale: true);
+      final retrieved = await shortTtlDataSource.getData(
+        'key',
+        allowStale: true,
+      );
       expect(retrieved, entity);
     });
   });
@@ -200,7 +209,10 @@ void main() {
         config: const HiveCacheConfig(defaultTtl: Duration(milliseconds: 1)),
       );
 
-      await shortTtlDataSource.put('key1', TestEntity(id: '1', name: 'a', value: 1));
+      await shortTtlDataSource.put(
+        'key1',
+        TestEntity(id: '1', name: 'a', value: 1),
+      );
       await Future<void>.delayed(const Duration(milliseconds: 10));
 
       final removed = await shortTtlDataSource.removeExpired();

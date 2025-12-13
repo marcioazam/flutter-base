@@ -9,7 +9,6 @@ enum Flavor { development, staging, production }
 
 /// Configuration validation errors.
 class ConfigValidationError implements Exception {
-
   ConfigValidationError(this.message, {this.missingKeys = const []});
   final String message;
   final List<String> missingKeys;
@@ -20,7 +19,6 @@ class ConfigValidationError implements Exception {
 
 /// Application configuration based on flavor/environment.
 class AppConfig {
-
   AppConfig._({
     required this.flavor,
     required this.apiBaseUrl,
@@ -42,7 +40,7 @@ class AppConfig {
   final bool showDebugBanner;
   final bool enableAnalytics;
   final bool enableCrashReporting;
-  
+
   // gRPC Configuration
   final String grpcHost;
   final int grpcPort;
@@ -72,34 +70,50 @@ class AppConfig {
         return true;
       }(), 'AppConfig: Using defaults, env file not loaded');
     }
-    
+
     _instance = AppConfig._(
       flavor: flavor,
-      apiBaseUrl: envLoaded ? (dotenv.env['API_BASE_URL'] ?? _defaultApiUrl(flavor)) : _defaultApiUrl(flavor),
-      appName: envLoaded ? (dotenv.env['APP_NAME'] ?? _defaultAppName(flavor)) : _defaultAppName(flavor),
+      apiBaseUrl: envLoaded
+          ? (dotenv.env['API_BASE_URL'] ?? _defaultApiUrl(flavor))
+          : _defaultApiUrl(flavor),
+      appName: envLoaded
+          ? (dotenv.env['APP_NAME'] ?? _defaultAppName(flavor))
+          : _defaultAppName(flavor),
       enableLogging: flavor != Flavor.production,
       showDebugBanner: flavor != Flavor.production,
-      enableAnalytics: envLoaded 
-          ? _parseBool(dotenv.env['ENABLE_ANALYTICS'], defaultValue: flavor != Flavor.development)
+      enableAnalytics: envLoaded
+          ? _parseBool(
+              dotenv.env['ENABLE_ANALYTICS'],
+              defaultValue: flavor != Flavor.development,
+            )
           : flavor != Flavor.development,
-      enableCrashReporting: envLoaded 
-          ? _parseBool(dotenv.env['ENABLE_CRASH_REPORTING'], defaultValue: flavor != Flavor.development)
+      enableCrashReporting: envLoaded
+          ? _parseBool(
+              dotenv.env['ENABLE_CRASH_REPORTING'],
+              defaultValue: flavor != Flavor.development,
+            )
           : flavor != Flavor.development,
       // gRPC Configuration
-      grpcHost: envLoaded 
-          ? (dotenv.env['GRPC_HOST'] ?? _defaultGrpcHost(flavor)) 
+      grpcHost: envLoaded
+          ? (dotenv.env['GRPC_HOST'] ?? _defaultGrpcHost(flavor))
           : _defaultGrpcHost(flavor),
-      grpcPort: envLoaded 
-          ? _parseInt(dotenv.env['GRPC_PORT'], defaultValue: _defaultGrpcPort(flavor)) 
+      grpcPort: envLoaded
+          ? _parseInt(
+              dotenv.env['GRPC_PORT'],
+              defaultValue: _defaultGrpcPort(flavor),
+            )
           : _defaultGrpcPort(flavor),
-      grpcUseTls: envLoaded 
-          ? _parseBool(dotenv.env['GRPC_USE_TLS'], defaultValue: flavor == Flavor.production) 
+      grpcUseTls: envLoaded
+          ? _parseBool(
+              dotenv.env['GRPC_USE_TLS'],
+              defaultValue: flavor == Flavor.production,
+            )
           : flavor == Flavor.production,
-      grpcTimeoutSeconds: envLoaded 
-          ? _parseInt(dotenv.env['GRPC_TIMEOUT_SECONDS'], defaultValue: 30) 
+      grpcTimeoutSeconds: envLoaded
+          ? _parseInt(dotenv.env['GRPC_TIMEOUT_SECONDS'], defaultValue: 30)
           : 30,
-      grpcMaxRetries: envLoaded 
-          ? _parseInt(dotenv.env['GRPC_MAX_RETRIES'], defaultValue: 3) 
+      grpcMaxRetries: envLoaded
+          ? _parseInt(dotenv.env['GRPC_MAX_RETRIES'], defaultValue: 3)
           : 3,
     );
   }
@@ -107,20 +121,20 @@ class AppConfig {
   /// Validates environment configuration on startup.
   static void _validateEnvironment() {
     final missingKeys = <String>[];
-    
+
     for (final key in _requiredKeys) {
       if (dotenv.env[key] == null || dotenv.env[key]!.isEmpty) {
         missingKeys.add(key);
       }
     }
-    
+
     if (missingKeys.isNotEmpty) {
       throw ConfigValidationError(
         'Missing required environment variables: ${missingKeys.join(", ")}',
         missingKeys: missingKeys,
       );
     }
-    
+
     // Validate API URL format
     final apiUrl = dotenv.env['API_BASE_URL'];
     if (apiUrl != null && !_isValidUrl(apiUrl)) {
@@ -148,34 +162,34 @@ class AppConfig {
   }
 
   static String _envFileName(Flavor flavor) => switch (flavor) {
-        Flavor.development => '.env.development',
-        Flavor.staging => '.env.staging',
-        Flavor.production => '.env.production',
-      };
+    Flavor.development => '.env.development',
+    Flavor.staging => '.env.staging',
+    Flavor.production => '.env.production',
+  };
 
   static String _defaultApiUrl(Flavor flavor) => switch (flavor) {
-        Flavor.development => 'http://localhost:8000/api/v1',
-        Flavor.staging => 'https://staging-api.example.com/api/v1',
-        Flavor.production => 'https://api.example.com/api/v1',
-      };
+    Flavor.development => 'http://localhost:8000/api/v1',
+    Flavor.staging => 'https://staging-api.example.com/api/v1',
+    Flavor.production => 'https://api.example.com/api/v1',
+  };
 
   static String _defaultAppName(Flavor flavor) => switch (flavor) {
-        Flavor.development => 'App Dev',
-        Flavor.staging => 'App Staging',
-        Flavor.production => 'App',
-      };
+    Flavor.development => 'App Dev',
+    Flavor.staging => 'App Staging',
+    Flavor.production => 'App',
+  };
 
   static String _defaultGrpcHost(Flavor flavor) => switch (flavor) {
-        Flavor.development => 'localhost',
-        Flavor.staging => 'grpc-staging.example.com',
-        Flavor.production => 'grpc.example.com',
-      };
+    Flavor.development => 'localhost',
+    Flavor.staging => 'grpc-staging.example.com',
+    Flavor.production => 'grpc.example.com',
+  };
 
   static int _defaultGrpcPort(Flavor flavor) => switch (flavor) {
-        Flavor.development => 50051,
-        Flavor.staging => 443,
-        Flavor.production => 443,
-      };
+    Flavor.development => 50051,
+    Flavor.staging => 443,
+    Flavor.production => 443,
+  };
 
   bool get isDevelopment => flavor == Flavor.development;
   bool get isStaging => flavor == Flavor.staging;

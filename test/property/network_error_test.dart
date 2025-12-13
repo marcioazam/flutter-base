@@ -150,8 +150,14 @@ void main() {
         final failure = ExceptionMapper.mapException(exception);
         expect(failure, isA<ValidationFailure>());
         final validationFailure = failure as ValidationFailure;
-        expect(validationFailure.fieldErrors['email'], contains('Invalid email'));
-        expect(validationFailure.fieldErrors['password'], contains('Too short'));
+        expect(
+          validationFailure.fieldErrors['email'],
+          contains('Invalid email'),
+        );
+        expect(
+          validationFailure.fieldErrors['password'],
+          contains('Too short'),
+        );
       });
     });
 

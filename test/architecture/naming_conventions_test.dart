@@ -20,13 +20,11 @@ void main() {
         }
 
         // File name must be snake_case (lowercase with underscores)
-        final isSnakeCase = RegExp(r'^[a-z][a-z0-9_]*\.dart$').hasMatch(filename);
+        final isSnakeCase = RegExp(
+          r'^[a-z][a-z0-9_]*\.dart$',
+        ).hasMatch(filename);
 
-        expect(
-          isSnakeCase,
-          isTrue,
-          reason: 'File $file is not in snake_case',
-        );
+        expect(isSnakeCase, isTrue, reason: 'File $file is not in snake_case');
       }
     });
 
@@ -77,7 +75,8 @@ void main() {
         final filename = file.split('/').last;
 
         // Ignore generated files
-        if (filename.endsWith('.g.dart') || filename.endsWith('.freezed.dart')) {
+        if (filename.endsWith('.g.dart') ||
+            filename.endsWith('.freezed.dart')) {
           continue;
         }
 

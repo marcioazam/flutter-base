@@ -1,6 +1,5 @@
 /// Paginated list for domain layer.
 class PaginatedList<T> {
-
   const PaginatedList({
     required this.items,
     required this.page,
@@ -12,13 +11,13 @@ class PaginatedList<T> {
 
   /// Creates empty paginated list.
   factory PaginatedList.empty() => const PaginatedList(
-        items: [],
-        page: 1,
-        pageSize: 20,
-        totalItems: 0,
-        totalPages: 0,
-        hasMore: false,
-      );
+    items: [],
+    page: 1,
+    pageSize: 20,
+    totalItems: 0,
+    totalPages: 0,
+    hasMore: false,
+  );
 
   /// Creates from items with calculated pagination.
   factory PaginatedList.fromItems(
@@ -61,36 +60,37 @@ class PaginatedList<T> {
 
   /// Maps items to another type.
   PaginatedList<R> map<R>(R Function(T) mapper) => PaginatedList(
-        items: items.map(mapper).toList(),
-        page: page,
-        pageSize: pageSize,
-        totalItems: totalItems,
-        totalPages: totalPages,
-        hasMore: hasMore,
-      );
+    items: items.map(mapper).toList(),
+    page: page,
+    pageSize: pageSize,
+    totalItems: totalItems,
+    totalPages: totalPages,
+    hasMore: hasMore,
+  );
 
   /// Concatenates with another paginated list (for infinite scroll).
   PaginatedList<T> concat(PaginatedList<T> other) => PaginatedList(
-      items: [...items, ...other.items],
-      page: other.page,
-      pageSize: pageSize,
-      totalItems: other.totalItems,
-      totalPages: other.totalPages,
-      hasMore: other.hasMore,
-    );
+    items: [...items, ...other.items],
+    page: other.page,
+    pageSize: pageSize,
+    totalItems: other.totalItems,
+    totalPages: other.totalPages,
+    hasMore: other.hasMore,
+  );
 
   /// Filters items while preserving pagination metadata.
   PaginatedList<T> where(bool Function(T) test) => PaginatedList(
-        items: items.where(test).toList(),
-        page: page,
-        pageSize: pageSize,
-        totalItems: totalItems,
-        totalPages: totalPages,
-        hasMore: hasMore,
-      );
+    items: items.where(test).toList(),
+    page: page,
+    pageSize: pageSize,
+    totalItems: totalItems,
+    totalPages: totalPages,
+    hasMore: hasMore,
+  );
 
   /// Returns item at index or null.
-  T? itemAt(int index) => index >= 0 && index < items.length ? items[index] : null;
+  T? itemAt(int index) =>
+      index >= 0 && index < items.length ? items[index] : null;
 
   /// Creates a copy with updated items.
   PaginatedList<T> copyWith({
@@ -101,13 +101,13 @@ class PaginatedList<T> {
     int? totalPages,
     bool? hasMore,
   }) => PaginatedList(
-      items: items ?? this.items,
-      page: page ?? this.page,
-      pageSize: pageSize ?? this.pageSize,
-      totalItems: totalItems ?? this.totalItems,
-      totalPages: totalPages ?? this.totalPages,
-      hasMore: hasMore ?? this.hasMore,
-    );
+    items: items ?? this.items,
+    page: page ?? this.page,
+    pageSize: pageSize ?? this.pageSize,
+    totalItems: totalItems ?? this.totalItems,
+    totalPages: totalPages ?? this.totalPages,
+    hasMore: hasMore ?? this.hasMore,
+  );
 
   @override
   String toString() =>

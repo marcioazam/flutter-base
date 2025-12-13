@@ -1,6 +1,7 @@
 import 'package:flutter_base_2025/core/network/websocket_client.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -13,7 +14,7 @@ void main() {
     /// *For any* reconnection attempt n with initial delay d and multiplier m:
     /// - Delay for attempt n = min(d * m^(n-1), maxDelay)
     /// - Total attempts <= maxAttempts
-    
+
     Glados<int>(any.positiveIntOrZero.map((i) => i % 10), _explore).test(
       'Backoff delay increases exponentially up to maxDelay',
       (attempt) {
@@ -26,7 +27,7 @@ void main() {
 
         // Delay should be >= initial delay
         expect(delay.inMilliseconds, greaterThanOrEqualTo(100));
-        
+
         // Delay should be <= max delay
         expect(delay.inMilliseconds, lessThanOrEqualTo(5000));
       },
@@ -119,7 +120,7 @@ void main() {
       // disconnecting -> disconnected
       // disconnected -> reconnecting
       // reconnecting -> connecting
-      
+
       final validTransitions = {
         WebSocketState.disconnected: [
           WebSocketState.connecting,
@@ -129,9 +130,7 @@ void main() {
           WebSocketState.connected,
           WebSocketState.disconnected,
         ],
-        WebSocketState.connected: [
-          WebSocketState.disconnected,
-        ],
+        WebSocketState.connected: [WebSocketState.disconnected],
         WebSocketState.reconnecting: [
           WebSocketState.connecting,
           WebSocketState.disconnected,

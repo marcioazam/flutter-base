@@ -1,5 +1,5 @@
 /// Shared validation patterns to avoid duplication.
-/// 
+///
 /// Use these patterns with lib/core/utils/validation.dart
 library;
 
@@ -11,9 +11,7 @@ abstract final class ValidationPatterns {
   );
 
   /// Phone number pattern (international format).
-  static final phone = RegExp(
-    r'^\+?[\d\s\-\(\)]{10,}$',
-  );
+  static final phone = RegExp(r'^\+?[\d\s\-\(\)]{10,}$');
 
   /// Strong password pattern (8+ chars, upper, lower, digit).
   static final strongPassword = RegExp(

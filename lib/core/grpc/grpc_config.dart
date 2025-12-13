@@ -14,8 +14,8 @@ class GrpcConfig extends Equatable {
     this.retryDelay = const Duration(milliseconds: 500),
     this.keepAliveTime = const Duration(seconds: 30),
     this.keepAliveTimeout = const Duration(seconds: 10),
-  })  : assert(port > 0 && port <= 65535, 'Port must be between 1 and 65535'),
-        assert(maxRetries >= 0, 'maxRetries must be non-negative');
+  }) : assert(port > 0 && port <= 65535, 'Port must be between 1 and 65535'),
+       assert(maxRetries >= 0, 'maxRetries must be non-negative');
 
   /// Create config from environment variables
   factory GrpcConfig.fromEnv({
@@ -25,15 +25,14 @@ class GrpcConfig extends Equatable {
     int? timeoutSeconds,
     int? maxRetries,
     int? retryDelayMs,
-  }) =>
-      GrpcConfig(
-        host: host,
-        port: port,
-        useTls: useTls ?? true,
-        timeout: Duration(seconds: timeoutSeconds ?? 30),
-        maxRetries: maxRetries ?? 3,
-        retryDelay: Duration(milliseconds: retryDelayMs ?? 500),
-      );
+  }) => GrpcConfig(
+    host: host,
+    port: port,
+    useTls: useTls ?? true,
+    timeout: Duration(seconds: timeoutSeconds ?? 30),
+    maxRetries: maxRetries ?? 3,
+    retryDelay: Duration(milliseconds: retryDelayMs ?? 500),
+  );
 
   /// gRPC server host
   final String host;
@@ -75,15 +74,14 @@ class GrpcConfig extends Equatable {
     Duration? retryDelay,
     Duration? keepAliveTime,
     Duration? keepAliveTimeout,
-  }) =>
-      GrpcConfig(
-        host: host ?? this.host,
-        port: port ?? this.port,
-        useTls: useTls ?? this.useTls,
-        timeout: timeout ?? this.timeout,
-        maxRetries: maxRetries ?? this.maxRetries,
-        retryDelay: retryDelay ?? this.retryDelay,
-        keepAliveTime: keepAliveTime ?? this.keepAliveTime,
-        keepAliveTimeout: keepAliveTimeout ?? this.keepAliveTimeout,
-      );
+  }) => GrpcConfig(
+    host: host ?? this.host,
+    port: port ?? this.port,
+    useTls: useTls ?? this.useTls,
+    timeout: timeout ?? this.timeout,
+    maxRetries: maxRetries ?? this.maxRetries,
+    retryDelay: retryDelay ?? this.retryDelay,
+    keepAliveTime: keepAliveTime ?? this.keepAliveTime,
+    keepAliveTimeout: keepAliveTimeout ?? this.keepAliveTimeout,
+  );
 }

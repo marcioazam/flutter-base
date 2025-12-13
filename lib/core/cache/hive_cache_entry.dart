@@ -32,13 +32,12 @@ class HiveCacheEntry<T> {
   factory HiveCacheEntry.fromJson(
     Map<String, dynamic> json,
     T Function(Map<String, dynamic>) dataFromJson,
-  ) =>
-      HiveCacheEntry(
-        data: dataFromJson(json['data'] as Map<String, dynamic>),
-        cachedAt: DateTime.parse(json['cachedAt'] as String),
-        expiresAt: DateTime.parse(json['expiresAt'] as String),
-        key: json['key'] as String?,
-      );
+  ) => HiveCacheEntry(
+    data: dataFromJson(json['data'] as Map<String, dynamic>),
+    cachedAt: DateTime.parse(json['cachedAt'] as String),
+    expiresAt: DateTime.parse(json['expiresAt'] as String),
+    key: json['key'] as String?,
+  );
 
   /// The cached data
   final T data;
@@ -63,11 +62,11 @@ class HiveCacheEntry<T> {
 
   /// Convert to JSON map for storage
   Map<String, dynamic> toJson(Map<String, dynamic> Function(T) dataToJson) => {
-        'data': dataToJson(data),
-        'cachedAt': cachedAt.toIso8601String(),
-        'expiresAt': expiresAt.toIso8601String(),
-        'key': key,
-      };
+    'data': dataToJson(data),
+    'cachedAt': cachedAt.toIso8601String(),
+    'expiresAt': expiresAt.toIso8601String(),
+    'key': key,
+  };
 
   @override
   String toString() =>

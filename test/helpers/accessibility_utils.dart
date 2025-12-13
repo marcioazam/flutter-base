@@ -77,10 +77,7 @@ class AccessibilityTestUtils {
   }
 
   /// Check if animations respect reduced motion preference.
-  static bool respectsReducedMotion(
-    WidgetTester tester,
-    Widget widget,
-  ) {
+  static bool respectsReducedMotion(WidgetTester tester, Widget widget) {
     // This would need to be tested by building widget with
     // MediaQuery.disableAnimations = true and verifying no animations run
     return true;
@@ -103,9 +100,7 @@ class AccessibilityTestUtils {
   }
 
   /// Run all accessibility checks.
-  static Future<AccessibilityReport> runFullAudit(
-    WidgetTester tester,
-  ) async {
+  static Future<AccessibilityReport> runFullAudit(WidgetTester tester) async {
     final issues = <String>[];
 
     if (!allButtonsHaveLabels(tester)) {
@@ -116,20 +111,13 @@ class AccessibilityTestUtils {
       issues.add('Some touch targets are smaller than 48x48 pixels');
     }
 
-    return AccessibilityReport(
-      passed: issues.isEmpty,
-      issues: issues,
-    );
+    return AccessibilityReport(passed: issues.isEmpty, issues: issues);
   }
 }
 
 /// Result of accessibility audit.
 class AccessibilityReport {
-
-  const AccessibilityReport({
-    required this.passed,
-    this.issues = const [],
-  });
+  const AccessibilityReport({required this.passed, this.issues = const []});
   final bool passed;
   final List<String> issues;
 
@@ -153,7 +141,8 @@ class _AccessibilityMatcher extends Matcher {
   }
 
   @override
-  Description describe(Description description) => description.add('meets accessibility guidelines');
+  Description describe(Description description) =>
+      description.add('meets accessibility guidelines');
 
   @override
   Description describeMismatch(

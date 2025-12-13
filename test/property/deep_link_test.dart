@@ -1,6 +1,7 @@
 import 'package:flutter_base_2025/core/router/app_router.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:glados/glados.dart' hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
+import 'package:glados/glados.dart'
+    hide expect, group, setUp, setUpAll, tearDown, tearDownAll, test;
 
 // Configure Glados for 100 iterations
 final _explore = ExploreConfig();
@@ -41,11 +42,7 @@ void main() {
     });
 
     test('parseDeepLink returns null for invalid scheme', () {
-      final uri = Uri(
-        scheme: 'https',
-        host: DeepLinks.host,
-        path: '/home',
-      );
+      final uri = Uri(scheme: 'https', host: DeepLinks.host, path: '/home');
 
       final path = DeepLinks.parseDeepLink(uri);
 

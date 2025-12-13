@@ -34,7 +34,9 @@ class SentryCrashReporter implements CrashReporter {
 
   @override
   Future<void> initialize() async {
-    AppLogger.instance.info('SentryCrashReporter initialized for ${config.environment}');
+    AppLogger.instance.info(
+      'SentryCrashReporter initialized for ${config.environment}',
+    );
   }
 
   @override
@@ -67,7 +69,9 @@ class SentryCrashReporter implements CrashReporter {
   @override
   void setUser({String? id, String? email, String? name}) {
     _userId = id;
-    AppLogger.instance.debug('Sentry: User set - id: $id, email: $email, name: $name');
+    AppLogger.instance.debug(
+      'Sentry: User set - id: $id, email: $email, name: $name',
+    );
   }
 
   @override
@@ -98,7 +102,9 @@ class SentryCrashReporter implements CrashReporter {
 
   /// Starts a performance transaction.
   Future<void> startTransaction(String name, String operation) async {
-    AppLogger.instance.debug('[Sentry Transaction] Started: $name ($operation)');
+    AppLogger.instance.debug(
+      '[Sentry Transaction] Started: $name ($operation)',
+    );
   }
 
   /// Captures a message.

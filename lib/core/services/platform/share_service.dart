@@ -10,11 +10,7 @@ enum ShareStatus { success, dismissed, unavailable }
 
 /// Share result.
 class ShareResult {
-
-  const ShareResult({
-    required this.status,
-    this.raw,
-  });
+  const ShareResult({required this.status, this.raw});
   final ShareStatus status;
   final String? raw;
 
@@ -25,16 +21,10 @@ class ShareResult {
 /// Abstract share service interface.
 abstract interface class ShareService {
   /// Shares text content.
-  Future<Result<ShareResult>> shareText(
-    String text, {
-    String? subject,
-  });
+  Future<Result<ShareResult>> shareText(String text, {String? subject});
 
   /// Shares a URL.
-  Future<Result<ShareResult>> shareUrl(
-    String url, {
-    String? title,
-  });
+  Future<Result<ShareResult>> shareUrl(String url, {String? title});
 
   /// Shares files.
   Future<Result<ShareResult>> shareFiles(
@@ -55,10 +45,7 @@ abstract interface class ShareService {
 /// Note: Requires share_plus package.
 class ShareServiceImpl implements ShareService {
   @override
-  Future<Result<ShareResult>> shareText(
-    String text, {
-    String? subject,
-  }) async {
+  Future<Result<ShareResult>> shareText(String text, {String? subject}) async {
     try {
       // Placeholder - requires share_plus package
       // final result = await Share.shareWithResult(
@@ -75,17 +62,16 @@ class ShareServiceImpl implements ShareService {
     } on PlatformException catch (e) {
       return Failure(UnexpectedFailure('Platform share error: ${e.message}'));
     } on MissingPluginException catch (e) {
-      return Failure(UnexpectedFailure('Share plugin not available: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Share plugin not available: ${e.message}'),
+      );
     } on Object catch (e) {
       return Failure(UnexpectedFailure('Unexpected share error: $e'));
     }
   }
 
   @override
-  Future<Result<ShareResult>> shareUrl(
-    String url, {
-    String? title,
-  }) async {
+  Future<Result<ShareResult>> shareUrl(String url, {String? title}) async {
     try {
       // Placeholder - requires share_plus package
       // final result = await Share.shareUri(
@@ -101,7 +87,9 @@ class ShareServiceImpl implements ShareService {
     } on PlatformException catch (e) {
       return Failure(UnexpectedFailure('Platform share error: ${e.message}'));
     } on MissingPluginException catch (e) {
-      return Failure(UnexpectedFailure('Share plugin not available: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Share plugin not available: ${e.message}'),
+      );
     } on FormatException catch (e) {
       return Failure(ValidationFailure('Invalid URL format: ${e.message}'));
     } on Object catch (e) {
@@ -133,7 +121,9 @@ class ShareServiceImpl implements ShareService {
     } on PlatformException catch (e) {
       return Failure(UnexpectedFailure('Platform share error: ${e.message}'));
     } on MissingPluginException catch (e) {
-      return Failure(UnexpectedFailure('Share plugin not available: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Share plugin not available: ${e.message}'),
+      );
     } on FileSystemException catch (e) {
       return Failure(UnexpectedFailure('File access error: ${e.message}'));
     } on Object catch (e) {
@@ -167,7 +157,9 @@ class ShareServiceImpl implements ShareService {
     } on PlatformException catch (e) {
       return Failure(UnexpectedFailure('Platform share error: ${e.message}'));
     } on MissingPluginException catch (e) {
-      return Failure(UnexpectedFailure('Share plugin not available: ${e.message}'));
+      return Failure(
+        UnexpectedFailure('Share plugin not available: ${e.message}'),
+      );
     } on FileSystemException catch (e) {
       return Failure(UnexpectedFailure('File system error: ${e.message}'));
     } on Object catch (e) {

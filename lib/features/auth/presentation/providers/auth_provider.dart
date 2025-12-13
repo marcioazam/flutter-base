@@ -7,29 +7,37 @@ import 'package:flutter_base_2025/features/auth/data/repositories/auth_repositor
 import 'package:flutter_base_2025/features/auth/domain/repositories/auth_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-export '../../domain/repositories/auth_repository.dart' show AuthState, AuthStateAuthenticated, AuthStateError, AuthStateExtension, AuthStateLoading, AuthStateUnauthenticated;
+export '../../domain/repositories/auth_repository.dart'
+    show
+        AuthState,
+        AuthStateAuthenticated,
+        AuthStateError,
+        AuthStateExtension,
+        AuthStateLoading,
+        AuthStateUnauthenticated;
 
 part 'auth_provider.g.dart';
 
 /// Provider for AuthRemoteDataSource.
 @riverpod
-AuthRemoteDataSource authRemoteDataSource(Ref ref) => AuthRemoteDataSourceImpl(ref.watch(apiClientProvider));
+AuthRemoteDataSource authRemoteDataSource(Ref ref) =>
+    AuthRemoteDataSourceImpl(ref.watch(apiClientProvider));
 
 /// Provider for AuthRepository.
 @riverpod
 AuthRepository authRepository(Ref ref) => AuthRepositoryImpl(
-    remoteDataSource: ref.watch(authRemoteDataSourceProvider),
-    tokenStorage: ref.watch(tokenStorageProvider),
-  );
+  remoteDataSource: ref.watch(authRemoteDataSourceProvider),
+  tokenStorage: ref.watch(tokenStorageProvider),
+);
 
 /// Provider for auth state stream with cleanup.
 @riverpod
 Stream<AuthState> authState(Ref ref) {
   final controller = StreamController<AuthState>();
-  final subscription = ref.watch(authRepositoryProvider).watchAuthState().listen(
-    controller.add,
-    onError: controller.addError,
-  );
+  final subscription = ref
+      .watch(authRepositoryProvider)
+      .watchAuthState()
+      .listen(controller.add, onError: controller.addError);
 
   ref.onDispose(() {
     subscription.cancel();
@@ -41,7 +49,8 @@ Stream<AuthState> authState(Ref ref) {
 
 /// Provider for checking if user is authenticated.
 @riverpod
-Future<bool> isAuthenticated(Ref ref) async => ref.watch(authRepositoryProvider).isAuthenticated();
+Future<bool> isAuthenticated(Ref ref) async =>
+    ref.watch(authRepositoryProvider).isAuthenticated();
 
 /// Notifier for login operations with cleanup.
 @riverpod
@@ -58,7 +67,9 @@ class LoginNotifier extends _$LoginNotifier {
 
   Future<void> login(String email, String password) async {
     state = const AsyncLoading();
-    final result = await ref.read(authRepositoryProvider).login(email, password);
+    final result = await ref
+        .read(authRepositoryProvider)
+        .login(email, password);
     state = result.fold(
       (failure) => AsyncError(failure, StackTrace.current),
       (_) => const AsyncData(null),

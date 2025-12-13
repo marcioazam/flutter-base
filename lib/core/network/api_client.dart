@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_base_2025/core/config/app_config.dart';
 import 'package:flutter_base_2025/core/errors/exceptions.dart';
-import 'package:flutter_base_2025/core/generics/paginated_response.dart';
+import 'package:flutter_base_2025/core/base/paginated_response.dart';
 import 'package:flutter_base_2025/core/network/interceptors/auth_interceptor.dart';
 import 'package:flutter_base_2025/core/network/interceptors/logging_interceptor.dart';
 import 'package:flutter_base_2025/core/network/interceptors/retry_interceptor.dart';
@@ -10,7 +10,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 /// Provider for Dio instance configured for Python API.
 final dioProvider = Provider<Dio>((ref) {
   final config = ref.watch(appConfigProvider);
-  
+
   final dio = Dio(
     BaseOptions(
       baseUrl: config.apiBaseUrl,
@@ -33,18 +33,20 @@ final dioProvider = Provider<Dio>((ref) {
 });
 
 /// Provider for generic API client.
-final apiClientProvider = Provider<ApiClient>((ref) => ApiClient(ref.watch(dioProvider)));
+final apiClientProvider = Provider<ApiClient>(
+  (ref) => ApiClient(ref.watch(dioProvider)),
+);
 
 /// Generic API client for consuming Python backend.
 class ApiClient {
-
   ApiClient(this._dio);
   final Dio _dio;
 
   /// GET request returning single item.
   Future<T> get<T>(
     String path, {
-    required T Function(Map<String, dynamic>) fromJson, Map<String, dynamic>? queryParameters,
+    required T Function(Map<String, dynamic>) fromJson,
+    Map<String, dynamic>? queryParameters,
   }) async {
     try {
       final response = await _dio.get<Map<String, dynamic>>(
@@ -60,7 +62,8 @@ class ApiClient {
   /// GET request returning list of items.
   Future<List<T>> getList<T>(
     String path, {
-    required T Function(Map<String, dynamic>) fromJson, Map<String, dynamic>? queryParameters,
+    required T Function(Map<String, dynamic>) fromJson,
+    Map<String, dynamic>? queryParameters,
   }) async {
     try {
       final response = await _dio.get<List<dynamic>>(
@@ -78,16 +81,13 @@ class ApiClient {
   /// GET request returning paginated response.
   Future<PaginatedResponse<T>> getPaginated<T>(
     String path, {
-    required T Function(Map<String, dynamic>) fromJson, int page = 1,
+    required T Function(Map<String, dynamic>) fromJson,
+    int page = 1,
     int pageSize = 20,
     Map<String, dynamic>? queryParameters,
   }) async {
     try {
-      final params = {
-        'page': page,
-        'page_size': pageSize,
-        ...?queryParameters,
-      };
+      final params = {'page': page, 'page_size': pageSize, ...?queryParameters};
       final response = await _dio.get<Map<String, dynamic>>(
         path,
         queryParameters: params,
@@ -104,7 +104,8 @@ class ApiClient {
   /// POST request.
   Future<T> post<T>(
     String path, {
-    required T Function(Map<String, dynamic>) fromJson, dynamic data,
+    required T Function(Map<String, dynamic>) fromJson,
+    dynamic data,
     Map<String, dynamic>? queryParameters,
   }) async {
     try {
@@ -122,7 +123,8 @@ class ApiClient {
   /// PUT request.
   Future<T> put<T>(
     String path, {
-    required T Function(Map<String, dynamic>) fromJson, dynamic data,
+    required T Function(Map<String, dynamic>) fromJson,
+    dynamic data,
     Map<String, dynamic>? queryParameters,
   }) async {
     try {
@@ -140,7 +142,8 @@ class ApiClient {
   /// PATCH request.
   Future<T> patch<T>(
     String path, {
-    required T Function(Map<String, dynamic>) fromJson, dynamic data,
+    required T Function(Map<String, dynamic>) fromJson,
+    dynamic data,
     Map<String, dynamic>? queryParameters,
   }) async {
     try {
@@ -173,41 +176,43 @@ class ApiClient {
   }
 
   /// Handles Dio errors and converts to app exceptions.
-  /// 
+  ///
   /// TODO(refactor): Consider using ExceptionMapper.mapException() instead
   /// to avoid duplicating error handling logic. This would require changing
   /// the return type from AppException to AppFailure.
   /// See: lib/core/errors/exception_mapper.dart
   AppException _handleDioError(DioException e) => switch (e.type) {
-      DioExceptionType.connectionTimeout ||
-      DioExceptionType.sendTimeout ||
-      DioExceptionType.receiveTimeout =>
-        NetworkException('Connection timeout', statusCode: 408),
-      DioExceptionType.connectionError =>
-        NetworkException('No internet connection'),
-      DioExceptionType.badResponse => _handleBadResponse(e.response),
-      DioExceptionType.cancel => NetworkException('Request cancelled'),
-      _ => NetworkException(e.message ?? 'Unknown network error'),
-    };
+    DioExceptionType.connectionTimeout ||
+    DioExceptionType.sendTimeout ||
+    DioExceptionType.receiveTimeout => NetworkException(
+      'Connection timeout',
+      statusCode: 408,
+    ),
+    DioExceptionType.connectionError => NetworkException(
+      'No internet connection',
+    ),
+    DioExceptionType.badResponse => _handleBadResponse(e.response),
+    DioExceptionType.cancel => NetworkException('Request cancelled'),
+    _ => NetworkException(e.message ?? 'Unknown network error'),
+  };
 
   AppException _handleBadResponse(Response<dynamic>? response) {
     final statusCode = response?.statusCode ?? 500;
     final data = response?.data;
-    
+
     var message = 'Server error';
     Map<String, List<String>>? fieldErrors;
-    
+
     if (data is Map<String, dynamic>) {
-      message = data['message'] as String? ?? 
-                data['detail'] as String? ?? 
-                'Server error';
-      
+      message =
+          data['message'] as String? ??
+          data['detail'] as String? ??
+          'Server error';
+
       if (data['errors'] is Map) {
         fieldErrors = (data['errors'] as Map<String, dynamic>).map(
-          (key, value) => MapEntry(
-            key,
-            (value as List).map((e) => e.toString()).toList(),
-          ),
+          (key, value) =>
+              MapEntry(key, (value as List).map((e) => e.toString()).toList()),
         );
       }
     }

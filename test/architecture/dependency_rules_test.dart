@@ -28,13 +28,17 @@ void main() {
           content.contains('package:flutter_riverpod/') ||
               content.contains('package:riverpod/'),
           isFalse,
-          reason: 'Domain layer file $file imports Riverpod (state management belongs in presentation)',
+          reason:
+              'Domain layer file $file imports Riverpod (state management belongs in presentation)',
         );
       }
 
       // Ensure we actually found domain files
-      expect(domainFiles.isNotEmpty, isTrue,
-          reason: 'No domain files found to test');
+      expect(
+        domainFiles.isNotEmpty,
+        isTrue,
+        reason: 'No domain files found to test',
+      );
     });
 
     test('Presentation layer does not import Data layer directly', () {
@@ -44,7 +48,8 @@ void main() {
         final content = File(file).readAsStringSync();
 
         // Exception: Providers can import datasources for DI (Riverpod pattern)
-        final isProvider = file.contains('/providers/') && file.endsWith('_provider.dart');
+        final isProvider =
+            file.contains('/providers/') && file.endsWith('_provider.dart');
 
         if (!isProvider) {
           // Presentation pages/widgets should NOT import data_sources
@@ -68,7 +73,9 @@ void main() {
 
     test('Data layer implements Domain interfaces', () {
       // This test ensures repository implementations exist
-      final repositoryImpls = _findDartFiles('lib/features/*/data/repositories/');
+      final repositoryImpls = _findDartFiles(
+        'lib/features/*/data/repositories/',
+      );
 
       for (final implFile in repositoryImpls) {
         final content = File(implFile).readAsStringSync();
@@ -85,7 +92,8 @@ void main() {
         expect(
           content.contains('implements'),
           isTrue,
-          reason: 'Repository implementation $implFile does not implement interface',
+          reason:
+              'Repository implementation $implFile does not implement interface',
         );
       }
     });

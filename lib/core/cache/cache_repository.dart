@@ -29,7 +29,6 @@ class CacheStats {
 /// Generic cache repository with TTL support.
 /// T = Entity type, ID = Identifier type
 abstract class CacheRepository<T, ID> {
-
   CacheRepository({this.defaultTtl});
   final Map<ID, CacheEntry<T>> _cache = {};
   final CacheStats _stats = CacheStats();
@@ -55,13 +54,10 @@ abstract class CacheRepository<T, ID> {
 
     final result = await fetcher();
 
-    return result.fold(
-      Failure.new,
-      (value) {
-        _cacheValue(id, value, ttl: ttl ?? defaultTtl);
-        return Success(value);
-      },
-    );
+    return result.fold(Failure.new, (value) {
+      _cacheValue(id, value, ttl: ttl ?? defaultTtl);
+      return Success(value);
+    });
   }
 
   /// Gets cached value if available and not expired.

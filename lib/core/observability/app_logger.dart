@@ -5,7 +5,6 @@ enum LogLevel { trace, debug, info, warning, error, fatal }
 
 /// Structured log entry.
 class LogEntry {
-
   LogEntry({
     required this.level,
     required this.message,
@@ -24,13 +23,13 @@ class LogEntry {
   final StackTrace? stackTrace;
 
   Map<String, dynamic> toJson() => {
-        'level': level.name,
-        'message': message,
-        'timestamp': timestamp.toIso8601String(),
-        if (correlationId != null) 'correlationId': correlationId,
-        if (context != null) 'context': context,
-        if (error != null) 'error': error.toString(),
-      };
+    'level': level.name,
+    'message': message,
+    'timestamp': timestamp.toIso8601String(),
+    if (correlationId != null) 'correlationId': correlationId,
+    if (context != null) 'context': context,
+    if (error != null) 'error': error.toString(),
+  };
 }
 
 /// Sensitive fields to redact from logs.
@@ -50,23 +49,23 @@ const _sensitiveFields = {
 
 /// Structured logger with context and redaction.
 class AppLogger {
-
   AppLogger._({
     Logger? logger,
     String? correlationId,
     Map<String, dynamic>? baseContext,
     bool redactSensitive = true,
-  })  : _logger = logger ??
-            Logger(
-              printer: PrettyPrinter(
-                methodCount: 0,
-                errorMethodCount: 5,
-                lineLength: 80,
-              ),
-            ),
-        _correlationId = correlationId,
-        _baseContext = baseContext ?? {},
-        _redactSensitive = redactSensitive;
+  }) : _logger =
+           logger ??
+           Logger(
+             printer: PrettyPrinter(
+               methodCount: 0,
+               errorMethodCount: 5,
+               lineLength: 80,
+             ),
+           ),
+       _correlationId = correlationId,
+       _baseContext = baseContext ?? {},
+       _redactSensitive = redactSensitive;
   final Logger _logger;
   final String? _correlationId;
   final Map<String, dynamic> _baseContext;
@@ -97,19 +96,19 @@ class AppLogger {
 
   /// Creates a child logger with additional context.
   AppLogger withContext(Map<String, dynamic> context) => AppLogger._(
-      logger: _logger,
-      correlationId: _correlationId,
-      baseContext: {..._baseContext, ...context},
-      redactSensitive: _redactSensitive,
-    );
+    logger: _logger,
+    correlationId: _correlationId,
+    baseContext: {..._baseContext, ...context},
+    redactSensitive: _redactSensitive,
+  );
 
   /// Creates a child logger with correlation ID.
   AppLogger withCorrelationId(String correlationId) => AppLogger._(
-      logger: _logger,
-      correlationId: correlationId,
-      baseContext: _baseContext,
-      redactSensitive: _redactSensitive,
-    );
+    logger: _logger,
+    correlationId: correlationId,
+    baseContext: _baseContext,
+    redactSensitive: _redactSensitive,
+  );
 
   /// Logs trace message.
   void trace(String message, {Map<String, dynamic>? context}) {
@@ -171,8 +170,9 @@ class AppLogger {
     Map<String, dynamic>? context,
   }) {
     final mergedContext = {..._baseContext, ...?context};
-    final redactedContext =
-        _redactSensitive ? _redactSensitiveData(mergedContext) : mergedContext;
+    final redactedContext = _redactSensitive
+        ? _redactSensitiveData(mergedContext)
+        : mergedContext;
 
     final entry = LogEntry(
       level: level,
@@ -215,18 +215,19 @@ class AppLogger {
     return buffer.toString();
   }
 
-  Map<String, dynamic> _redactSensitiveData(Map<String, dynamic> data) => data.map((key, value) {
-      if (_isSensitiveKey(key)) {
-        return MapEntry(key, '[REDACTED]');
-      }
-      if (value is Map<String, dynamic>) {
-        return MapEntry(key, _redactSensitiveData(value));
-      }
-      if (value is String && _containsSensitivePattern(value)) {
-        return MapEntry(key, '[REDACTED]');
-      }
-      return MapEntry(key, value);
-    });
+  Map<String, dynamic> _redactSensitiveData(Map<String, dynamic> data) =>
+      data.map((key, value) {
+        if (_isSensitiveKey(key)) {
+          return MapEntry(key, '[REDACTED]');
+        }
+        if (value is Map<String, dynamic>) {
+          return MapEntry(key, _redactSensitiveData(value));
+        }
+        if (value is String && _containsSensitivePattern(value)) {
+          return MapEntry(key, '[REDACTED]');
+        }
+        return MapEntry(key, value);
+      });
 
   bool _isSensitiveKey(String key) {
     final lowerKey = key.toLowerCase();

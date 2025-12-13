@@ -1,4 +1,4 @@
-import 'package:flutter_base_2025/core/generics/paginated_list.dart';
+import 'package:flutter_base_2025/core/base/paginated_list.dart';
 import 'package:flutter_base_2025/core/utils/result.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -7,7 +7,6 @@ const _sentinel = Object();
 
 /// State for paginated data.
 class PaginationState<T> {
-
   const PaginationState({
     required this.data,
     this.isLoadingMore = false,
@@ -15,9 +14,8 @@ class PaginationState<T> {
     this.error,
   });
 
-  factory PaginationState.initial() => PaginationState(
-        data: PaginatedList.empty(),
-      );
+  factory PaginationState.initial() =>
+      PaginationState(data: PaginatedList.empty());
   final PaginatedList<T> data;
   final bool isLoadingMore;
   final bool isRefreshing;
@@ -29,11 +27,11 @@ class PaginationState<T> {
     bool? isRefreshing,
     Object? error = _sentinel,
   }) => PaginationState(
-      data: data ?? this.data,
-      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
-      isRefreshing: isRefreshing ?? this.isRefreshing,
-      error: error == _sentinel ? this.error : error as String?,
-    );
+    data: data ?? this.data,
+    isLoadingMore: isLoadingMore ?? this.isLoadingMore,
+    isRefreshing: isRefreshing ?? this.isRefreshing,
+    error: error == _sentinel ? this.error : error as String?,
+  );
 
   /// Returns true if initial load is in progress.
   bool get isInitialLoading => data.isEmpty && !isLoadingMore && error == null;
@@ -53,9 +51,7 @@ class PaginationState<T> {
 
 /// Generic pagination notifier for infinite scroll.
 /// T = Item type
-abstract class PaginationNotifier<T>
-    extends AsyncNotifier<PaginationState<T>> {
-
+abstract class PaginationNotifier<T> extends AsyncNotifier<PaginationState<T>> {
   PaginationNotifier({int pageSize = 20}) : _pageSize = pageSize;
   int _currentPage = 1;
   final int _pageSize;
@@ -69,9 +65,8 @@ abstract class PaginationNotifier<T>
     final result = await fetchPage(_currentPage, _pageSize);
 
     return result.fold(
-      (failure) => PaginationState<T>.initial().copyWith(
-        error: failure.userMessage,
-      ),
+      (failure) =>
+          PaginationState<T>.initial().copyWith(error: failure.userMessage),
       (data) => PaginationState(data: data),
     );
   }
@@ -90,10 +85,12 @@ abstract class PaginationNotifier<T>
     result.fold(
       (failure) {
         // Preserve existing items on failure
-        state = AsyncData(currentState.copyWith(
-          isLoadingMore: false,
-          error: failure.userMessage,
-        ));
+        state = AsyncData(
+          currentState.copyWith(
+            isLoadingMore: false,
+            error: failure.userMessage,
+          ),
+        );
       },
       (newData) {
         _currentPage = nextPage;
@@ -119,10 +116,12 @@ abstract class PaginationNotifier<T>
     result.fold(
       (failure) {
         // Preserve existing items on failure
-        state = AsyncData(currentState.copyWith(
-          isRefreshing: false,
-          error: failure.userMessage,
-        ));
+        state = AsyncData(
+          currentState.copyWith(
+            isRefreshing: false,
+            error: failure.userMessage,
+          ),
+        );
       },
       (data) {
         state = AsyncData(PaginationState(data: data));

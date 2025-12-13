@@ -6,7 +6,6 @@ enum PaymentStatus { success, cancelled, failed }
 
 /// Payment result.
 class PaymentResult {
-
   const PaymentResult({
     required this.status,
     this.paymentIntentId,
@@ -23,10 +22,10 @@ class PaymentResult {
 
 /// Payment sheet configuration.
 class PaymentSheetConfig {
-
   const PaymentSheetConfig({
     required this.paymentIntentClientSecret,
-    required this.merchantDisplayName, this.customerId,
+    required this.merchantDisplayName,
+    this.customerId,
     this.customerEphemeralKeySecret,
     this.merchantCountryCode = 'US',
     this.googlePayEnabled = true,
@@ -45,7 +44,6 @@ class PaymentSheetConfig {
 
 /// Card details for manual payment.
 class CardDetails {
-
   const CardDetails({
     required this.number,
     required this.expiryMonth,
@@ -137,9 +135,7 @@ class StripePaymentService implements PaymentService {
       //
       // await Stripe.instance.presentPaymentSheet();
 
-      return const Success(PaymentResult(
-        status: PaymentStatus.success,
-      ));
+      return const Success(PaymentResult(status: PaymentStatus.success));
     } on Exception catch (e) {
       // Handle StripeException for cancellation
       // if (e is StripeException && e.error.code == FailureCode.Canceled) {
@@ -173,9 +169,7 @@ class StripePaymentService implements PaymentService {
       //   ),
       // );
 
-      return const Success(PaymentResult(
-        status: PaymentStatus.success,
-      ));
+      return const Success(PaymentResult(status: PaymentStatus.success));
     } on Exception catch (e) {
       return Failure(ValidationFailure('Payment confirmation failed: $e'));
     }

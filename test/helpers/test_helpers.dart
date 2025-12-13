@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -7,14 +7,8 @@ export 'package:flutter_test/flutter_test.dart'
     show setUp, setUpAll, tearDown, tearDownAll;
 
 /// Creates a testable widget wrapped with necessary providers.
-Widget createTestableWidget({
-  required Widget child,
-}) =>
-    ProviderScope(
-      child: MaterialApp(
-        home: child,
-      ),
-    );
+Widget createTestableWidget({required Widget child}) =>
+    ProviderScope(child: MaterialApp(home: child));
 
 /// Creates a ProviderContainer for unit testing providers.
 ProviderContainer createProviderContainer() {

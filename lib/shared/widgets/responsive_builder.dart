@@ -26,7 +26,6 @@ extension ScreenSizeExtension on BuildContext {
 
 /// Responsive builder widget.
 class ResponsiveBuilder extends StatelessWidget {
-
   const ResponsiveBuilder({required this.builder, super.key});
   final Widget Function(BuildContext context, ScreenSize screenSize) builder;
 
@@ -36,9 +35,9 @@ class ResponsiveBuilder extends StatelessWidget {
 
 /// Responsive layout widget with different builders for each size.
 class ResponsiveLayout extends StatelessWidget {
-
   const ResponsiveLayout({
-    required this.mobile, super.key,
+    required this.mobile,
+    super.key,
     this.tablet,
     this.desktop,
   });
@@ -48,10 +47,10 @@ class ResponsiveLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => switch (context.screenSize) {
-      ScreenSize.desktop => desktop ?? tablet ?? mobile,
-      ScreenSize.tablet => tablet ?? mobile,
-      ScreenSize.mobile => mobile,
-    };
+    ScreenSize.desktop => desktop ?? tablet ?? mobile,
+    ScreenSize.tablet => tablet ?? mobile,
+    ScreenSize.mobile => mobile,
+  };
 }
 
 /// Responsive value helper.
@@ -61,16 +60,16 @@ T responsiveValue<T>(
   T? tablet,
   T? desktop,
 }) => switch (context.screenSize) {
-    ScreenSize.desktop => desktop ?? tablet ?? mobile,
-    ScreenSize.tablet => tablet ?? mobile,
-    ScreenSize.mobile => mobile,
-  };
+  ScreenSize.desktop => desktop ?? tablet ?? mobile,
+  ScreenSize.tablet => tablet ?? mobile,
+  ScreenSize.mobile => mobile,
+};
 
 /// Responsive padding.
 class ResponsivePadding extends StatelessWidget {
-
   const ResponsivePadding({
-    required this.child, super.key,
+    required this.child,
+    super.key,
     this.mobile,
     this.tablet,
     this.desktop,
